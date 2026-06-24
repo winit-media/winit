@@ -4,23 +4,35 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-
-const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Work", href: "#work" },
-  { label: "Contact", href: "#contact" },
-];
+import { useAdmin } from "./AdminProvider";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("#home");
+  const { data } = useAdmin();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const sections = data.navLinks.map((link) => document.querySelector(link.href));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(`#${entry.target.id}`);
+          }
+        });
+      },
+      { rootMargin: "-20% 0px -60% 0px" }
+    );
+    sections.forEach((section) => section && observer.observe(section));
+    return () => observer.disconnect();
+  }, [data.navLinks]);
 
   const handleClick = (href: string) => {
     setOpen(false);
@@ -31,35 +43,35 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md" : "bg-white"
+        scrolled ? "bg-brand/90 backdrop-blur-sm shadow-md" : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex-1 flex justify-start">
+          <div className="flex items-center justify-between h-16">
+          <div className="flex-shrink-0">
             <button onClick={() => handleClick("#home")} className="flex-shrink-0">
-              <Image src="/logo.png" alt="WiNit" width={48} height={32} priority className="h-8 w-auto" style={{ width: "auto", height: "auto" }} />
+              <Image src={data.logoUrl} alt="WiNit" width={48} height={32} priority className="h-12 w-auto" />
             </button>
           </div>
 
-          <div className="hidden md:flex flex-1 justify-center space-x-8">
-            {navLinks.map((link) => (
+          <div className="hidden md:flex items-center space-x-8">
+            {data.navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => handleClick(link.href)}
-                className="text-gray-700 hover:text-brand font-medium transition-colors text-sm tracking-wide"
+                className={`text-white hover:text-white/80 font-medium transition-colors text-sm tracking-wide uppercase relative ${
+                  activeSection === link.href ? "after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-white" : ""
+                }`}
               >
                 {link.label}
               </button>
             ))}
           </div>
 
-          <div className="flex-1 flex justify-end">
-            <div className="md:hidden">
-              <button onClick={() => setOpen(!open)} className="text-gray-700 p-2">
-                {open ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
+          <div className="flex items-center md:hidden">
+            <button onClick={() => setOpen(!open)} className="text-white p-2">
+              {open ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
       </div>
@@ -79,11 +91,13 @@ export default function Navbar() {
               </button>
             </div>
             <div className="flex flex-col items-start px-8 space-y-6 mt-4">
-              {navLinks.map((link) => (
+              {data.navLinks.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => handleClick(link.href)}
-                  className="text-gray-700 hover:text-brand font-medium text-lg transition-colors"
+                  className={`text-brand hover:text-brand-dark font-medium text-lg transition-colors uppercase relative ${
+                    activeSection === link.href ? "after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-brand" : ""
+                  }`}
                 >
                   {link.label}
                 </button>

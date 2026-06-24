@@ -1,27 +1,45 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import PatternOverlay from "./PatternOverlay";
+import { useAdmin } from "./AdminProvider";
 
-const headingText = "SHAPING SUCCESS STORIES";
-
-const letterVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.04, duration: 0.5, ease: "easeOut" as const },
-  }),
-};
+const TYPING_SPEED = 80;
 
 export default function Hero() {
+  const { data } = useAdmin();
+  const [typedText, setTypedText] = useState("");
+  const [typingDone, setTypingDone] = useState(false);
   const [showSubtext, setShowSubtext] = useState(false);
+  const indexRef = useRef(0);
+
+  const headingText = data.heroHeading;
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSubtext(true), headingText.length * 40 + 600);
-    return () => clearTimeout(timer);
-  }, []);
+    indexRef.current = 0;
+    setTypedText("");
+    setTypingDone(false);
+    setShowSubtext(false);
+
+    const interval = setInterval(() => {
+      indexRef.current += 1;
+      if (indexRef.current <= headingText.length) {
+        setTypedText(headingText.slice(0, indexRef.current));
+      } else {
+        clearInterval(interval);
+        setTypingDone(true);
+      }
+    }, TYPING_SPEED);
+    return () => clearInterval(interval);
+  }, [headingText]);
+
+  useEffect(() => {
+    if (typingDone) {
+      const timer = setTimeout(() => setShowSubtext(true), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [typingDone]);
 
   const scrollToContact = () => {
     document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
@@ -34,57 +52,51 @@ export default function Hero() {
     >
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
-        <h1 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-wide leading-tight">
-          {headingText.split(" ").map((word, wordIndex, wordsArray) => {
-            const previousCharsCount = wordsArray.slice(0, wordIndex).join(" ").length + (wordIndex > 0 ? 1 : 0);
-            return (
-              <span key={wordIndex} className="inline-block whitespace-nowrap mr-[0.3em] last:mr-0">
-                {word.split("").map((char, charIndex) => (
-                  <motion.span
-                    key={charIndex}
-                    custom={previousCharsCount + charIndex}
-                    variants={letterVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="inline-block"
-                  >
-                    {char}
-                  </motion.span>
-                ))}
-              </span>
-            );
-          })}
-        </h1>
-
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={showSubtext ? { opacity: 1, y: 0 } : {}}
+          animate={showSubtext ? { y: -60 } : { y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mt-10 max-w-3xl mx-auto"
         >
-          <p className="text-white/90 text-base sm:text-lg md:text-xl leading-relaxed">
-            We believe every brand has a unique story waiting to be told. Our mission is to
-            transform those stories into powerful narratives that drive success. By connecting
-            your brand with the right audience, we ensure your message isn&apos;t just heard, but
-            truly remembered. Let&apos;s craft your story together and make it unforgettable.
-          </p>
+          <h1
+            className="font-serif text-white text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mt-16 mb-2"
+            style={{ letterSpacing: "-0.03em", lineHeight: "0.95" }}
+          >
+            <span>{typedText}</span>
+            {!typingDone && <span className="dot-cursor" />}
+          </h1>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={showSubtext ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-          className="mt-8"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={scrollToContact}
-            className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-brand"
-          >
-            Connect Now
-          </motion.button>
-        </motion.div>
+        <AnimatePresence>
+          {showSubtext && (
+            <>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="mt-2 max-w-3xl mx-auto"
+              >
+                <p className="text-white text-base sm:text-lg md:text-xl leading-relaxed font-medium mx-auto" style={{ maxWidth: '60ch', opacity: 0.85 }}>
+                  {data.heroSubtext}
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+                className="mt-8"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(255,255,255,0.3)' }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={scrollToContact}
+                  className="bg-white text-[#912dbf] px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-white/90"
+                >
+                  {data.heroCtaText}
+                </motion.button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

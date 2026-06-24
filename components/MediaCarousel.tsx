@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow, Autoplay, Keyboard, Navigation } from "swiper/modules";
-import { ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { X, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
-import "swiper/css";
-import "swiper/css/effect-coverflow";
-import "swiper/css/navigation";
 
 const defaultVideos = [
   { id: "1", name: "Campaign 1", url: "/fallback-video.mp4" },
@@ -16,23 +11,75 @@ const defaultVideos = [
   { id: "3", name: "Campaign 3", url: "/fallback-video.mp4" },
   { id: "4", name: "Campaign 4", url: "/fallback-video.mp4" },
   { id: "5", name: "Campaign 5", url: "/fallback-video.mp4" },
+  { id: "6", name: "Campaign 6", url: "/fallback-video.mp4" },
+  { id: "7", name: "Campaign 7", url: "/fallback-video.mp4" },
+  { id: "8", name: "Campaign 8", url: "/fallback-video.mp4" },
 ];
 
-function CarouselVideoSlide({ video, isActive }: { video: { id: string; url: string; name: string }; isActive: boolean }) {
+interface VideoCardProps {
+  video: { id: string; url: string; name: string };
+  onExpand: (video: { id: string; url: string; name: string }) => void;
+  isPaused: boolean;
+}
+
+function VideoCard({ video, onExpand, isPaused }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const loopDuration = 5;
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (isActive) {
-      v.play().catch(() => {});
-    } else {
+
+    const handleTimeUpdate = () => {
+      if (v.currentTime >= loopDuration) {
+        v.currentTime = 0;
+      }
+    };
+
+    v.addEventListener("timeupdate", handleTimeUpdate);
+    return () => v.removeEventListener("timeupdate", handleTimeUpdate);
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    const container = containerRef.current;
+    if (!v || !container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (isPaused) {
+          v.pause();
+        } else if (entry.isIntersecting) {
+          v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [isPaused]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    if (isPaused) {
       v.pause();
     }
-  }, [isActive]);
+  }, [isPaused]);
 
-  const toggleAudio = () => {
+  const handleClick = () => {
+    onExpand(video);
+  };
+
+  const toggleAudio = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const v = videoRef.current;
     if (v) {
       v.muted = !v.muted;
@@ -41,24 +88,145 @@ function CarouselVideoSlide({ video, isActive }: { video: { id: string; url: str
   };
 
   return (
-    <div className="relative w-full h-full bg-black rounded-lg overflow-hidden border-[5px] border-white">
+    <div
+      ref={containerRef}
+      onClick={handleClick}
+      className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02]`}
+    >
       <video
         ref={videoRef}
         src={video.url}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         loop
         playsInline
         muted
-        preload="metadata"
+        preload="none"
+        onLoadedMetadata={(e) => {
+          const v = e.currentTarget;
+          setIsLandscape(v.videoWidth > v.videoHeight);
+        }}
       />
-      {isActive && (
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span className="text-white text-sm font-medium truncate">{video.name}</span>
         <button
           onClick={toggleAudio}
-          className="absolute bottom-4 right-4 bg-white/90 hover:bg-white rounded-full p-2 transition-colors z-10"
+          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-1.5 transition-colors"
         >
-          {muted ? <VolumeX size={20} className="text-brand" /> : <Volume2 size={20} className="text-brand" />}
+          {muted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
         </button>
-      )}
+      </div>
+      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5">
+          <Play size={14} className="text-white fill-white" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface ExpandedVideoModalProps {
+  video: { id: string; url: string; name: string };
+  onClose: () => void;
+}
+
+function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [aspect, setAspect] = useState<string>("16/9");
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) {
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    }
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (isPlaying) {
+      v.pause();
+    } else {
+      v.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const toggleAudio = () => {
+    const v = videoRef.current;
+    if (v) {
+      v.muted = !muted;
+      setMuted(!muted);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative mx-4"
+        style={{ maxWidth: "90vw", maxHeight: "90vh", aspectRatio: aspect }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-full h-full flex items-center justify-center bg-black rounded-2xl overflow-hidden">
+          <video
+            ref={videoRef}
+            src={video.url}
+            className="w-full h-full object-contain"
+            playsInline
+            muted={muted}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onLoadedMetadata={(e) => {
+              const v = e.currentTarget;
+              setAspect(`${v.videoWidth}/${v.videoHeight}`);
+            }}
+          />
+        </div>
+
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+          <button
+            onClick={togglePlay}
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
+          >
+            {isPlaying ? (
+              <Pause size={20} className="text-white" />
+            ) : (
+              <Play size={20} className="text-white fill-white" />
+            )}
+          </button>
+          <button
+            onClick={toggleAudio}
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
+          >
+            {muted ? <VolumeX size={20} className="text-white" /> : <Volume2 size={20} className="text-white" />}
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
+          >
+            <X size={20} className="text-white" />
+          </button>
+          <span className="text-white/80 text-sm font-medium">{video.name}</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -66,69 +234,84 @@ function CarouselVideoSlide({ video, isActive }: { video: { id: string; url: str
 export default function MediaCarousel() {
   const { data } = useAdmin();
   const videos = data.carouselVideos.length > 0 ? data.carouselVideos : defaultVideos;
-  const [activeIndex, setActiveIndex] = useState(0);
-  const swiperRef = useRef<any>(null);
+  const [expandedVideo, setExpandedVideo] = useState<{ id: string; url: string; name: string } | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const row1Videos = videos.slice(0, Math.ceil(videos.length / 2));
+  const row2Videos = videos.slice(Math.ceil(videos.length / 2));
+
+  const handleExpand = useCallback((video: { id: string; url: string; name: string }) => {
+    setExpandedVideo(video);
+    setIsPaused(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setExpandedVideo(null);
+    setIsPaused(false);
+  }, []);
 
   return (
-    <section id="work" className="relative bg-brand min-h-[80vh] snap-section py-16 overflow-hidden">
+    <section id="work" className="relative bg-brand h-screen snap-section overflow-hidden flex flex-col">
       <PatternOverlay opacity={0.16} />
-      <div className="relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-white text-center">Our Work</h2>
+      <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden">
+        <div className="flex-shrink-0 flex items-end justify-center pt-20 pb-4 px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white text-center">{data.carouselTitle}</h2>
         </div>
 
-        <div className="relative">
-          <Swiper
-            modules={[EffectCoverflow, Autoplay, Keyboard, Navigation]}
-            effect="coverflow"
-            grabCursor
-            centeredSlides
-            slidesPerView="auto"
-            coverflowEffect={{
-              rotate: 0,
-              stretch: 0,
-              depth: 150,
-              modifier: 1.5,
-              slideShadows: false,
-            }}
-            autoplay={{ delay: 5000, disableOnInteraction: false }}
-            keyboard={{ enabled: true }}
-            navigation
-            loop
-            onSwiper={(swiper) => (swiperRef.current = swiper)}
-            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="w-full !overflow-visible"
-          >
-            {videos.map((video) => (
-              <SwiperSlide key={video.id} className="!w-[300px] md:!w-[500px]">
-                {({ isActive }) => (
-                  <div className="h-[400px] md:h-[550px]">
-                    <CarouselVideoSlide video={video} isActive={isActive} />
-                  </div>
-                )}
-              </SwiperSlide>
-            ))}
-          </Swiper>
+        <div className="flex-1 flex flex-col gap-3 min-h-0 px-4 pb-2">
+          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
+            <div className="flex h-full w-max gap-3 media-marquee media-marquee-left">
+              <div className="flex items-center gap-3 shrink-0">
+                {row1Videos.map((video, index) => (
+                  <VideoCard
+                    key={`${video.id}-a-${index}`}
+                    video={video}
+                    onExpand={handleExpand}
+                    isPaused={isPaused}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                {row1Videos.map((video, index) => (
+                  <VideoCard
+                    key={`${video.id}-b-${index}`}
+                    video={video}
+                    onExpand={handleExpand}
+                    isPaused={isPaused}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
 
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <button
-              onClick={() => swiperRef.current?.slidePrev()}
-              className="bg-white/20 hover:bg-white/30 text-white rounded-full p-3 transition-colors"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <span className="text-white/80 text-sm font-medium">
-              {activeIndex + 1} / {videos.length}
-            </span>
-            <button
-              onClick={() => swiperRef.current?.slideNext()}
-              className="bg-white/20 hover:bg-white/30 text-white rounded-full p-3 transition-colors"
-            >
-              <ChevronRight size={24} />
-            </button>
+          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
+            <div className="flex h-full w-max gap-3 media-marquee media-marquee-right">
+              <div className="flex items-center gap-3 shrink-0">
+                {row2Videos.map((video, index) => (
+                  <VideoCard
+                    key={`${video.id}-a-${index}`}
+                    video={video}
+                    onExpand={handleExpand}
+                    isPaused={isPaused}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                {row2Videos.map((video, index) => (
+                  <VideoCard
+                    key={`${video.id}-b-${index}`}
+                    video={video}
+                    onExpand={handleExpand}
+                    isPaused={isPaused}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {expandedVideo && <ExpandedVideoModal video={expandedVideo} onClose={handleClose} />}
     </section>
   );
 }

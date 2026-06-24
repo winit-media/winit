@@ -1,101 +1,146 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  fetchSiteContent,
+  saveSiteContent,
+  SiteContent,
+  defaultSiteContent,
+} from "@/lib/firebase";
 
-export interface Brand {
-  id: string;
-  name: string;
-  imageUrl: string;
-}
-
-export interface Testimonial {
-  id: string;
-  name: string;
-  designation: string;
-  company: string;
-  service: string;
-  review: string;
-  website: string;
-  logoUrl: string;
-}
-
-export interface CarouselVideo {
-  id: string;
-  name: string;
-  url: string;
-}
-
-interface AdminData {
-  brands: Brand[];
-  testimonials: Testimonial[];
-  carouselVideos: CarouselVideo[];
-  defaultVideoUrl: string;
-}
+export type { SiteContent };
 
 interface AdminContextType {
-  data: AdminData;
-  addBrand: (brand: Brand) => void;
-  removeBrand: (id: string) => void;
-  addTestimonial: (t: Testimonial) => void;
-  removeTestimonial: (id: string) => void;
-  addCarouselVideo: (v: CarouselVideo) => void;
-  removeCarouselVideo: (id: string) => void;
-  setDefaultVideoUrl: (url: string) => void;
+  data: SiteContent;
+  loaded: boolean;
+  saving: boolean;
+  updateContent: (partial: Partial<SiteContent>) => Promise<void>;
+  addBrand: (brand: SiteContent["brands"][0]) => Promise<void>;
+  removeBrand: (id: string) => Promise<void>;
+  addTestimonial: (t: SiteContent["testimonials"][0]) => Promise<void>;
+  removeTestimonial: (id: string) => Promise<void>;
+  addCarouselVideo: (v: SiteContent["carouselVideos"][0]) => Promise<void>;
+  removeCarouselVideo: (id: string) => Promise<void>;
+  addService: (s: SiteContent["services"][0]) => Promise<void>;
+  removeService: (index: number) => Promise<void>;
+  updateService: (index: number, s: SiteContent["services"][0]) => Promise<void>;
 }
-
-const defaultData: AdminData = {
-  brands: [],
-  testimonials: [],
-  carouselVideos: [],
-  defaultVideoUrl: "/fallback-video.mp4",
-};
 
 const AdminContext = createContext<AdminContextType | null>(null);
 
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<AdminData>(defaultData);
+  const [data, setData] = useState<SiteContent>(defaultSiteContent);
   const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("winit-admin-data");
-    if (stored) {
-      try {
-        setData(JSON.parse(stored));
-      } catch {
-        /* ignore */
-      }
-    }
-    setLoaded(true);
+    fetchSiteContent().then((content) => {
+      console.log("[AdminProvider] Loaded content, testimonials:", content.testimonials.length);
+      setData(content);
+      setLoaded(true);
+    });
   }, []);
 
-  useEffect(() => {
-    if (loaded) {
-      localStorage.setItem("winit-admin-data", JSON.stringify(data));
+  const persist = async (updated: SiteContent) => {
+    setSaving(true);
+    try {
+      await saveSiteContent(updated);
+    } catch (err) {
+      console.error("Failed to save:", err);
     }
-  }, [data, loaded]);
+    setSaving(false);
+  };
 
-  const addBrand = (brand: Brand) => setData((p) => ({ ...p, brands: [...p.brands, brand] }));
-  const removeBrand = (id: string) => setData((p) => ({ ...p, brands: p.brands.filter((b) => b.id !== id) }));
+  const updateContent = async (partial: Partial<SiteContent>) => {
+    const updated = { ...data, ...partial };
+    setData(updated);
+    await persist(updated);
+  };
 
-  const addTestimonial = (t: Testimonial) => setData((p) => ({ ...p, testimonials: [...p.testimonials, t] }));
-  const removeTestimonial = (id: string) => setData((p) => ({ ...p, testimonials: p.testimonials.filter((t) => t.id !== id) }));
+  const addBrand = async (brand: SiteContent["brands"][0]) => {
+    const updated = { ...data, brands: [...data.brands, brand] };
+    setData(updated);
+    await persist(updated);
+  };
 
-  const addCarouselVideo = (v: CarouselVideo) => setData((p) => ({ ...p, carouselVideos: [...p.carouselVideos, v] }));
-  const removeCarouselVideo = (id: string) => setData((p) => ({ ...p, carouselVideos: p.carouselVideos.filter((v) => v.id !== id) }));
+  const removeBrand = async (id: string) => {
+    const updated = { ...data, brands: data.brands.filter((b) => b.id !== id) };
+    setData(updated);
+    await persist(updated);
+  };
 
-  const setDefaultVideoUrl = (url: string) => setData((p) => ({ ...p, defaultVideoUrl: url }));
+  const addTestimonial = async (t: SiteContent["testimonials"][0]) => {
+    const updated = { ...data, testimonials: [...data.testimonials, t] };
+    setData(updated);
+    await persist(updated);
+  };
+
+  const removeTestimonial = async (id: string) => {
+    const updated = {
+      ...data,
+      testimonials: data.testimonials.filter((t) => t.id !== id),
+    };
+    setData(updated);
+    await persist(updated);
+  };
+
+  const addCarouselVideo = async (v: SiteContent["carouselVideos"][0]) => {
+    const updated = {
+      ...data,
+      carouselVideos: [...data.carouselVideos, v],
+    };
+    setData(updated);
+    await persist(updated);
+  };
+
+  const removeCarouselVideo = async (id: string) => {
+    const updated = {
+      ...data,
+      carouselVideos: data.carouselVideos.filter((v) => v.id !== id),
+    };
+    setData(updated);
+    await persist(updated);
+  };
+
+  const addService = async (s: SiteContent["services"][0]) => {
+    const updated = { ...data, services: [...data.services, s] };
+    setData(updated);
+    await persist(updated);
+  };
+
+  const removeService = async (index: number) => {
+    const updated = {
+      ...data,
+      services: data.services.filter((_, i) => i !== index),
+    };
+    setData(updated);
+    await persist(updated);
+  };
+
+  const updateService = async (index: number, s: SiteContent["services"][0]) => {
+    const services = [...data.services];
+    services[index] = s;
+    const updated = { ...data, services };
+    setData(updated);
+    await persist(updated);
+  };
 
   return (
     <AdminContext.Provider
       value={{
         data,
+        loaded,
+        saving,
+        updateContent,
         addBrand,
         removeBrand,
         addTestimonial,
         removeTestimonial,
         addCarouselVideo,
         removeCarouselVideo,
-        setDefaultVideoUrl,
+        addService,
+        removeService,
+        updateService,
       }}
     >
       {children}
