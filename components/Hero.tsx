@@ -41,10 +41,6 @@ export default function Hero() {
     }
   }, [typingDone]);
 
-  const scrollToContact = () => {
-    document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <section
       id="home"
@@ -88,7 +84,7 @@ export default function Hero() {
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(255,255,255,0.3)' }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={scrollToContact}
+                  onClick={() => window.dispatchEvent(new CustomEvent("open-contact-modal"))}
                   className="bg-white text-[#912dbf] px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-white/90"
                 >
                   {data.heroCtaText}

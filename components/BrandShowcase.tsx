@@ -25,7 +25,7 @@ function VerticalCarousel({
             href={item.link || "#"}
             target={item.link ? "_blank" : undefined}
             rel={item.link ? "noopener noreferrer" : undefined}
-            className="brand-glow block mx-auto mb-4 w-[220px] h-[220px] rounded-xl flex items-center justify-center p-5 transition-shadow duration-300"
+            className="brand-glow block mx-auto mb-4 w-[225px] h-[225px] md:w-[325px] md:h-[325px] rounded-xl flex items-center justify-center p-5 md:p-8 transition-shadow duration-300"
           >
             {item.imageUrl ? (
               <img
@@ -50,15 +50,21 @@ export default function BrandShowcase() {
   return (
     <section className="relative bg-white h-screen snap-section overflow-hidden">
       <PatternOverlay opacity={0.08} />
-      <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex items-center">
-        <div className="w-full flex items-center gap-12">
-          <div className="shrink-0 w-2/5 flex items-center justify-center lg:justify-start">
-            <h2 className="text-5xl md:text-6xl font-serif font-bold text-gray-900">
-              {data.brandTitle || "Our Brands"}
-            </h2>
+      <div className="relative z-10 h-full max-w-7xl mx-auto flex items-center lg:px-8">
+        <div className="w-full h-full flex flex-col lg:flex-row items-center lg:gap-12 relative">
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none lg:relative lg:inset-auto lg:z-auto lg:shrink-0 lg:w-2/5 lg:justify-start">
+            <div className="px-4 lg:p-0">
+              <h2 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 text-center lg:text-left drop-shadow-sm lg:drop-shadow-none">
+                {data.brandTitle || "Our Brands"}
+              </h2>
+            </div>
           </div>
 
-          <div className="flex-1 h-[calc(100vh-10rem)] flex gap-6 justify-center">
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none lg:hidden">
+            <div className="w-full h-64 bg-gradient-to-b from-transparent via-white to-transparent opacity-80" />
+          </div>
+
+          <div className="flex-1 w-full h-full flex gap-4 sm:gap-6 justify-center relative z-0">
             {brands.length > 0 ? (
               <>
                 <VerticalCarousel items={brands} direction="down" />

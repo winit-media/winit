@@ -147,9 +147,10 @@ export const defaultSiteContent: SiteContent = {
 
   whyChooseUsTitle: "Why Choose Us?",
   stats: [
-    { number: 150, suffix: "+", label: "Projects Completed" },
-    { number: 50, suffix: "+", label: "Happy Clients" },
-    { number: 98, suffix: "%", label: "Client Satisfaction" },
+    { number: 700000, suffix: "+", label: "Creators Association" },
+    { number: 50, suffix: "+", label: "Brands" },
+    { number: 200, suffix: "+", label: "Campaigns" },
+    { number: 500, suffix: "mn+", label: "Views Delivered" },
   ],
   reasons: [
     {
@@ -272,6 +273,13 @@ export async function fetchSiteContent(): Promise<SiteContent> {
     const snap = await getDoc(docRef);
     if (snap.exists()) {
       const raw = snap.data() as Partial<SiteContent>;
+      
+      // Auto-sync new stats if they don't have the 4 required stats
+      if (raw.stats && raw.stats.length !== 4) {
+        raw.stats = defaultSiteContent.stats;
+        saveSiteContent({ ...defaultSiteContent, ...raw, stats: raw.stats } as SiteContent);
+      }
+
       return {
         ...defaultSiteContent,
         ...raw,
@@ -279,6 +287,10 @@ export async function fetchSiteContent(): Promise<SiteContent> {
           raw.testimonials && raw.testimonials.length > 0
             ? raw.testimonials
             : defaultSiteContent.testimonials,
+        stats:
+          raw.stats && raw.stats.length > 0
+            ? raw.stats
+            : defaultSiteContent.stats,
         brands:
           raw.brands && raw.brands.length > 0
             ? raw.brands

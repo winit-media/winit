@@ -56,7 +56,7 @@ function TestimonialCard({
         <p className="text-gray-500 text-sm mt-1">
           {t.designation}
           {t.company && (
-            <span className="text-gray-400"> @{t.company}</span>
+            <span className="text-gray-400 block mt-0.5">@{t.company}</span>
           )}
         </p>
       </div>
@@ -130,7 +130,7 @@ function TestimonialModal({
             <p className="text-gray-500 text-sm mt-1">
               {t.designation}
               {t.company && (
-                <span className="text-gray-400"> @{t.company}</span>
+                <span className="text-gray-400 block mt-0.5">@{t.company}</span>
               )}
             </p>
           </div>
@@ -154,33 +154,20 @@ export default function Testimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white py-24 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-16 pb-10 lg:pt-32 lg:pb-16 overflow-hidden snap-section min-h-screen flex flex-col justify-center">
       <PatternOverlay opacity={0.06} />
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
-          <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-4 block">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 lg:mb-6">
+          <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">
             {data.testimonialsSubtitle}
           </span>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 tracking-tight">
             {data.testimonialsTitle}
           </h2>
-          <div className="mx-auto mt-6 h-1 w-20 bg-gradient-to-r from-brand to-brand-light rounded-full" />
+          <div className="mx-auto mt-4 lg:mt-6 h-1 w-20 bg-gradient-to-r from-brand to-brand-light rounded-full" />
         </div>
 
         <div className="relative group">
-          <button
-            ref={prevRef}
-            className="absolute -left-5 md:-left-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            ref={nextRef}
-            className="absolute -right-5 md:-right-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100"
-          >
-            <ChevronRight size={20} />
-          </button>
-
           <Swiper
             modules={[Navigation, Pagination]}
             spaceBetween={0}
@@ -231,7 +218,21 @@ export default function Testimonials() {
             ))}
           </Swiper>
 
-          <div className="testimonial-pagination flex justify-center gap-2 mt-8" />
+          <div className="flex items-center justify-center gap-4 mt-6 lg:mt-8">
+            <button
+              ref={prevRef}
+              className="md:absolute md:left-0 lg:-left-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div className="testimonial-pagination !w-auto flex justify-center gap-2" />
+            <button
+              ref={nextRef}
+              className="md:absolute md:right-0 lg:-right-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
         </div>
       </div>
 

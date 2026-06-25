@@ -114,7 +114,7 @@ export default function WhatWeDo() {
         </div>
 
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row h-full relative z-10">
-          <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-10 lg:pt-0">
+          <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-28 lg:pt-0">
             <div className="relative flex items-center justify-center lg:justify-start">
               <span
                 className="absolute text-brand font-serif font-bold opacity-25 select-none pointer-events-none"

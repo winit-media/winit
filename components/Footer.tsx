@@ -14,15 +14,15 @@ export default function Footer() {
   return (
     <footer id="contact" className="relative bg-brand snap-section overflow-hidden">
       <PatternOverlay opacity={0.08} />
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
           {/* Left Column — Brand */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white font-serif text-xl font-bold">{data.footerTitle}</h3>
-            <p className="text-white/70 text-sm leading-relaxed max-w-xs">
+          <div className="flex flex-col gap-2 lg:gap-4 order-1 md:order-1 pr-2 min-w-0">
+            <h3 className="text-white font-serif text-lg lg:text-xl font-bold">{data.footerTitle}</h3>
+            <p className="text-white/70 text-xs lg:text-sm leading-relaxed max-w-xs">
               {data.footerTagline}
             </p>
-            <div className="flex gap-3 mt-2">
+            <div className="flex gap-3 mt-1 lg:mt-2">
               {data.socialLinks.map((social) => (
                 <a
                   key={social.label}
@@ -30,7 +30,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="bg-white/15 hover:bg-white/25 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors"
+                  className="bg-white/15 hover:bg-white/25 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors shrink-0"
                 >
                   <SocialIcon label={social.label} />
                 </a>
@@ -39,14 +39,14 @@ export default function Footer() {
           </div>
 
           {/* Middle Column — Quick Links */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white font-serif text-xl font-bold">{data.footerQuickLinksTitle}</h3>
-            <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2 lg:gap-4 order-3 md:order-2 col-span-2 md:col-span-1 mt-2 md:mt-0 min-w-0">
+            <h3 className="text-white font-serif text-lg lg:text-xl font-bold">{data.footerQuickLinksTitle}</h3>
+            <div className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-1.5 lg:gap-2.5">
               {data.footerQuickLinks.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => scrollTo(link.href)}
-                  className="text-white/70 hover:text-white transition-colors text-sm text-left w-fit"
+                  className="text-white/70 hover:text-white transition-colors text-xs lg:text-sm text-left w-fit shrink-0"
                 >
                   {link.label}
                 </button>
@@ -55,39 +55,39 @@ export default function Footer() {
           </div>
 
           {/* Right Column — Contact Us */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white font-serif text-xl font-bold">{data.footerContactTitle}</h3>
-            <div className="flex flex-col gap-3.5">
+          <div className="flex flex-col gap-2 lg:gap-4 order-2 md:order-3 min-w-0">
+            <h3 className="text-white font-serif text-lg lg:text-xl font-bold">{data.footerContactTitle}</h3>
+            <div className="flex flex-col gap-2 lg:gap-3.5">
               <a
                 href={`tel:${data.contactPhone.replace(/\s/g, "")}`}
-                className="flex items-start gap-3 group"
+                className="flex items-start gap-2.5 lg:gap-3 group"
               >
-                <Phone size={18} className="text-white mt-0.5 flex-shrink-0" />
-                <span className="text-white/80 text-sm group-hover:text-white transition-colors">{data.contactPhone}</span>
+                <Phone className="text-white mt-0.5 flex-shrink-0 w-4 h-4 lg:w-[18px] lg:h-[18px]" />
+                <span className="text-white/80 text-xs lg:text-sm group-hover:text-white transition-colors break-words">{data.contactPhone}</span>
               </a>
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.contactAddress)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-3 group"
+                className="flex items-start gap-2.5 lg:gap-3 group"
               >
-                <MapPin size={18} className="text-white mt-0.5 flex-shrink-0" />
-                <span className="text-white/80 text-sm leading-relaxed group-hover:text-white transition-colors">{data.contactAddress}</span>
+                <MapPin className="text-white mt-0.5 flex-shrink-0 w-4 h-4 lg:w-[18px] lg:h-[18px]" />
+                <span className="text-white/80 text-xs lg:text-sm leading-relaxed group-hover:text-white transition-colors break-words">{data.contactAddress}</span>
               </a>
               <a
                 href={`mailto:${data.contactEmail}`}
-                className="flex items-start gap-3 group"
+                className="flex items-start gap-2.5 lg:gap-3 group"
               >
-                <Mail size={18} className="text-white mt-0.5 flex-shrink-0" />
-                <span className="text-white/80 text-sm group-hover:text-white transition-colors">{data.contactEmail}</span>
+                <Mail className="text-white mt-0.5 flex-shrink-0 w-4 h-4 lg:w-[18px] lg:h-[18px]" />
+                <span className="text-white/80 text-xs lg:text-sm group-hover:text-white transition-colors break-all">{data.contactEmail}</span>
               </a>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/20 mt-12 pt-8 text-center">
-          <p className="text-white/60 text-sm">
+        <div className="border-t border-white/20 mt-8 lg:mt-12 pt-6 lg:pt-8 text-center">
+          <p className="text-white/60 text-xs lg:text-sm">
             {data.footerCopyright}
           </p>
         </div>

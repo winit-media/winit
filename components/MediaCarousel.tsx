@@ -106,18 +106,18 @@ function VideoCard({ video, onExpand, isPaused }: VideoCardProps) {
           setIsLandscape(v.videoWidth > v.videoHeight);
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <span className="text-white text-sm font-medium truncate">{video.name}</span>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+        <span className="text-white text-sm font-medium truncate drop-shadow-md">{video.name}</span>
         <button
           onClick={toggleAudio}
-          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-1.5 transition-colors"
+          className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300"
         >
           {muted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
         </button>
       </div>
-      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5">
+      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-y-2 group-hover:translate-y-0">
+        <div className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300">
           <Play size={14} className="text-white fill-white" />
         </div>
       </div>
@@ -251,15 +251,18 @@ export default function MediaCarousel() {
   }, []);
 
   return (
-    <section id="work" className="relative bg-brand h-screen snap-section overflow-hidden flex flex-col">
+    <section id="work" className="relative bg-brand h-screen pt-16 snap-section overflow-hidden flex flex-col">
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden">
-        <div className="flex-shrink-0 flex items-end justify-center pt-20 pb-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex-shrink-0 flex items-end justify-center pt-6 pb-8 px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white text-center">{data.carouselTitle}</h2>
         </div>
 
-        <div className="flex-1 flex flex-col gap-3 min-h-0 px-4 pb-2">
-          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
+        <div 
+          className="flex-1 flex flex-col gap-3 min-h-0 pb-4"
+          style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
+        >
+          <div className="h-[35vh] max-h-[350px] min-h-0 overflow-hidden rounded-xl">
             <div className="flex h-full w-max gap-3 media-marquee media-marquee-left">
               <div className="flex items-center gap-3 shrink-0">
                 {row1Videos.map((video, index) => (
@@ -284,7 +287,7 @@ export default function MediaCarousel() {
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
+          <div className="h-[35vh] max-h-[350px] min-h-0 overflow-hidden rounded-xl">
             <div className="flex h-full w-max gap-3 media-marquee media-marquee-right">
               <div className="flex items-center gap-3 shrink-0">
                 {row2Videos.map((video, index) => (

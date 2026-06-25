@@ -1,5 +1,3 @@
-
-
 import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -10,6 +8,7 @@ import BrandShowcase from "@/components/BrandShowcase";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
+import FloatingCTA from "@/components/FloatingCTA";
 
 export default function Home() {
   return (
@@ -25,6 +24,7 @@ export default function Home() {
         <Testimonials />
       </main>
       <Footer />
+      <FloatingCTA />
     </AdminProvider>
   );
 }
