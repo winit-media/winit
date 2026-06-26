@@ -5,6 +5,23 @@ import { X, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
 
+const getOptimizedMedia = (url: string) => {
+  if (!url || !url.includes('cloudinary.com')) return { videoUrl: url, posterUrl: url };
+  const [baseUrl, path] = url.split('/upload/');
+  return {
+    videoUrl: `${baseUrl}/upload/f_auto,q_auto:eco,c_limit,w_400,so_0,eo_5/${path}`,
+    posterUrl: `${baseUrl}/upload/f_auto,q_auto:eco,c_limit,w_400,so_0/${path}`.replace(/\.[^/.]+$/, ".webp")
+  };
+};
+
+const getHighQualityMedia = (url: string) => {
+  if (!url || !url.includes('cloudinary.com')) return { videoUrl: url };
+  const [baseUrl, path] = url.split('/upload/');
+  return {
+    videoUrl: `${baseUrl}/upload/f_auto,q_auto:good/${path}`,
+  };
+};
+
 const defaultVideos = [
   { id: "1", name: "Campaign 1", url: "/fallback-video.mp4" },
   { id: "2", name: "Campaign 2", url: "/fallback-video.mp4" },
@@ -16,37 +33,51 @@ const defaultVideos = [
   { id: "8", name: "Campaign 8", url: "/fallback-video.mp4" },
 ];
 
+const useDeviceCapabilities = () => {
+  const [canPlayMedia, setCanPlayMedia] = useState(true);
+
+  useEffect(() => {
+    try {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      // @ts-ignore
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const saveData = connection?.saveData === true;
+      const slowConnection = connection?.effectiveType === 'slow-2g' || connection?.effectiveType === '2g';
+      
+      // @ts-ignore
+      const lowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
+      const lowCPU = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+
+      if (prefersReducedMotion || saveData || slowConnection || lowMemory || lowCPU) {
+        setCanPlayMedia(false);
+      }
+    } catch (e) {
+      // Ignore errors, default to true
+    }
+  }, []);
+
+  return canPlayMedia;
+};
+
 interface VideoCardProps {
   video: { id: string; url: string; name: string };
   onExpand: (video: { id: string; url: string; name: string }) => void;
   isPaused: boolean;
+  canPlayMedia: boolean;
 }
 
-function VideoCard({ video, onExpand, isPaused }: VideoCardProps) {
+function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
   const [isLandscape, setIsLandscape] = useState(false);
-  const loopDuration = 5;
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-
-    const handleTimeUpdate = () => {
-      if (v.currentTime >= loopDuration) {
-        v.currentTime = 0;
-      }
-    };
-
-    v.addEventListener("timeupdate", handleTimeUpdate);
-    return () => v.removeEventListener("timeupdate", handleTimeUpdate);
-  }, []);
+  const { videoUrl, posterUrl } = getOptimizedMedia(video.url);
 
   useEffect(() => {
     const v = videoRef.current;
     const container = containerRef.current;
-    if (!v || !container) return;
+    if (!v || !container || !canPlayMedia) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -58,21 +89,21 @@ function VideoCard({ video, onExpand, isPaused }: VideoCardProps) {
           v.pause();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.2 }
     );
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, [isPaused]);
+  }, [isPaused, canPlayMedia]);
 
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || !canPlayMedia) return;
 
     if (isPaused) {
       v.pause();
     }
-  }, [isPaused]);
+  }, [isPaused, canPlayMedia]);
 
   const handleClick = () => {
     onExpand(video);
@@ -80,6 +111,7 @@ function VideoCard({ video, onExpand, isPaused }: VideoCardProps) {
 
   const toggleAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!canPlayMedia) return;
     const v = videoRef.current;
     if (v) {
       v.muted = !v.muted;
@@ -93,28 +125,43 @@ function VideoCard({ video, onExpand, isPaused }: VideoCardProps) {
       onClick={handleClick}
       className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02]`}
     >
-      <video
-        ref={videoRef}
-        src={video.url}
-        className="w-full h-full object-contain"
-        loop
-        playsInline
-        muted
-        preload="none"
-        onLoadedMetadata={(e) => {
-          const v = e.currentTarget;
-          setIsLandscape(v.videoWidth > v.videoHeight);
-        }}
-      />
+      {canPlayMedia ? (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          poster={posterUrl}
+          className="w-full h-full object-contain bg-black"
+          loop
+          playsInline
+          muted
+          preload="none"
+          onLoadedMetadata={(e) => {
+            const v = e.currentTarget;
+            setIsLandscape(v.videoWidth > v.videoHeight);
+          }}
+        />
+      ) : (
+        <img
+          src={posterUrl}
+          alt={video.name}
+          className="w-full h-full object-contain bg-black"
+          onLoad={(e) => {
+            const img = e.currentTarget;
+            setIsLandscape(img.naturalWidth > img.naturalHeight);
+          }}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
         <span className="text-white text-sm font-medium truncate drop-shadow-md">{video.name}</span>
-        <button
-          onClick={toggleAudio}
-          className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300"
-        >
-          {muted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
-        </button>
+        {canPlayMedia && (
+          <button
+            onClick={toggleAudio}
+            className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300"
+          >
+            {muted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
+          </button>
+        )}
       </div>
       <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-y-2 group-hover:translate-y-0">
         <div className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300">
@@ -135,6 +182,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
   const [muted, setMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [aspect, setAspect] = useState<string>("16/9");
+  const { videoUrl } = getHighQualityMedia(video.url);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -188,7 +236,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
         <div className="w-full h-full flex items-center justify-center bg-black rounded-2xl overflow-hidden">
           <video
             ref={videoRef}
-            src={video.url}
+            src={videoUrl}
             className="w-full h-full object-contain"
             playsInline
             muted={muted}
@@ -236,6 +284,7 @@ export default function MediaCarousel() {
   const videos = data.carouselVideos.length > 0 ? data.carouselVideos : defaultVideos;
   const [expandedVideo, setExpandedVideo] = useState<{ id: string; url: string; name: string } | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const canPlayMedia = useDeviceCapabilities();
 
   const row1Videos = videos.slice(0, Math.ceil(videos.length / 2));
   const row2Videos = videos.slice(Math.ceil(videos.length / 2));
@@ -271,6 +320,7 @@ export default function MediaCarousel() {
                     video={video}
                     onExpand={handleExpand}
                     isPaused={isPaused}
+                    canPlayMedia={canPlayMedia}
                   />
                 ))}
               </div>
@@ -281,6 +331,7 @@ export default function MediaCarousel() {
                     video={video}
                     onExpand={handleExpand}
                     isPaused={isPaused}
+                    canPlayMedia={canPlayMedia}
                   />
                 ))}
               </div>
@@ -296,6 +347,7 @@ export default function MediaCarousel() {
                     video={video}
                     onExpand={handleExpand}
                     isPaused={isPaused}
+                    canPlayMedia={canPlayMedia}
                   />
                 ))}
               </div>
@@ -306,6 +358,7 @@ export default function MediaCarousel() {
                     video={video}
                     onExpand={handleExpand}
                     isPaused={isPaused}
+                    canPlayMedia={canPlayMedia}
                   />
                 ))}
               </div>
