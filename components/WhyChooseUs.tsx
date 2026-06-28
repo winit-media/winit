@@ -50,7 +50,7 @@ export default function WhyChooseUs() {
     <section className="relative bg-brand min-h-screen snap-section pt-24 lg:pt-32 pb-10 lg:pb-20">
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-5xl font-serif font-bold text-white text-center mb-6 lg:mb-16">
+        <h2 className="text-3xl md:text-5xl font-display font-bold text-white text-center mb-6 lg:mb-16">
           {data.whyChooseUsTitle}
         </h2>
 
@@ -68,7 +68,7 @@ export default function WhyChooseUs() {
                 className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg text-center flex flex-col items-center justify-center"
               >
                 <Icon className="text-brand mb-2 lg:mb-4" size={28} />
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-brand font-serif mb-1 lg:mb-2">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-brand font-display mb-1 lg:mb-2">
                   <AnimatedCounter target={stat.number} suffix={stat.suffix} />
                 </div>
                 <p className="text-gray-600 font-medium text-xs sm:text-sm lg:text-base leading-tight">{stat.label}</p>

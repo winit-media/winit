@@ -19,7 +19,7 @@ function TestimonialCard({
   onReadMore: () => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 p-10 flex flex-col items-center text-center h-[480px] mx-3">
+    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 p-6 sm:p-10 flex flex-col items-center text-center h-auto min-h-[350px] max-h-[480px] mx-3">
       {t.logoUrl ? (
         <div className="h-16 mb-5 flex items-center justify-center shrink-0">
           <img
@@ -161,7 +161,7 @@ export default function Testimonials() {
           <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">
             {data.testimonialsSubtitle}
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 tracking-tight">
             {data.testimonialsTitle}
           </h2>
           <div className="mx-auto mt-4 lg:mt-6 h-1 w-20 bg-gradient-to-r from-brand to-brand-light rounded-full" />

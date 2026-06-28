@@ -5,6 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Send } from "lucide-react";
 import PatternOverlay from "./PatternOverlay";
 
+const fieldVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.15 + i * 0.07, duration: 0.4, ease: "easeOut" as const },
+  }),
+};
+
 export default function ContactModal({
   isOpen,
   onClose,
@@ -74,21 +83,34 @@ export default function ContactModal({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="relative pt-8 px-8 pb-6 bg-white shrink-0">
+            <div className="relative pt-4 px-6 pb-3 bg-white shrink-0">
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-brand hover:bg-purple-50 transition-colors"
+                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100/80 text-gray-400 hover:text-brand hover:bg-purple-50 transition-colors"
               >
                 <X size={18} />
               </button>
-              <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Let's Connect</h2>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                Leave your details and our team will get back to you within 24 hours.
-              </p>
+
+              <div className="flex items-center gap-3 pr-8">
+                <img
+                  src="/logo.png"
+                  alt="Winit logo"
+                  className="h-12 w-auto rounded-lg shrink-0"
+                />
+                <div className="min-w-0">
+                  <h2 className="text-2xl font-display font-bold text-gray-900 mb-0.5">Let&apos;s Connect</h2>
+                  <p className="text-gray-500 text-sm leading-snug break-words">
+                    Leave your details and our team will get back to you within 24 hours.
+                  </p>
+                </div>
+              </div>
             </div>
 
+            {/* Divider */}
+            <div className="mx-6 border-t border-gray-100" />
+
             {/* Scrollable Form Body */}
-            <div className="px-8 pb-8 overflow-y-auto">
+            <div className="px-6 pb-6 pt-4 overflow-y-auto">
               {status === "success" ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -103,7 +125,7 @@ export default function ContactModal({
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                  <div>
+                  <motion.div custom={0} variants={fieldVariants} initial="hidden" animate="visible">
                     <label htmlFor="name" className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
                       Full Name *
                     </label>
@@ -113,12 +135,12 @@ export default function ContactModal({
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 placeholder:text-gray-400"
                       placeholder="Aditya"
                     />
-                  </div>
+                  </motion.div>
                   
-                  <div>
+                  <motion.div custom={1} variants={fieldVariants} initial="hidden" animate="visible">
                     <label htmlFor="email" className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
                       Email Address *
                     </label>
@@ -128,12 +150,12 @@ export default function ContactModal({
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 placeholder:text-gray-400"
                       placeholder="hi@acaditya10.tech"
                     />
-                  </div>
+                  </motion.div>
 
-                  <div>
+                  <motion.div custom={2} variants={fieldVariants} initial="hidden" animate="visible">
                     <label htmlFor="phone" className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
                       Phone Number
                     </label>
@@ -142,12 +164,12 @@ export default function ContactModal({
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 placeholder:text-gray-400"
                       placeholder="+91 9876543210"
                     />
-                  </div>
+                  </motion.div>
 
-                  <div>
+                  <motion.div custom={3} variants={fieldVariants} initial="hidden" animate="visible">
                     <label htmlFor="message" className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
                       Your Message *
                     </label>
@@ -157,17 +179,21 @@ export default function ContactModal({
                       rows={3}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 resize-none"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 resize-none placeholder:text-gray-400"
                       placeholder="Tell us about your project..."
                     />
-                  </div>
+                  </motion.div>
 
                   <motion.button
+                    custom={4}
+                    variants={fieldVariants}
+                    initial="hidden"
+                    animate="visible"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     disabled={status === "submitting"}
                     type="submit"
-                    className="w-full mt-2 bg-brand text-white font-semibold py-3.5 rounded-xl hover:bg-[#8025a8] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full mt-1 bg-brand text-white font-semibold py-3.5 rounded-xl hover:bg-[#8025a8] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {status === "submitting" ? (
                       <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

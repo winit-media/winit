@@ -25,7 +25,7 @@ function VerticalCarousel({
             href={item.link || "#"}
             target={item.link ? "_blank" : undefined}
             rel={item.link ? "noopener noreferrer" : undefined}
-            className="brand-glow block mx-auto mb-4 w-[225px] h-[225px] md:w-[325px] md:h-[325px] rounded-xl flex items-center justify-center p-5 md:p-8 transition-shadow duration-300"
+            className="brand-glow block mx-auto mb-4 w-[40vw] max-w-[225px] aspect-square md:w-[325px] md:h-[325px] md:max-w-none rounded-xl flex items-center justify-center p-4 sm:p-5 md:p-8 transition-shadow duration-300"
           >
             {item.imageUrl ? (
               <img
@@ -54,7 +54,7 @@ export default function BrandShowcase() {
         <div className="w-full h-full flex flex-col lg:flex-row items-center lg:gap-12 relative">
           <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none lg:relative lg:inset-auto lg:z-auto lg:shrink-0 lg:w-2/5 lg:justify-start">
             <div className="px-4 lg:p-0">
-              <h2 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 text-center lg:text-left drop-shadow-sm lg:drop-shadow-none">
+              <h2 className="text-5xl md:text-6xl font-display font-bold text-gray-900 text-center lg:text-left drop-shadow-sm lg:drop-shadow-none">
                 {data.brandTitle || "Our Brands"}
               </h2>
             </div>

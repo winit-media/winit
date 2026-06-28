@@ -49,11 +49,11 @@ export default function Hero() {
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
-          animate={showSubtext ? { y: -60 } : { y: 0 }}
+          animate={showSubtext ? { y: -10 } : { y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1
-            className="font-serif text-white text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mt-16 mb-2"
+            className="font-display text-white text-5xl sm:text-5xl md:text-7xl lg:text-8xl font-black mt-16 mb-2"
             style={{ letterSpacing: "-0.03em", lineHeight: "0.95" }}
           >
             <span>{typedText}</span>

@@ -71,7 +71,7 @@ function StackedCard({
       <div
         className={`${item.bg} w-full h-full rounded-3xl shadow-2xl p-8 lg:p-12 flex flex-col justify-center text-white`}
       >
-        <h3 className="text-3xl lg:text-4xl font-bold mb-4 font-serif">{item.sub}</h3>
+        <h3 className="text-3xl lg:text-4xl font-bold mb-4 font-display">{item.sub}</h3>
         <p className="text-white/90 text-[15px] lg:text-base leading-relaxed">{item.content}</p>
       </div>
     </motion.div>
@@ -117,7 +117,7 @@ export default function WhatWeDo() {
           <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-28 lg:pt-0">
             <div className="relative flex items-center justify-center lg:justify-start">
               <span
-                className="absolute text-brand font-serif font-bold opacity-25 select-none pointer-events-none"
+                className="absolute text-brand font-display font-bold opacity-25 select-none pointer-events-none"
                 style={{
                   fontSize: "clamp(12rem, 30vw, 26rem)",
                   lineHeight: 1,
@@ -130,7 +130,7 @@ export default function WhatWeDo() {
                 ?
               </span>
               <h2
-                className="font-serif font-bold text-black leading-[0.95] text-center relative z-10"
+                className="font-display font-bold text-black leading-[0.95] text-center relative z-10"
                 style={{ fontSize: "clamp(2.835rem, 6.48vw, 5.67rem)" }}
               >
                 What we<br />do

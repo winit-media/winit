@@ -18,7 +18,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
           {/* Left Column — Brand */}
           <div className="flex flex-col gap-2 lg:gap-4 order-1 md:order-1 pr-2 min-w-0">
-            <h3 className="text-white font-serif text-lg lg:text-xl font-bold">{data.footerTitle}</h3>
+            <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerTitle}</h3>
             <p className="text-white/70 text-xs lg:text-sm leading-relaxed max-w-xs">
               {data.footerTagline}
             </p>
@@ -40,7 +40,7 @@ export default function Footer() {
 
           {/* Middle Column — Quick Links */}
           <div className="flex flex-col gap-2 lg:gap-4 order-3 md:order-2 col-span-2 md:col-span-1 mt-2 md:mt-0 min-w-0">
-            <h3 className="text-white font-serif text-lg lg:text-xl font-bold">{data.footerQuickLinksTitle}</h3>
+            <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerQuickLinksTitle}</h3>
             <div className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-1.5 lg:gap-2.5">
               {data.footerQuickLinks.map((link) => (
                 <button
@@ -56,7 +56,7 @@ export default function Footer() {
 
           {/* Right Column — Contact Us */}
           <div className="flex flex-col gap-2 lg:gap-4 order-2 md:order-3 min-w-0">
-            <h3 className="text-white font-serif text-lg lg:text-xl font-bold">{data.footerContactTitle}</h3>
+            <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerContactTitle}</h3>
             <div className="flex flex-col gap-2 lg:gap-3.5">
               <a
                 href={`tel:${data.contactPhone.replace(/\s/g, "")}`}
