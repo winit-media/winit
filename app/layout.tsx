@@ -11,6 +11,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "WiNit - Shaping Success Stories",
   description: "We transform brand stories into powerful narratives that drive success.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
