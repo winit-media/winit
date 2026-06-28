@@ -119,7 +119,7 @@ export default function WhatWeDo() {
               <span
                 className="absolute text-brand font-display font-bold opacity-25 select-none pointer-events-none"
                 style={{
-                  fontSize: "clamp(12rem, 30vw, 26rem)",
+                  fontSize: "clamp(18rem, 40vw, 36rem)",
                   lineHeight: 1,
                   top: "50%",
                   left: "50%",

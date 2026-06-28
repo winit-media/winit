@@ -62,7 +62,7 @@ export default function VideoSection() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full aspect-video min-h-[50vh] max-h-[80vh] snap-section overflow-hidden bg-black group">
+    <div ref={containerRef} className="relative w-full aspect-video snap-section overflow-hidden bg-black group">
       <video
         ref={videoRef}
         src={videoSrc}

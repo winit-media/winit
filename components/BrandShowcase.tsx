@@ -20,11 +20,8 @@ function VerticalCarousel({
         }
       >
         {duplicated.map((item, i) => (
-          <a
+          <div
             key={`${item.id}-${i}`}
-            href={item.link || "#"}
-            target={item.link ? "_blank" : undefined}
-            rel={item.link ? "noopener noreferrer" : undefined}
             className="brand-glow block mx-auto mb-4 w-[40vw] max-w-[225px] aspect-square md:w-[325px] md:h-[325px] md:max-w-none rounded-xl flex items-center justify-center p-4 sm:p-5 md:p-8 transition-shadow duration-300"
           >
             {item.imageUrl ? (
@@ -36,7 +33,7 @@ function VerticalCarousel({
             ) : (
               <span className="text-gray-400 text-sm text-center">{item.name}</span>
             )}
-          </a>
+          </div>
         ))}
       </div>
     </div>
