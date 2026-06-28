@@ -48,12 +48,24 @@ export default function ContactModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
-    
-    // TODO: The user will provide instructions for email integration.
-    // Simulating a successful network request for now
-    setTimeout(() => {
-      setStatus("success");
-    }, 1500);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setStatus("success");
+      } else {
+        setStatus("error");
+        setTimeout(() => setStatus("idle"), 3000);
+      }
+    } catch {
+      setStatus("error");
+      setTimeout(() => setStatus("idle"), 3000);
+    }
   };
 
   return (
@@ -121,7 +133,19 @@ export default function ContactModal({
                     <Send size={28} />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                  <p className="text-gray-500">We'll be in touch very soon.</p>
+                  <p className="text-gray-500">We&apos;ll be in touch very soon.</p>
+                </motion.div>
+              ) : status === "error" ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center py-8 text-center"
+                >
+                  <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4">
+                    <X size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h3>
+                  <p className="text-gray-500">Please try again or contact us directly.</p>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
