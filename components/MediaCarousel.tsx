@@ -157,14 +157,14 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
         {canPlayMedia && (
           <button
             onClick={toggleAudio}
-            className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300"
+            className="bg-black/40 hover:bg-black/60 border border-white/20 rounded-full p-2 transition-all duration-300"
           >
             {muted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
           </button>
         )}
       </div>
       <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-y-2 group-hover:translate-y-0">
-        <div className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300">
+        <div className="bg-black/40 hover:bg-black/60 border border-white/20 rounded-full p-2 transition-all duration-300">
           <Play size={14} className="text-white fill-white" />
         </div>
       </div>
@@ -225,7 +225,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
       onClick={onClose}
     >
       <div
@@ -252,7 +252,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
           <button
             onClick={togglePlay}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
+            className="bg-black/40 hover:bg-black/60 rounded-full p-3 transition-colors"
           >
             {isPlaying ? (
               <Pause size={20} className="text-white" />
@@ -262,13 +262,13 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
           </button>
           <button
             onClick={toggleAudio}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
+            className="bg-black/40 hover:bg-black/60 rounded-full p-3 transition-colors"
           >
             {muted ? <VolumeX size={20} className="text-white" /> : <Volume2 size={20} className="text-white" />}
           </button>
           <button
             onClick={onClose}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
+            className="bg-black/40 hover:bg-black/60 rounded-full p-3 transition-colors"
           >
             <X size={20} className="text-white" />
           </button>
@@ -309,7 +309,6 @@ export default function MediaCarousel() {
 
         <div 
           className="flex-1 flex flex-col gap-3 min-h-0 pb-4"
-          style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
         >
           <div className="h-[min(35vh,350px)] min-h-[200px] overflow-hidden rounded-xl">
             <div className="flex h-full w-max gap-3 media-marquee media-marquee-left">

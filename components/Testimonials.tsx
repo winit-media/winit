@@ -10,6 +10,7 @@ import PatternOverlay from "./PatternOverlay";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import Image from "next/image";
 
 function TestimonialCard({
   t,
@@ -21,11 +22,13 @@ function TestimonialCard({
   return (
     <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 p-6 sm:p-10 flex flex-col items-center text-center h-auto min-h-[350px] max-h-[480px] mx-3">
       {t.logoUrl ? (
-        <div className="h-16 mb-5 flex items-center justify-center shrink-0">
-          <img
+        <div className="h-16 mb-5 shrink-0 relative w-full">
+          <Image
             src={t.logoUrl}
-            alt={t.company}
-            className="max-h-full w-auto object-contain"
+            alt={t.company || "Company logo"}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-contain"
           />
         </div>
       ) : (
@@ -45,7 +48,8 @@ function TestimonialCard({
       {t.review.length > 120 && (
         <button
           onClick={onReadMore}
-          className="text-brand text-sm font-semibold hover:text-brand-dark transition-colors mb-2 shrink-0"
+          data-id={t.id}
+          className="read-more-btn text-brand text-sm font-semibold hover:text-brand-dark transition-colors mb-2 shrink-0"
         >
           Read More
         </button>
@@ -85,7 +89,7 @@ function TestimonialModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
       onClick={onClose}
     >
       <div
@@ -101,11 +105,13 @@ function TestimonialModal({
 
         <div className="flex flex-col items-center text-center">
           {t.logoUrl ? (
-            <div className="h-16 mb-5 flex items-center justify-center">
-              <img
+            <div className="h-16 mb-5 relative w-full max-w-[200px]">
+              <Image
                 src={t.logoUrl}
-                alt={t.company}
-                className="max-h-full w-auto object-contain"
+                alt={t.company || "Company logo"}
+                fill
+                sizes="(max-width: 768px) 100vw, 200px"
+                className="object-contain"
               />
             </div>
           ) : (
@@ -143,8 +149,7 @@ function TestimonialModal({
 export default function Testimonials() {
   const { data } = useAdmin();
   const testimonials = data.testimonials;
-  const prevRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [selected, setSelected] = useState<
     SiteContent["testimonials"][0] | null
   >(null);
@@ -179,17 +184,14 @@ export default function Testimonials() {
               clickable: true,
               el: ".testimonial-pagination",
             }}
-            navigation={{
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-            }}
-            onBeforeInit={(swiper: SwiperType) => {
-              if (
-                swiper.params.navigation &&
-                typeof swiper.params.navigation !== "boolean"
-              ) {
-                swiper.params.navigation.prevEl = prevRef.current;
-                swiper.params.navigation.nextEl = nextRef.current;
+            onSwiper={setSwiperInstance}
+            onClick={(swiper, event) => {
+              const target = event.target as HTMLElement;
+              const btn = target.closest(".read-more-btn");
+              if (btn) {
+                const id = btn.getAttribute("data-id");
+                const t = testimonials.find((x) => x.id === id);
+                if (t) setSelected(t);
               }
             }}
             breakpoints={{
@@ -220,14 +222,14 @@ export default function Testimonials() {
 
           <div className="flex items-center justify-center gap-4 mt-6 lg:mt-8">
             <button
-              ref={prevRef}
+              onClick={() => swiperInstance?.slidePrev()}
               className="md:absolute md:left-0 lg:-left-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
             >
               <ChevronLeft size={20} />
             </button>
             <div className="testimonial-pagination !w-auto flex justify-center gap-2" />
             <button
-              ref={nextRef}
+              onClick={() => swiperInstance?.slideNext()}
               className="md:absolute md:right-0 lg:-right-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
             >
               <ChevronRight size={20} />

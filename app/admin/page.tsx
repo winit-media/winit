@@ -20,7 +20,7 @@ import {
 import { AdminProvider, useAdmin, SiteContent } from "@/components/AdminProvider";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { app } from "@/lib/firebase";
+import { app, fetchSiteContent } from "@/lib/firebase";
 import Link from "next/link";
 
 const auth = getAuth(app);
@@ -1153,6 +1153,7 @@ function AdminDashboard() {
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [siteData, setSiteData] = useState<SiteContent | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -1162,7 +1163,13 @@ export default function AdminPage() {
     return () => unsubscribe();
   }, []);
 
-  if (checking) {
+  useEffect(() => {
+    if (authed) {
+      fetchSiteContent().then(setSiteData);
+    }
+  }, [authed]);
+
+  if (checking || (authed && !siteData)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-brand" />
@@ -1175,7 +1182,7 @@ export default function AdminPage() {
   }
 
   return (
-    <AdminProvider>
+    <AdminProvider initialData={siteData!}>
       <AdminDashboard />
     </AdminProvider>
   );

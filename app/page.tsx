@@ -1,18 +1,23 @@
+import dynamic from 'next/dynamic';
 import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import VideoSection from "@/components/VideoSection";
-import WhatWeDo from "@/components/WhatWeDo";
-import MediaCarousel from "@/components/MediaCarousel";
-import BrandShowcase from "@/components/BrandShowcase";
-import WhyChooseUs from "@/components/WhyChooseUs";
-import Testimonials from "@/components/Testimonials";
-import Footer from "@/components/Footer";
-import FloatingCTA from "@/components/FloatingCTA";
+import { fetchSiteContent } from "@/lib/firebase";
 
-export default function Home() {
+const VideoSection = dynamic(() => import("@/components/VideoSection"));
+const WhatWeDo = dynamic(() => import("@/components/WhatWeDo"));
+const MediaCarousel = dynamic(() => import("@/components/MediaCarousel"));
+const BrandShowcase = dynamic(() => import("@/components/BrandShowcase"));
+const WhyChooseUs = dynamic(() => import("@/components/WhyChooseUs"));
+const Testimonials = dynamic(() => import("@/components/Testimonials"));
+const Footer = dynamic(() => import("@/components/Footer"));
+const FloatingCTA = dynamic(() => import("@/components/FloatingCTA"));
+
+export default async function Home() {
+  const initialData = await fetchSiteContent();
+
   return (
-    <AdminProvider>
+    <AdminProvider initialData={initialData}>
       <Navbar />
       <main>
         <Hero />

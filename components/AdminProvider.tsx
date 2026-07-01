@@ -1,11 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import {
-  fetchSiteContent,
   saveSiteContent,
   SiteContent,
-  defaultSiteContent,
 } from "@/lib/firebase";
 
 export type { SiteContent };
@@ -28,18 +26,10 @@ interface AdminContextType {
 
 const AdminContext = createContext<AdminContextType | null>(null);
 
-export function AdminProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<SiteContent>(defaultSiteContent);
-  const [loaded, setLoaded] = useState(false);
+export function AdminProvider({ children, initialData }: { children: ReactNode; initialData: SiteContent }) {
+  const [data, setData] = useState<SiteContent>(initialData);
+  const [loaded, setLoaded] = useState(true);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    fetchSiteContent().then((content) => {
-      console.log("[AdminProvider] Loaded content, testimonials:", content.testimonials.length);
-      setData(content);
-      setLoaded(true);
-    });
-  }, []);
 
   const persist = async (updated: SiteContent) => {
     setSaving(true);
