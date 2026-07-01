@@ -66,8 +66,6 @@ function StackedCard({
         opacity,
         scale,
         zIndex,
-        z: 0,
-        willChange: "transform, opacity",
       }}
     >
       <div

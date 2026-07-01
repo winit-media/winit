@@ -2,7 +2,6 @@
 
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
-import Image from "next/image";
 
 function VerticalCarousel({
   items,
@@ -23,15 +22,13 @@ function VerticalCarousel({
         {duplicated.map((item, i) => (
           <div
             key={`${item.id}-${i}`}
-            className="brand-glow block mx-auto mb-4 w-[40vw] max-w-[225px] aspect-square md:w-[325px] md:h-[325px] md:max-w-none rounded-xl flex items-center justify-center p-4 sm:p-5 md:p-8 transition-shadow duration-300 relative"
+            className="brand-glow block mx-auto mb-4 w-[40vw] max-w-[225px] aspect-square md:w-[325px] md:h-[325px] md:max-w-none rounded-xl flex items-center justify-center p-4 sm:p-5 md:p-8 transition-shadow duration-300"
           >
             {item.imageUrl ? (
-              <Image
+              <img
                 src={item.imageUrl}
                 alt={item.name}
-                fill
-                sizes="(max-width: 768px) 40vw, 325px"
-                className="brand-logo object-contain p-8"
+                className="brand-logo max-w-full max-h-full object-contain"
               />
             ) : (
               <span className="text-gray-400 text-sm text-center">{item.name}</span>

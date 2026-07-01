@@ -25,7 +25,7 @@ export default function PatternOverlay({ opacity = 0.16 }: { opacity?: number })
   }, []);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 pointer-events-none z-0" style={{ transform: "translateZ(0)" }}>
+    <div ref={containerRef} className="absolute inset-0 pointer-events-none z-0">
       {loaded && (
         <img
           src="/pattern.svg"
