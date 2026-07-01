@@ -35,29 +35,32 @@ const defaultVideos = [
 
 const useDeviceCapabilities = () => {
   const [canPlayMedia, setCanPlayMedia] = useState(true);
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
     try {
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
       
-      // @ts-ignore
+      // @ts-expect-error connection API is non-standard but widely supported
       const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
       const saveData = connection?.saveData === true;
       const slowConnection = connection?.effectiveType === 'slow-2g' || connection?.effectiveType === '2g';
       
-      // @ts-ignore
+      // @ts-expect-error deviceMemory is non-standard but supported on some browsers
       const lowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
       const lowCPU = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
 
-      if (prefersReducedMotion || saveData || slowConnection || lowMemory || lowCPU) {
+      if (prefersReducedMotion || saveData || slowConnection || lowMemory || lowCPU || mobile) {
         setCanPlayMedia(false);
       }
-    } catch (e) {
+    } catch {
       // Ignore errors, default to true
     }
   }, []);
 
-  return canPlayMedia;
+  return { canPlayMedia, isMobile };
 };
 
 interface VideoCardProps {
@@ -89,7 +92,7 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
           v.pause();
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.4 }
     );
 
     observer.observe(container);
@@ -284,10 +287,14 @@ export default function MediaCarousel() {
   const videos = data.carouselVideos.length > 0 ? data.carouselVideos : defaultVideos;
   const [expandedVideo, setExpandedVideo] = useState<{ id: string; url: string; name: string } | null>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const canPlayMedia = useDeviceCapabilities();
+  const { canPlayMedia, isMobile } = useDeviceCapabilities();
 
   const row1Videos = videos.slice(0, Math.ceil(videos.length / 2));
   const row2Videos = videos.slice(Math.ceil(videos.length / 2));
+
+  // On mobile, reduce video count to prevent memory issues
+  const mobileRow1Videos = isMobile ? row1Videos.slice(0, Math.min(4, row1Videos.length)) : row1Videos;
+  const mobileRow2Videos = isMobile ? row2Videos.slice(0, Math.min(4, row2Videos.length)) : row2Videos;
 
   const handleExpand = useCallback((video: { id: string; url: string; name: string }) => {
     setExpandedVideo(video);
@@ -314,7 +321,7 @@ export default function MediaCarousel() {
           <div className="h-[min(35vh,350px)] min-h-[200px] overflow-hidden rounded-xl">
             <div className="flex h-full w-max gap-3 media-marquee media-marquee-left">
               <div className="flex items-center gap-3 shrink-0">
-                {row1Videos.map((video, index) => (
+                {mobileRow1Videos.map((video, index) => (
                   <VideoCard
                     key={`${video.id}-a-${index}`}
                     video={video}
@@ -324,24 +331,26 @@ export default function MediaCarousel() {
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-3 shrink-0">
-                {row1Videos.map((video, index) => (
-                  <VideoCard
-                    key={`${video.id}-b-${index}`}
-                    video={video}
-                    onExpand={handleExpand}
-                    isPaused={isPaused}
-                    canPlayMedia={canPlayMedia}
-                  />
-                ))}
-              </div>
+              {!isMobile && (
+                <div className="flex items-center gap-3 shrink-0">
+                  {mobileRow1Videos.map((video, index) => (
+                    <VideoCard
+                      key={`${video.id}-b-${index}`}
+                      video={video}
+                      onExpand={handleExpand}
+                      isPaused={isPaused}
+                      canPlayMedia={canPlayMedia}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
           <div className="h-[min(35vh,350px)] min-h-[200px] overflow-hidden rounded-xl">
             <div className="flex h-full w-max gap-3 media-marquee media-marquee-right">
               <div className="flex items-center gap-3 shrink-0">
-                {row2Videos.map((video, index) => (
+                {mobileRow2Videos.map((video, index) => (
                   <VideoCard
                     key={`${video.id}-a-${index}`}
                     video={video}
@@ -351,17 +360,19 @@ export default function MediaCarousel() {
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-3 shrink-0">
-                {row2Videos.map((video, index) => (
-                  <VideoCard
-                    key={`${video.id}-b-${index}`}
-                    video={video}
-                    onExpand={handleExpand}
-                    isPaused={isPaused}
-                    canPlayMedia={canPlayMedia}
-                  />
-                ))}
-              </div>
+              {!isMobile && (
+                <div className="flex items-center gap-3 shrink-0">
+                  {mobileRow2Videos.map((video, index) => (
+                    <VideoCard
+                      key={`${video.id}-b-${index}`}
+                      video={video}
+                      onExpand={handleExpand}
+                      isPaused={isPaused}
+                      canPlayMedia={canPlayMedia}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

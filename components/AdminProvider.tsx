@@ -1,12 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import {
-  fetchSiteContent,
-  saveSiteContent,
-  SiteContent,
-  defaultSiteContent,
-} from "@/lib/firebase";
+import type { SiteContent } from "@/lib/content";
+import { defaultSiteContent } from "@/lib/content";
 
 export type { SiteContent };
 
@@ -34,16 +30,19 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchSiteContent().then((content) => {
-      console.log("[AdminProvider] Loaded content, testimonials:", content.testimonials.length);
-      setData(content);
-      setLoaded(true);
+    import("@/lib/firebase").then(({ fetchSiteContent }) => {
+      fetchSiteContent().then((content) => {
+        console.log("[AdminProvider] Loaded content, testimonials:", content.testimonials.length);
+        setData(content);
+        setLoaded(true);
+      });
     });
   }, []);
 
   const persist = async (updated: SiteContent) => {
     setSaving(true);
     try {
+      const { saveSiteContent } = await import("@/lib/firebase");
       await saveSiteContent(updated);
     } catch (err) {
       console.error("Failed to save:", err);

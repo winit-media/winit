@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquarePlus } from "lucide-react";
 import ContactModal from "./ContactModal";
 
@@ -59,24 +58,17 @@ export default function FloatingCTA() {
 
   return (
     <>
-      <AnimatePresence>
-        <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 1, type: "spring", stiffness: 200, damping: 20 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsOpen(true)}
-          className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-[0_8px_30px_rgba(145,45,191,0.4)] flex items-center justify-center transition-colors duration-500 ${
-            isDarkBg
-              ? "bg-white text-brand hover:bg-gray-100" // On purple BG: white button, purple icon
-              : "bg-brand text-white hover:bg-[#8025a8]" // On white BG: purple button, white icon
-          }`}
-          aria-label="Open contact form"
-        >
-          <MessageSquarePlus size={24} />
-        </motion.button>
-      </AnimatePresence>
+      <button
+        onClick={() => setIsOpen(true)}
+        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-[0_8px_30px_rgba(145,45,191,0.4)] flex items-center justify-center transition-all duration-500 animate-cta-entrance hover:scale-110 active:scale-90 ${
+          isDarkBg
+            ? "bg-white text-brand hover:bg-gray-100"
+            : "bg-brand text-white hover:bg-[#8025a8]"
+        }`}
+        aria-label="Open contact form"
+      >
+        <MessageSquarePlus size={24} />
+      </button>
       
       <ContactModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>

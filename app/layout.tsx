@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import FontLoader from "@/components/FontLoader";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -24,12 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <head>
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://api.fontshare.com" />
       </head>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <FontLoader />
+        {children}
+      </body>
     </html>
   );
 }

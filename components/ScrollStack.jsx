@@ -2,6 +2,10 @@ import { useLayoutEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';
 import './ScrollStack.css';
 
+const isTouchDevice = () =>
+  typeof window !== 'undefined' &&
+  ('ontouchstart' in window || window.innerWidth < 768);
+
 export const ScrollStackItem = ({ children, itemClassName = '' }) => (
   <div className={`scroll-stack-card ${itemClassName}`.trim()}>{children}</div>
 );
@@ -187,6 +191,28 @@ const ScrollStack = ({
   }, [updateCardTransforms]);
 
   const setupLenis = useCallback(() => {
+    if (isTouchDevice()) {
+      // Use native scroll on touch devices — Lenis conflicts with iOS scroll
+      const scrollTarget = useWindowScroll
+        ? window
+        : scrollerRef.current;
+      if (!scrollTarget) return;
+
+      const onScroll = () => handleScroll();
+      scrollTarget.addEventListener('scroll', onScroll, { passive: true });
+      animationFrameRef.current = requestAnimationFrame(function raf() {
+        updateCardTransforms();
+        animationFrameRef.current = requestAnimationFrame(raf);
+      });
+      lenisRef.current = {
+        destroy: () => {
+          scrollTarget.removeEventListener('scroll', onScroll);
+          if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        }
+      };
+      return;
+    }
+
     if (useWindowScroll) {
       const lenis = new Lenis({
         duration: 1.2,

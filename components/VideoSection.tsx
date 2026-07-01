@@ -11,8 +11,19 @@ export default function VideoSection() {
   const [inView, setInView] = useState(false);
   const [muted, setMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [canAutoPlay, setCanAutoPlay] = useState(false);
 
   const videoSrc = data.defaultVideoUrl || "/fallback-video.mp4";
+
+  useEffect(() => {
+    try {
+      const mobile = window.innerWidth < 768;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (mobile || prefersReducedMotion) {
+        setCanAutoPlay(false);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -33,6 +44,12 @@ export default function VideoSection() {
     const video = videoRef.current;
     if (!video) return;
 
+    if (!canAutoPlay) {
+      video.pause();
+      setIsPlaying(false);
+      return;
+    }
+
     if (inView) {
       video.play().catch(() => {});
       setIsPlaying(true);
@@ -40,7 +57,7 @@ export default function VideoSection() {
       video.pause();
       setIsPlaying(false);
     }
-  }, [inView]);
+  }, [inView, canAutoPlay]);
 
   const togglePlay = () => {
     const v = videoRef.current;
