@@ -251,11 +251,11 @@ export const defaultSiteContent: SiteContent = {
   footerCopyright: "© 2026 WiNit. All rights reserved.",
 
   brands: [
-    { id: "1", name: "Reliance Retail Limited", imageUrl: "https://relianceretail.com/img/RRfavicon.png", link: "https://www.relianceretail.com" },
-    { id: "2", name: "Lokmat Media Pvt. Ltd.", imageUrl: "https://d3pc1xvrcw35tl.cloudfront.net/assets/images/lokmat-logo-white-v0.2.png", link: "https://www.lokmat.com" },
-    { id: "3", name: "Brand Concepts Ltd", imageUrl: "https://www.brandconcepts.in/wp-content/uploads/2024/02/Brand-Concepts-Logo-new.png", link: "https://www.brandconcepts.in" },
-    { id: "4", name: "Augmont Goldtech Private Limited", imageUrl: "https://www.augmont.com/assets/logos/augmont-logo.webp", link: "https://www.augmont.com" },
-    { id: "5", name: "Everest Fleet Pvt Ltd", imageUrl: "https://everestfleet.com/wp-content/uploads/2025/04/New-Logo-01-2.png", link: "https://everestfleet.com" },
+    { id: "1", name: "Reliance Retail Limited", imageUrl: "/brands/RRfavicon.png", link: "https://www.relianceretail.com" },
+    { id: "2", name: "Lokmat Media Pvt. Ltd.", imageUrl: "/brands/lokmat.png", link: "https://www.lokmat.com" },
+    { id: "3", name: "Brand Concepts Ltd", imageUrl: "/brands/brandconcepts.png", link: "https://www.brandconcepts.in" },
+    { id: "4", name: "Augmont Goldtech Private Limited", imageUrl: "/brands/augmont.webp", link: "https://www.augmont.com" },
+    { id: "5", name: "Everest Fleet Pvt Ltd", imageUrl: "/brands/everestfleet.png", link: "https://everestfleet.com" },
   ],
   defaultVideoUrl: "/fallback-video.mp4",
   carouselVideos: [],

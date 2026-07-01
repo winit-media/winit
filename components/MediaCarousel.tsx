@@ -72,38 +72,37 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
   const [isLandscape, setIsLandscape] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const { videoUrl, posterUrl } = getOptimizedMedia(video.url);
 
+  const shouldMountVideo = inView || isHovered;
+
   useEffect(() => {
-    const v = videoRef.current;
     const container = containerRef.current;
-    if (!v || !container || !canPlayMedia) return;
+    if (!container || !canPlayMedia) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (isPaused) {
-          v.pause();
-        } else if (entry.isIntersecting) {
-          v.play().catch(() => {});
-        } else {
-          v.pause();
-        }
+        setInView(entry.isIntersecting);
       },
       { threshold: 0.2 }
     );
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, [isPaused, canPlayMedia]);
+  }, [canPlayMedia]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !canPlayMedia) return;
 
-    if (isPaused) {
+    if (!isPaused && inView) {
+      v.play().catch(() => {});
+    } else {
       v.pause();
     }
-  }, [isPaused, canPlayMedia]);
+  }, [inView, isPaused, shouldMountVideo, canPlayMedia]);
 
   const handleClick = () => {
     onExpand(video);
@@ -123,9 +122,11 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
     <div
       ref={containerRef}
       onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02]`}
     >
-      {canPlayMedia ? (
+      {canPlayMedia && shouldMountVideo ? (
         <video
           ref={videoRef}
           src={videoUrl}
@@ -133,8 +134,8 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
           className="w-full h-full object-contain bg-black"
           loop
           playsInline
-          muted
-          preload="none"
+          muted={muted}
+          preload="metadata"
           onLoadedMetadata={(e) => {
             const v = e.currentTarget;
             setIsLandscape(v.videoWidth > v.videoHeight);
@@ -240,6 +241,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
             className="w-full h-full object-contain"
             playsInline
             muted={muted}
+            preload="metadata"
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
             onLoadedMetadata={(e) => {

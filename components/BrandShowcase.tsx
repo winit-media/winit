@@ -2,6 +2,17 @@
 
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
+import Image from "next/image";
+
+const getLocalImageUrl = (url: string) => {
+  if (!url) return url;
+  if (url.includes('RRfavicon.png')) return '/brands/RRfavicon.png';
+  if (url.includes('lokmat-logo')) return '/brands/lokmat.png';
+  if (url.includes('Brand-Concepts')) return '/brands/brandconcepts.png';
+  if (url.includes('augmont-logo')) return '/brands/augmont.webp';
+  if (url.includes('New-Logo-01-2.png')) return '/brands/everestfleet.png';
+  return url;
+};
 
 function VerticalCarousel({
   items,
@@ -19,22 +30,29 @@ function VerticalCarousel({
           direction === "down" ? "animate-marquee-down" : "animate-marquee-up"
         }
       >
-        {duplicated.map((item, i) => (
+        {duplicated.map((item, i) => {
+          const finalUrl = getLocalImageUrl(item.imageUrl);
+          return (
           <div
             key={`${item.id}-${i}`}
             className="brand-glow block mx-auto mb-4 w-[40vw] max-w-[225px] aspect-square md:w-[325px] md:h-[325px] md:max-w-none rounded-xl flex items-center justify-center p-4 sm:p-5 md:p-8 transition-shadow duration-300"
           >
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                className="brand-logo max-w-full max-h-full object-contain"
-              />
+            {finalUrl ? (
+              <div className="relative w-full h-full">
+                <Image
+                  src={finalUrl}
+                  alt={item.name}
+                  fill
+                  className="brand-logo object-contain"
+                  sizes="(max-width: 768px) 225px, 325px"
+                  unoptimized={finalUrl.startsWith('http')}
+                />
+              </div>
             ) : (
               <span className="text-gray-400 text-sm text-center">{item.name}</span>
             )}
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );
