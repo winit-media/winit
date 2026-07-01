@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import PatternOverlay from "./PatternOverlay";
 import { useAdmin } from "./AdminProvider";
 
@@ -47,9 +48,9 @@ export default function Hero() {
     >
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
-        <div
-          className="transition-transform duration-800 ease-out"
-          style={{ transform: showSubtext ? 'translateY(-10px)' : 'translateY(0)', transition: 'transform 0.8s ease-out' }}
+        <motion.div
+          animate={showSubtext ? { y: -10 } : { y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1
             className="font-display text-white text-5xl sm:text-5xl md:text-7xl lg:text-8xl font-black mt-16 mb-2"
@@ -58,32 +59,40 @@ export default function Hero() {
             <span>{typedText}</span>
             {!typingDone && <span className="dot-cursor" />}
           </h1>
-        </div>
+        </motion.div>
 
-        {showSubtext && (
-          <>
-            <div
-              className="mt-2 max-w-3xl mx-auto animate-fade-in-up"
-              style={{ animationDelay: '0s' }}
-            >
-              <p className="text-white text-base sm:text-lg md:text-xl leading-relaxed font-medium mx-auto" style={{ maxWidth: '60ch', opacity: 0.85 }}>
-                {data.heroSubtext}
-              </p>
-            </div>
-
-            <div
-              className="mt-8 animate-fade-in-up"
-              style={{ animationDelay: '0.3s' }}
-            >
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent("open-contact-modal"))}
-                className="bg-white text-[#912dbf] px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_20px_rgba(255,255,255,0.3)] active:scale-95"
+        <AnimatePresence>
+          {showSubtext && (
+            <>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="mt-2 max-w-3xl mx-auto"
               >
-                {data.heroCtaText}
-              </button>
-            </div>
-          </>
-        )}
+                <p className="text-white text-base sm:text-lg md:text-xl leading-relaxed font-medium mx-auto" style={{ maxWidth: '60ch', opacity: 0.85 }}>
+                  {data.heroSubtext}
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+                className="mt-8"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(255,255,255,0.3)' }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => window.dispatchEvent(new CustomEvent("open-contact-modal"))}
+                  className="bg-white text-[#912dbf] px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-white/90"
+                >
+                  {data.heroCtaText}
+                </motion.button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

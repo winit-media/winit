@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useAdmin } from "./AdminProvider";
 
@@ -77,37 +78,48 @@ export default function Navbar() {
         </div>
       </nav>
 
-      <div
-        className={`fixed inset-0 bg-black z-[9998] md:hidden transition-opacity duration-300 ${
-          open ? "opacity-50 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={() => setOpen(false)}
-      />
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black z-[9998] md:hidden"
+            onClick={() => setOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      <div
-        className={`fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-[9999] transition-transform duration-300 ease-out md:hidden ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex justify-end p-4">
-          <button onClick={() => setOpen(false)} className="text-gray-700 p-2">
-            <X size={24} />
-          </button>
-        </div>
-        <div className="flex flex-col items-start px-8 space-y-6 mt-4">
-          {data.navLinks.map((link) => (
-            <button
-              key={link.href}
-              onClick={() => handleClick(link.href)}
-              className={`text-brand hover:text-brand-dark font-medium text-lg transition-colors uppercase relative ${
-                activeSection === link.href ? "after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-brand" : ""
-              }`}
-            >
-              {link.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.3 }}
+            className="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-[9999] md:hidden"
+          >
+            <div className="flex justify-end p-4">
+              <button onClick={() => setOpen(false)} className="text-gray-700 p-2">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex flex-col items-start px-8 space-y-6 mt-4">
+              {data.navLinks.map((link) => (
+                <button
+                  key={link.href}
+                  onClick={() => handleClick(link.href)}
+                  className={`text-brand hover:text-brand-dark font-medium text-lg transition-colors uppercase relative ${
+                    activeSection === link.href ? "after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-brand" : ""
+                  }`}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

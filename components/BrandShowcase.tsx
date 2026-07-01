@@ -2,7 +2,6 @@
 
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
-import { useEffect, useState } from "react";
 
 function VerticalCarousel({
   items,
@@ -11,14 +10,7 @@ function VerticalCarousel({
   items: { id: string; name: string; imageUrl: string; link?: string }[];
   direction: "up" | "down";
 }) {
-  const [isMobile, setIsMobile] = useState(true);
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-  }, []);
-
-  // On mobile, duplicate fewer times to reduce DOM size
-  const duplicated = isMobile ? [...items, ...items] : [...items, ...items, ...items, ...items];
+  const duplicated = [...items, ...items, ...items, ...items];
 
   return (
     <div className="overflow-hidden h-full">

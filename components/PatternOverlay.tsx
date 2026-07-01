@@ -17,7 +17,7 @@ export default function PatternOverlay({ opacity = 0.16 }: { opacity?: number })
           observer.disconnect();
         }
       },
-      { rootMargin: "50px" }
+      { rootMargin: "200px" }
     );
 
     observer.observe(el);

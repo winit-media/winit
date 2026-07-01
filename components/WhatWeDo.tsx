@@ -70,7 +70,6 @@ function StackedCard({
     >
       <div
         className={`${item.bg} w-full h-full rounded-3xl shadow-2xl p-8 lg:p-12 flex flex-col justify-center text-white`}
-        style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
       >
         <h3 className="text-3xl lg:text-4xl font-bold mb-4 font-display">{item.sub}</h3>
         <p className="text-white/90 text-[15px] lg:text-base leading-relaxed">{item.content}</p>
@@ -110,8 +109,6 @@ export default function WhatWeDo() {
             style={{
               backgroundImage: "url(/pattern.svg)",
               opacity: 0.24,
-              willChange: "transform",
-              transform: "translateZ(0)",
             }}
           />
         </div>
