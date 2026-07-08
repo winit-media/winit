@@ -38,7 +38,7 @@ function TestimonialCard({
 
       <Quote size={24} className="text-brand mb-4 fill-brand/10 shrink-0" />
 
-      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-8 mb-4 overflow-hidden">
+      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-4 mb-4 overflow-hidden">
         {t.review}
       </p>
 
@@ -161,8 +161,13 @@ export default function Testimonials() {
           <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">
             {data.testimonialsSubtitle}
           </span>
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-brand tracking-tight">
-            {data.testimonialsTitle}
+          <h2 className="text-5xl sm:text-6xl md:text-7xl font-display font-bold text-brand tracking-tight leading-[1.1]">
+            {data.testimonialsTitle.replace(/from /i, "from \n").split('\n').map((line, i, arr) => (
+              <span key={i}>
+                {line}
+                {i < arr.length - 1 && <br className="block md:hidden" />}
+              </span>
+            ))}
           </h2>
           <div className="mx-auto mt-4 lg:mt-6 h-1 w-20 bg-gradient-to-r from-brand to-brand-light rounded-full" />
         </div>

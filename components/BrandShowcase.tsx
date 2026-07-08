@@ -80,9 +80,6 @@ export default function BrandShowcase() {
             <h2 className="font-display font-bold text-brand drop-shadow-sm lg:drop-shadow-none" style={{ fontSize: "clamp(3.5rem, 8vw, 7rem)", lineHeight: "0.95" }}>
               Our<br className="hidden lg:block" /> Brands
             </h2>
-            <p className="mt-4 text-gray-500 text-sm md:text-base max-w-xs mx-auto lg:mx-0">
-              Trusted by industry leaders and innovative companies worldwide.
-            </p>
           </div>
         </div>
 

@@ -35,21 +35,49 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-[60vh] md:min-h-screen flex items-center justify-center bg-brand overflow-hidden snap-section"
+      className="relative pt-24 pb-24 md:py-0 h-auto md:min-h-screen flex items-center justify-center bg-brand overflow-hidden snap-section"
     >
       <PatternOverlay opacity={0.16} />
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
           initial={{ y: "-100vh" }}
           animate={{ y: 0 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
         >
           <h1
-            className="font-display text-white text-5xl sm:text-5xl md:text-7xl lg:text-8xl font-black mt-16 mb-2"
-            style={{ letterSpacing: "-0.03em", lineHeight: "0.95" }}
+            className="font-display text-white text-5xl leading-[1.1] sm:text-6xl md:text-7xl lg:text-8xl font-black mt-8 mb-4 md:mt-16 md:mb-2 relative tracking-wide"
           >
-            <span>{typedText}</span>
-            {!typingDone && <span className="dot-cursor" />}
+            {/* Ghost text to preserve layout height during typing animation */}
+            <span className="opacity-0 pointer-events-none select-none block" aria-hidden="true">
+              {"SHAPING SUCCESS STORIES".split(' ').map((word, index, array) => (
+                <span key={`ghost-${index}`}>
+                  {word}
+                  {index === 0 && index < array.length - 1 && (
+                    <>
+                      <br className="block md:hidden" />
+                      <span className="hidden md:inline"> </span>
+                    </>
+                  )}
+                  {index === 1 && index < array.length - 1 && <br className="block" />}
+                </span>
+              ))}
+            </span>
+            {/* Actual typed text */}
+            <span className="absolute top-0 left-0 w-full h-full">
+              {typedText.split(' ').map((word, index, array) => (
+                <span key={index}>
+                  {word}
+                  {index === 0 && index < array.length - 1 && (
+                    <>
+                      <br className="block md:hidden" />
+                      <span className="hidden md:inline"> </span>
+                    </>
+                  )}
+                  {index === 1 && index < array.length - 1 && <br className="block" />}
+                </span>
+              ))}
+              {!typingDone && <span className="dot-cursor inline-block align-baseline" />}
+            </span>
           </h1>
         </motion.div>
 
@@ -57,13 +85,13 @@ export default function Hero() {
           initial={{ y: "-100vh" }}
           animate={{ y: 0 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          className="mt-8"
+          className="mt-6 md:mt-8"
         >
           <motion.button
-            whileHover={{ scale: 1.05, boxShadow: "0 8px 20px rgba(255,255,255,0.3)" }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => window.dispatchEvent(new CustomEvent("open-contact-modal"))}
-            className="bg-white text-[#912dbf] px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-white/90"
+            className="bg-white text-[#912dbf] px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-white/95 shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_15px_25px_rgba(0,0,0,0.15)] shadow-[inset_0_-2px_4px_rgba(0,0,0,0.05)]"
           >
             {data.heroCtaText}
           </motion.button>

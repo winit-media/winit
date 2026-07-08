@@ -32,7 +32,7 @@ export default function MobileBrandMarquee() {
           return (
             <div
               key={`${item.id}-${i}`}
-              className="flex-shrink-0 mx-6 w-[120px] h-[60px] relative flex items-center justify-center transition-all duration-300"
+              className="flex-shrink-0 mx-8 w-[100px] h-[40px] relative flex items-center justify-center transition-all duration-300"
             >
               {finalUrl ? (
                 <Image
@@ -40,7 +40,7 @@ export default function MobileBrandMarquee() {
                   alt={item.name}
                   fill
                   className="object-contain"
-                  sizes="120px"
+                  sizes="100px"
                   unoptimized={finalUrl.startsWith('http')}
                 />
               ) : (

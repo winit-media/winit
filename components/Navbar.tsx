@@ -66,7 +66,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             <div className="flex-shrink-0">
               <button onClick={() => handleClick("#home")} className="flex-shrink-0">
-                <Image src={data.logoUrl} alt="WiNit" width={48} height={32} priority className="h-12 w-auto" />
+                <Image src={data.logoUrl} alt="WiNit" width={48} height={32} priority className="h-9 md:h-12 w-auto transition-all" />
               </button>
             </div>
 

@@ -50,8 +50,13 @@ export default function WhyChooseUs() {
     <section className="relative bg-brand min-h-screen snap-section pt-24 lg:pt-32 pb-10 lg:pb-20">
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-5xl font-display font-bold text-white text-center mb-6 lg:mb-16">
-          {data.whyChooseUsTitle}
+        <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center mb-6 lg:mb-16 leading-[1.1]">
+          {data.whyChooseUsTitle.replace(/Choose /i, "Choose \n").split('\n').map((line, i, arr) => (
+            <span key={i}>
+              {line}
+              {i < arr.length - 1 && <br className="block md:hidden" />}
+            </span>
+          ))}
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
