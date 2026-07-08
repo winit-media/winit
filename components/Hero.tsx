@@ -35,7 +35,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative pt-24 pb-24 md:py-0 h-auto md:min-h-screen flex items-center justify-center bg-brand overflow-hidden snap-section"
+      className="relative pt-24 pb-24 md:py-0 h-auto md:min-h-screen flex items-center justify-center bg-brand overflow-hidden"
     >
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">

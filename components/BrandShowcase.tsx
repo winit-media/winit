@@ -70,7 +70,7 @@ export default function BrandShowcase() {
   const brands = data.brands;
 
   return (
-    <section className="relative bg-[#fcfcfc] h-screen snap-section overflow-hidden">
+    <section className="relative bg-[#fcfcfc] h-screen overflow-hidden">
       <PatternOverlay opacity={0.05} />
       <div className="relative z-10 h-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center lg:gap-12 lg:px-8">
         

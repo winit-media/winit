@@ -10,7 +10,6 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
   scroll-padding-top: 4rem;
 }
 
@@ -22,9 +21,7 @@ main {
   overflow: visible;
 }
 
-.snap-section {
-  scroll-snap-align: start;
-}
+
 
 .swiper-pagination-bullet-active {
   background: #912dbf !important;

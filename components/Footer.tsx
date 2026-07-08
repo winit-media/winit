@@ -12,7 +12,7 @@ export default function Footer() {
   };
 
   return (
-    <footer id="contact" className="relative bg-brand snap-section overflow-hidden">
+    <footer id="contact" className="relative bg-brand overflow-hidden">
       <PatternOverlay opacity={0.08} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
@@ -22,7 +22,7 @@ export default function Footer() {
             <p className="text-white/70 text-xs lg:text-sm leading-relaxed max-w-xs">
               {data.footerTagline}
             </p>
-            <div className="flex gap-3 mt-1 lg:mt-2">
+            <div className="flex flex-wrap gap-3 mt-1 lg:mt-2 max-w-[140px] lg:max-w-none">
               {data.socialLinks.map((social) => (
                 <a
                   key={social.label}
@@ -114,9 +114,16 @@ function SocialIcon({ label }: { label: string }) {
         </svg>
       );
     case "Twitter":
+    case "X":
       return (
         <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      );
+    case "YouTube":
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.501 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
         </svg>
       );
     case "LinkedIn":

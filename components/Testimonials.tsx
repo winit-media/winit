@@ -154,7 +154,7 @@ export default function Testimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-16 pb-10 lg:pt-32 lg:pb-16 overflow-hidden snap-section min-h-screen flex flex-col justify-center">
+    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-16 pb-10 lg:pt-32 lg:pb-16 overflow-hidden min-h-screen flex flex-col justify-center">
       <PatternOverlay opacity={0.06} />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-6 lg:mb-6">

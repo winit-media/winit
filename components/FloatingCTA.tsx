@@ -23,7 +23,7 @@ export default function FloatingCTA() {
       
       // Find the structural section/footer behind it
       const container = elements.find(
-        (el) => el.tagName === "SECTION" || el.tagName === "FOOTER" || el.classList.contains("snap-section")
+        (el) => el.tagName === "SECTION" || el.tagName === "FOOTER"
       );
 
       if (container) {

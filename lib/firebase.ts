@@ -249,8 +249,9 @@ export const defaultSiteContent: SiteContent = {
   socialLinks: [
     { label: "Facebook", href: "#" },
     { label: "Instagram", href: "#" },
-    { label: "Twitter", href: "#" },
+    { label: "X", href: "#" },
     { label: "LinkedIn", href: "#" },
+    { label: "YouTube", href: "#" },
   ],
   footerCopyright: "© 2026 WiNit. All rights reserved.",
 
@@ -282,6 +283,17 @@ export async function fetchSiteContent(): Promise<SiteContent> {
       if (raw.stats && raw.stats.length !== 4) {
         raw.stats = defaultSiteContent.stats;
         saveSiteContent({ ...defaultSiteContent, ...raw, stats: raw.stats } as SiteContent);
+      }
+
+      // Auto-sync social links to have 5 logos
+      if (raw.socialLinks && raw.socialLinks.length < 5) {
+        raw.socialLinks = raw.socialLinks.map(link => 
+          link.label === "Twitter" ? { ...link, label: "X" } : link
+        );
+        if (!raw.socialLinks.find(link => link.label === "YouTube")) {
+          raw.socialLinks.push({ label: "YouTube", href: "#" });
+        }
+        saveSiteContent({ ...defaultSiteContent, ...raw, socialLinks: raw.socialLinks } as SiteContent);
       }
 
       return {

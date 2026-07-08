@@ -47,7 +47,7 @@ export default function WhyChooseUs() {
   const { data } = useAdmin();
 
   return (
-    <section className="relative bg-brand min-h-screen snap-section pt-24 lg:pt-32 pb-10 lg:pb-20">
+    <section className="relative bg-brand min-h-screen pt-24 lg:pt-32 pb-10 lg:pb-20">
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center mb-6 lg:mb-16 leading-[1.1]">

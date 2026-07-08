@@ -302,18 +302,18 @@ export default function MediaCarousel() {
   }, []);
 
   return (
-    <section id="work" className="relative bg-brand h-screen pt-16 snap-section overflow-hidden flex flex-col">
+    <section id="work" className="relative bg-brand h-screen pt-16 overflow-hidden flex flex-col">
       <PatternOverlay opacity={0.16} />
-      <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden">
+      <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
         <div className="flex-shrink-0 flex items-end justify-center pt-6 pb-8 px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>
+          <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>
         </div>
 
         <div 
-          className="flex-1 flex flex-col gap-3 min-h-0 pb-4"
+          className="flex-1 w-full flex flex-col gap-3 sm:gap-4 min-h-0 pb-6 sm:pb-8"
           style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
         >
-          <div className="h-[min(35vh,350px)] min-h-[200px] overflow-hidden rounded-xl">
+          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
             <div className="flex h-full w-max gap-3 media-marquee media-marquee-left">
               <div className="flex items-center gap-3 shrink-0">
                 {row1Videos.map((video, index) => (
@@ -340,7 +340,7 @@ export default function MediaCarousel() {
             </div>
           </div>
 
-          <div className="h-[min(35vh,350px)] min-h-[200px] overflow-hidden rounded-xl">
+          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
             <div className="flex h-full w-max gap-3 media-marquee media-marquee-right">
               <div className="flex items-center gap-3 shrink-0">
                 {row2Videos.map((video, index) => (
