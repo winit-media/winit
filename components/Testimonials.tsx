@@ -161,7 +161,7 @@ export default function Testimonials() {
           <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">
             {data.testimonialsSubtitle}
           </span>
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-brand tracking-tight">
             {data.testimonialsTitle}
           </h2>
           <div className="mx-auto mt-4 lg:mt-6 h-1 w-20 bg-gradient-to-r from-brand to-brand-light rounded-full" />

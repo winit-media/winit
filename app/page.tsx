@@ -2,6 +2,7 @@ import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import VideoSection from "@/components/VideoSection";
+import MobileBrandMarquee from "@/components/MobileBrandMarquee";
 import WhatWeDo from "@/components/WhatWeDo";
 import MediaCarousel from "@/components/MediaCarousel";
 import BrandShowcase from "@/components/BrandShowcase";
@@ -17,6 +18,7 @@ export default function Home() {
       <main>
         <Hero />
         <VideoSection />
+        <MobileBrandMarquee />
         <WhatWeDo />
         <MediaCarousel />
         <BrandShowcase />

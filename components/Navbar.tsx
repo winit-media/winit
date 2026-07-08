@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -10,10 +10,25 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("#home");
+  const [showNav, setShowNav] = useState(true);
+  const lastScrollY = useRef(0);
   const { data } = useAdmin();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 10);
+      
+      if (currentScrollY < 10) {
+        setShowNav(true);
+      } else if (currentScrollY < lastScrollY.current) {
+        setShowNav(true);
+      } else if (currentScrollY > lastScrollY.current + 10) {
+        setShowNav(false);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -43,9 +58,9 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${
-          scrolled ? "bg-brand/90 backdrop-blur-sm shadow-md" : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 md:translate-y-0 ${
+          showNav ? "translate-y-0" : "-translate-y-full"
+        } ${scrolled ? "bg-brand/90 backdrop-blur-sm shadow-md" : "bg-transparent"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">

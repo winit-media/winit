@@ -39,25 +39,6 @@ main {
   background: rgba(255, 255, 255, 0.5) !important;
 }
 
-.brand-glow {
-  background-color: transparent;
-  box-shadow: none;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.brand-glow:hover {
-  background-color: #912dbf;
-  box-shadow: 0 0 25px rgba(145, 45, 191, 0.6);
-}
-
-.brand-logo {
-  filter: grayscale(1) sepia(1) hue-rotate(270deg) saturate(3);
-  transition: filter 0.3s ease;
-}
-
-.brand-glow:hover .brand-logo {
-  filter: brightness(0) invert(1);
-}
 
 @keyframes marquee-down {
   0% { transform: translateY(0); }

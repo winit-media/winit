@@ -6,7 +6,7 @@ import { useAdmin } from "./AdminProvider";
 
 const CARD_WIDTH = 440;
 const CARD_HEIGHT = 440;
-const ROTATION_AMOUNT = 8;
+const ROTATION_AMOUNT = 15;
 
 function StackedCard({
   item,
@@ -27,7 +27,7 @@ function StackedCard({
   const startFly = (index + 0.2) * step;
   const endFly = startFly + step * 0.8;
 
-  const dir = index % 2 === 0 ? 1 : -1;
+  const dir = -1;
   const initialRotation = dir * index * ROTATION_AMOUNT;
 
   const y = useTransform(
@@ -108,7 +108,7 @@ export default function WhatWeDo() {
             className="w-full h-full bg-cover bg-center"
             style={{
               backgroundImage: "url(/pattern.svg)",
-              opacity: 0.24,
+              opacity: 0.12,
             }}
           />
         </div>
@@ -117,23 +117,23 @@ export default function WhatWeDo() {
           <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-28 lg:pt-0">
             <div className="relative flex items-center justify-center lg:justify-start">
               <span
-                className="absolute text-brand font-display font-bold opacity-25 select-none pointer-events-none"
+                className="absolute text-brand font-display font-medium opacity-25 select-none pointer-events-none"
                 style={{
                   fontSize: "clamp(18rem, 40vw, 36rem)",
                   lineHeight: 1,
                   top: "50%",
                   left: "50%",
-                  transform: "translate(-50%, -50%)",
+                  transform: "translate(-50%, -50%) scaleX(0.8)",
                   zIndex: -1,
                 }}
               >
                 ?
               </span>
               <h2
-                className="font-display font-bold text-black leading-[0.95] text-center relative z-10"
-                style={{ fontSize: "clamp(2.835rem, 6.48vw, 5.67rem)" }}
+                className="font-display font-bold text-brand leading-[0.95] text-center relative z-10"
+                style={{ fontSize: "clamp(3.5rem, 8vw, 7rem)" }}
               >
-                What we<br />do
+                What<br />we do
               </h2>
             </div>
           </div>

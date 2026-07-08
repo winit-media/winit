@@ -150,7 +150,11 @@ export const defaultSiteContent: SiteContent = {
     { number: 700000, suffix: "+", label: "Creators Association" },
     { number: 50, suffix: "+", label: "Brands" },
     { number: 200, suffix: "+", label: "Campaigns" },
-    { number: 500, suffix: "mn+", label: "Views Delivered" },
+    { number: 1, suffix: "bn+", label: "Views Delivered" },
+    { number: 14, suffix: "+", label: "Languages" },
+    { number: 24, suffix: "+", label: "States" },
+    { number: 10, suffix: "+", label: "Services" },
+    { number: 25, suffix: "%", label: "Cost Optimisation" },
   ],
   reasons: [
     {

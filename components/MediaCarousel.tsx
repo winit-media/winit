@@ -124,14 +124,14 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02]`}
+      className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02] border-2 border-white`}
     >
       {canPlayMedia && shouldMountVideo ? (
         <video
           ref={videoRef}
           src={videoUrl}
           poster={posterUrl}
-          className="w-full h-full object-contain bg-black"
+          className="w-full h-full object-cover bg-black"
           loop
           playsInline
           muted={muted}
@@ -145,7 +145,7 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
         <img
           src={posterUrl}
           alt={video.name}
-          className="w-full h-full object-contain bg-black"
+          className="w-full h-full object-cover bg-black"
           onLoad={(e) => {
             const img = e.currentTarget;
             setIsLandscape(img.naturalWidth > img.naturalHeight);
@@ -226,7 +226,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
