@@ -16,6 +16,9 @@ import {
   Save,
   Loader2,
   LogOut,
+  ChevronUp,
+  ChevronDown,
+  ArrowLeftRight,
 } from "lucide-react";
 import { AdminProvider, useAdmin, SiteContent } from "@/components/AdminProvider";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -494,6 +497,34 @@ function VideosTab() {
     updateContent(updated);
   };
 
+  const moveVideo = (id: string, direction: "up" | "down") => {
+    const videos = [...local.carouselVideos];
+    const idx = videos.findIndex((v) => v.id === id);
+    if (idx === -1) return;
+    const target = direction === "up" ? idx - 1 : idx + 1;
+    if (target < 0 || target >= videos.length) return;
+    [videos[idx], videos[target]] = [videos[target], videos[idx]];
+    const updated = { ...local, carouselVideos: videos };
+    setLocal(updated);
+    updateContent(updated);
+  };
+
+  const moveToOtherRow = (id: string) => {
+    const videos = [...local.carouselVideos];
+    const idx = videos.findIndex((v) => v.id === id);
+    if (idx === -1) return;
+    const mid = Math.ceil(videos.length / 2);
+    const [video] = videos.splice(idx, 1);
+    if (idx < mid) {
+      videos.push(video);
+    } else {
+      videos.splice(mid, 0, video);
+    }
+    const updated = { ...local, carouselVideos: videos };
+    setLocal(updated);
+    updateContent(updated);
+  };
+
   return (
     <div className="space-y-6">
       <Section title="Default Fallback Video">
@@ -594,47 +625,77 @@ function VideosTab() {
             const mid = Math.ceil(local.carouselVideos.length / 2);
             const topRow = local.carouselVideos.slice(0, mid);
             const bottomRow = local.carouselVideos.slice(mid);
-            const renderRow = (videos: typeof local.carouselVideos) => (
+            const renderRow = (videos: typeof local.carouselVideos, baseIdx: number, rowLabel: string) => (
               <div className="space-y-2">
-                {videos.map((v) => (
-                  <div key={v.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {v.url ? (
-                        <video
-                          src={v.url}
-                          className="h-12 w-16 object-cover rounded border bg-gray-900"
-                          muted
-                          preload="metadata"
-                        />
-                      ) : (
-                        <Film size={16} className="text-gray-400" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <input
-                          type="text"
-                          value={v.name}
-                          onChange={(e) => updateVideoName(v.id, e.target.value)}
-                          className="font-medium text-sm bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand focus:outline-none w-full px-1 py-0.5 rounded"
-                        />
-                        <p className="text-xs text-gray-400 truncate max-w-[300px]">{v.url}</p>
+                {videos.map((v, localIdx) => {
+                  const globalIdx = baseIdx + localIdx;
+                  const isFirst = globalIdx === 0;
+                  const isLast = globalIdx === local.carouselVideos.length - 1;
+                  return (
+                    <div key={v.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        {v.url ? (
+                          <video
+                            src={v.url}
+                            className="h-12 w-16 object-cover rounded border bg-gray-900"
+                            muted
+                            preload="metadata"
+                          />
+                        ) : (
+                          <Film size={16} className="text-gray-400" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={v.name}
+                            onChange={(e) => updateVideoName(v.id, e.target.value)}
+                            className="font-medium text-sm bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand focus:outline-none w-full px-1 py-0.5 rounded"
+                          />
+                          <p className="text-xs text-gray-400 truncate max-w-[300px]">{v.url}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        <button
+                          onClick={() => moveVideo(v.id, "up")}
+                          disabled={isFirst}
+                          className="text-gray-400 hover:text-gray-600 disabled:opacity-25 disabled:cursor-not-allowed p-1"
+                          title="Move up"
+                        >
+                          <ChevronUp size={14} />
+                        </button>
+                        <button
+                          onClick={() => moveVideo(v.id, "down")}
+                          disabled={isLast}
+                          className="text-gray-400 hover:text-gray-600 disabled:opacity-25 disabled:cursor-not-allowed p-1"
+                          title="Move down"
+                        >
+                          <ChevronDown size={14} />
+                        </button>
+                        <button
+                          onClick={() => moveToOtherRow(v.id)}
+                          className="text-brand hover:text-brand-dark p-1"
+                          title={`Move to ${rowLabel === "top" ? "bottom" : "top"} row`}
+                        >
+                          <ArrowLeftRight size={14} />
+                        </button>
+                        <button onClick={() => removeVideo(v.id)} className="text-red-400 hover:text-red-600 p-1">
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
-                    <button onClick={() => removeVideo(v.id)} className="text-red-400 hover:text-red-600 p-1">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             );
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Top Row ({topRow.length})</p>
-                  {renderRow(topRow)}
+                  {renderRow(topRow, 0, "top")}
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Bottom Row ({bottomRow.length})</p>
-                  {renderRow(bottomRow)}
+                  {renderRow(bottomRow, mid, "bottom")}
                 </div>
               </div>
             );
