@@ -5,8 +5,9 @@ export function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") || "";
   const { pathname } = request.nextUrl;
 
-  // blogs.winitmedia.com → serve /admin/blogs
-  if (hostname.startsWith("blogs.") && !pathname.startsWith("/admin/blogs")) {
+  // Blog subdomain (e.g., blog.acaditya10.tech) → serve /admin/blogs
+  const blogDomain = process.env.BLOG_DOMAIN;
+  if (blogDomain && hostname === blogDomain && !pathname.startsWith("/admin/blogs")) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/blogs";
     return NextResponse.rewrite(url);
