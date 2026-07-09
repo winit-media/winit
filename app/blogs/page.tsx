@@ -9,6 +9,7 @@ import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import PatternOverlay from "@/components/PatternOverlay";
 import FloatingCTA from "@/components/FloatingCTA";
+import Footer from "@/components/Footer";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -204,6 +205,7 @@ export default function BlogsPage() {
         </div>
       </div>
 
+      <Footer />
       {selected && <BlogModal post={selected} onClose={handleClose} />}
       {!selected && <FloatingCTA />}
     </AdminProvider>

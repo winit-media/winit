@@ -18,10 +18,12 @@ function VerticalCarousel({
   items,
   direction,
   variant = "minimal",
+  duration = 30,
 }: {
   items: { id: string; name: string; imageUrl: string; link?: string }[];
   direction: "up" | "down";
   variant?: "minimal" | "glass";
+  duration?: number;
 }) {
   const duplicated = [...items, ...items, ...items, ...items];
 
@@ -36,6 +38,7 @@ function VerticalCarousel({
         className={
           direction === "down" ? "animate-marquee-down" : "animate-marquee-up"
         }
+        style={{ animationDuration: `${duration}s` }}
       >
         {duplicated.map((item, i) => {
           const finalUrl = getLocalImageUrl(item.imageUrl);
@@ -68,6 +71,7 @@ function VerticalCarousel({
 export default function BrandShowcase() {
   const { data } = useAdmin();
   const brands = data.brands;
+  const duration = Math.max(20, brands.length * 4);
 
   return (
     <section className="relative bg-[#fcfcfc] h-screen overflow-hidden">
@@ -91,9 +95,9 @@ export default function BrandShowcase() {
           {brands.length > 0 ? (
             <>
               {/* Left Carousel - Glass Variant */}
-              <VerticalCarousel items={brands} direction="down" variant="glass" />
+              <VerticalCarousel items={brands} direction="down" variant="glass" duration={duration} />
               {/* Right Carousel - Glass Variant */}
-              <VerticalCarousel items={[...brands].reverse()} direction="up" variant="glass" />
+              <VerticalCarousel items={[...brands].reverse()} direction="up" variant="glass" duration={duration} />
             </>
           ) : (
             <>
