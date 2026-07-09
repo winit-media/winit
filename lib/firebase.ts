@@ -77,6 +77,9 @@ export interface SiteContent {
   defaultVideoUrl: string;
   carouselVideos: { id: string; name: string; url: string }[];
 
+  // Blog Users
+  blogUsers: { email: string; displayName: string }[];
+
   // Page Metadata
   pageTitle: string;
   pageDescription: string;
@@ -88,6 +91,7 @@ export const defaultSiteContent: SiteContent = {
     { label: "Home", href: "#home" },
     { label: "Services", href: "#services" },
     { label: "Work", href: "#work" },
+    { label: "Blogs", href: "/blogs" },
     { label: "Contact", href: "#contact" },
   ],
 
@@ -253,7 +257,7 @@ export const defaultSiteContent: SiteContent = {
     { label: "LinkedIn", href: "#" },
     { label: "YouTube", href: "#" },
   ],
-  footerCopyright: "© 2026 WiNit. All rights reserved.",
+  footerCopyright: "© 2026 WinIt. All rights reserved.",
 
   brands: [
     { id: "1", name: "Reliance Retail Limited", imageUrl: "/brands/RRfavicon.png", link: "https://www.relianceretail.com" },
@@ -265,7 +269,9 @@ export const defaultSiteContent: SiteContent = {
   defaultVideoUrl: "/fallback-video.mp4",
   carouselVideos: [],
 
-  pageTitle: "WiNit - Shaping Success Stories",
+  blogUsers: [],
+
+  pageTitle: "WinIt - Shaping Success Stories",
   pageDescription:
     "We transform brand stories into powerful narratives that drive success.",
 };
@@ -335,6 +341,76 @@ export async function fetchSiteContent(): Promise<SiteContent> {
 export async function saveSiteContent(content: SiteContent): Promise<void> {
   const docRef = doc(db, DOC_PATH);
   await setDoc(docRef, content);
+}
+
+// ── Blog Types ──────────────────────────────────────────────
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  author: string;
+  published: boolean;
+  tags: string[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+const BLOGS_COLLECTION = "blogs";
+
+export async function fetchBlogPosts(): Promise<BlogPost[]> {
+  try {
+    const { getDocs, collection, query, orderBy } = await import("firebase/firestore");
+    const q = query(collection(db, BLOGS_COLLECTION), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as BlogPost);
+  } catch (err) {
+    console.error("[Firebase] fetchBlogPosts error:", err);
+    return [];
+  }
+}
+
+export async function fetchBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  try {
+    const { getDocs, collection, query, where } = await import("firebase/firestore");
+    const q = query(collection(db, BLOGS_COLLECTION), where("slug", "==", slug));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return snap.docs[0].data() as BlogPost;
+  } catch (err) {
+    console.error("[Firebase] fetchBlogPostBySlug error:", err);
+    return null;
+  }
+}
+
+export async function createBlogPost(post: BlogPost): Promise<void> {
+  try {
+    const { doc, setDoc } = await import("firebase/firestore");
+    await setDoc(doc(db, BLOGS_COLLECTION, post.id), post);
+  } catch (err) {
+    console.error("[Firebase] createBlogPost error:", err);
+  }
+}
+
+export async function updateBlogPost(id: string, partial: Partial<BlogPost>): Promise<void> {
+  try {
+    const { doc, updateDoc } = await import("firebase/firestore");
+    await updateDoc(doc(db, BLOGS_COLLECTION, id), partial);
+  } catch (err) {
+    console.error("[Firebase] updateBlogPost error:", err);
+  }
+}
+
+export async function deleteBlogPost(id: string): Promise<void> {
+  try {
+    const { doc, deleteDoc } = await import("firebase/firestore");
+    await deleteDoc(doc(db, BLOGS_COLLECTION, id));
+  } catch (err) {
+    console.error("[Firebase] deleteBlogPost error:", err);
+  }
 }
 
 export { db };

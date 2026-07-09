@@ -34,7 +34,9 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const sections = data.navLinks.map((link) => document.querySelector(link.href));
+    const sections = data.navLinks
+      .filter((link) => link.href.startsWith("#"))
+      .map((link) => document.querySelector(link.href));
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -51,6 +53,10 @@ export default function Navbar() {
 
   const handleClick = (href: string) => {
     setOpen(false);
+    if (href.startsWith("/")) {
+      window.location.href = href;
+      return;
+    }
     const el = document.querySelector(href);
     el?.scrollIntoView({ behavior: "smooth" });
   };
@@ -66,7 +72,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             <div className="flex-shrink-0">
               <button onClick={() => handleClick("#home")} className="flex-shrink-0">
-                <Image src={data.logoUrl} alt="WiNit" width={48} height={32} priority className="h-9 md:h-12 w-auto transition-all" />
+                <Image src={data.logoUrl} alt="WinIt" width={48} height={32} priority className="h-9 md:h-12 w-auto transition-all" />
               </button>
             </div>
 

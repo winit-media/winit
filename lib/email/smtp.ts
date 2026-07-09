@@ -19,7 +19,7 @@ interface SendEmailOptions {
 
 export async function sendEmail({ to, subject, html, replyTo }: SendEmailOptions) {
   return transporter.sendMail({
-    from: `"WiNit Media" <${process.env.SMTP_USER}>`,
+    from: `"WinIt Media" <${process.env.SMTP_USER}>`,
     to,
     subject,
     html,

@@ -26,7 +26,7 @@ function emailWrapper(children: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WiNit Media</title>
+  <title>WinIt Media</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7;padding:40px 20px;">
@@ -46,7 +46,7 @@ function headerBar(): string {
   return `
 <tr>
   <td style="background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);padding:32px 40px;border-radius:16px 16px 0 0;text-align:center;">
-    <img src="https://winitmedia.com/logo.png" alt="WiNit" width="120" style="display:block;margin:0 auto 16px;max-width:120px;height:auto;" />
+    <img src="https://winitmedia.com/logo.png" alt="WinIt" width="120" style="display:block;margin:0 auto 16px;max-width:120px;height:auto;" />
     <div style="width:40px;height:3px;background:rgba(255,255,255,0.4);border-radius:2px;margin:0 auto;"></div>
   </td>
 </tr>`;
@@ -80,7 +80,7 @@ export function visitorAutoResponseTemplate(
           Hi ${data.name},
         </h1>
         <p style="margin:0 0 24px;font-size:15px;color:#6b7280;line-height:1.6;">
-          Thank you for contacting <strong style="color:${BRAND_COLOR};">WiNit Media</strong>! We&apos;ve received your message and our team will get back to you within <strong>24 hours</strong>.
+          Thank you for contacting <strong style="color:${BRAND_COLOR};">WinIt Media</strong>! We&apos;ve received your message and our team will get back to you within <strong>24 hours</strong>.
         </p>
 
         <div style="background-color:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
@@ -162,7 +162,7 @@ export function adminNotificationTemplate(
           </tr>
         </table>
 
-        <a href="mailto:${data.email}?subject=Re: Your message to WiNit Media" style="display:inline-block;background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:12px;">
+        <a href="mailto:${data.email}?subject=Re: Your message to WinIt Media" style="display:inline-block;background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:12px;">
           Reply to ${data.name.split(" ")[0]}
         </a>
       </td>

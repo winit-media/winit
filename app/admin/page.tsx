@@ -20,7 +20,8 @@ import {
 import { AdminProvider, useAdmin, SiteContent } from "@/components/AdminProvider";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { app } from "@/lib/firebase";
+import { app, BlogPost, fetchBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost } from "@/lib/firebase";
+import TiptapEditor from "@/components/TiptapEditor";
 import Link from "next/link";
 
 const auth = getAuth(app);
@@ -153,7 +154,7 @@ function SaveIndicator({ saving }: { saving: boolean }) {
   );
 }
 
-type Tab = "content" | "videos" | "services" | "brands" | "testimonials" | "social";
+type Tab = "content" | "videos" | "services" | "brands" | "testimonials" | "social" | "blogusers" | "blogs";
 
 function ContentTab() {
   const { data, updateContent } = useAdmin();
@@ -1026,6 +1027,221 @@ function SocialTab() {
   );
 }
 
+function BlogUsersTab() {
+  const { data, updateContent } = useAdmin();
+  const [users, setUsers] = useState(data.blogUsers);
+  const [newEmail, setNewEmail] = useState("");
+  const [newName, setNewName] = useState("");
+
+  useEffect(() => { setUsers(data.blogUsers); }, [data]);
+
+  const add = () => {
+    if (!newEmail.trim()) return;
+    const updated = [...users, { email: newEmail.trim(), displayName: newName.trim() || newEmail.trim() }];
+    setUsers(updated);
+    updateContent({ blogUsers: updated });
+    setNewEmail("");
+    setNewName("");
+  };
+
+  const remove = (i: number) => {
+    const updated = users.filter((_, j) => j !== i);
+    setUsers(updated);
+    updateContent({ blogUsers: updated });
+  };
+
+  return (
+    <div className="space-y-6">
+      <Section title="Add Blog User">
+        <p className="text-sm text-gray-500">Users added here can sign in to manage blog posts at <strong>blogs.winitmedia.com</strong></p>
+        <Field label="Email" value={newEmail} onChange={setNewEmail} placeholder="user@example.com" />
+        <Field label="Display Name" value={newName} onChange={setNewName} placeholder="John Doe" />
+        <button
+          onClick={add}
+          className="bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors flex items-center gap-2"
+        >
+          <Plus size={14} /> Add User
+        </button>
+      </Section>
+
+      <Section title={`Blog Users (${users.length})`}>
+        {users.length === 0 ? (
+          <p className="text-gray-400 text-sm">No blog users added yet</p>
+        ) : (
+          <div className="space-y-2">
+            {users.map((u, i) => (
+              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-sm">{u.displayName}</p>
+                  <p className="text-xs text-gray-400">{u.email}</p>
+                </div>
+                <button onClick={() => remove(i)} className="text-red-400 hover:text-red-600 p-1">
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
+    </div>
+  );
+}
+
+function BlogPostsTab() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<BlogPost | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    const p = await fetchBlogPosts();
+    setPosts(p);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const create = () => {
+    const now = Date.now();
+    setEditing({
+      id: now.toString(),
+      title: "",
+      slug: "",
+      excerpt: "",
+      content: "",
+      coverImage: "",
+      author: "",
+      published: false,
+      tags: [],
+      createdAt: now,
+      updatedAt: now,
+    });
+  };
+
+  const save = async () => {
+    if (!editing) return;
+    setSaving(true);
+    if (posts.find((p) => p.id === editing.id)) {
+      await updateBlogPost(editing.id, editing);
+    } else {
+      await createBlogPost(editing);
+    }
+    setSaving(false);
+    setEditing(null);
+    load();
+  };
+
+  const remove = async (id: string) => {
+    await deleteBlogPost(id);
+    load();
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-lg">Blog Posts ({posts.length})</h3>
+        <button
+          onClick={create}
+          className="bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors flex items-center gap-2"
+        >
+          <Plus size={14} /> New Post
+        </button>
+      </div>
+
+      {/* Editor */}
+      {editing && (
+        <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-lg">{editing.id && posts.find((p) => p.id === editing.id) ? "Edit Post" : "New Post"}</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setEditing({ ...editing, published: !editing.published })}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  editing.published ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                }`}
+              >
+                {editing.published ? "Published" : "Draft"}
+              </button>
+              <button
+                onClick={() => setEditing(null)}
+                className="px-3 py-1.5 text-sm text-gray-400 hover:text-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <Field label="Title" value={editing.title} onChange={(v) => setEditing({ ...editing, title: v, slug: v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") })} />
+          <Field label="Slug" value={editing.slug} onChange={(v) => setEditing({ ...editing, slug: v })} placeholder="my-blog-post" />
+          <Field label="Excerpt" value={editing.excerpt} onChange={(v) => setEditing({ ...editing, excerpt: v })} textarea />
+          <Field label="Author" value={editing.author} onChange={(v) => setEditing({ ...editing, author: v })} />
+          <Field label="Cover Image URL" value={editing.coverImage} onChange={(v) => setEditing({ ...editing, coverImage: v })} />
+          <ImageUpload label="Cover Image" value={editing.coverImage} onChange={(v) => setEditing({ ...editing, coverImage: v })} folder="winit/blogs" />
+          <Field label="Tags (comma separated)" value={editing.tags.join(", ")} onChange={(v) => setEditing({ ...editing, tags: v.split(",").map((t) => t.trim()).filter(Boolean) })} />
+
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">Content</label>
+            <TiptapEditor
+              content={editing.content}
+              onChange={(html) => setEditing({ ...editing, content: html })}
+            />
+          </div>
+
+          <button
+            onClick={save}
+            disabled={saving || !editing.title.trim()}
+            className="bg-brand text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-brand-dark transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            {saving && <Loader2 size={16} className="animate-spin" />}
+            <Save size={16} /> {editing.id && posts.find((p) => p.id === editing.id) ? "Update Post" : "Publish Post"}
+          </button>
+        </div>
+      )}
+
+      {/* List */}
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 size={24} className="animate-spin text-brand" />
+        </div>
+      ) : posts.length === 0 ? (
+        <p className="text-gray-400 text-sm text-center py-12">No blog posts yet. Click &quot;New Post&quot; to create one.</p>
+      ) : (
+        <div className="space-y-3">
+          {posts.map((post) => (
+            <div key={post.id} className="bg-white rounded-xl p-4 shadow-sm flex items-start gap-4">
+              {post.coverImage && (
+                <img src={post.coverImage} alt="" className="w-20 h-16 object-cover rounded-lg flex-shrink-0" />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded ${post.published ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                    {post.published ? "Published" : "Draft"}
+                  </span>
+                  <span className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</span>
+                </div>
+                <p className="font-semibold text-sm truncate">{post.title || "Untitled"}</p>
+                <p className="text-xs text-gray-400 mt-0.5 truncate">/{post.slug}</p>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <button
+                  onClick={() => setEditing(post)}
+                  className="text-brand hover:text-brand-dark text-sm font-medium px-2"
+                >
+                  Edit
+                </button>
+                <button onClick={() => remove(post.id)} className="text-red-400 hover:text-red-600 p-1">
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -1083,6 +1299,8 @@ function AdminDashboard() {
     { key: "brands", label: "Brands", icon: ImageIcon },
     { key: "testimonials", label: "Testimonials", icon: MessageSquare },
     { key: "social", label: "Social Links", icon: LinkIcon },
+    { key: "blogusers", label: "Blog Users", icon: Plus },
+    { key: "blogs", label: "Blog Posts", icon: Type },
   ];
 
   return (
@@ -1141,6 +1359,8 @@ function AdminDashboard() {
             {tab === "brands" && <BrandsTab />}
             {tab === "testimonials" && <TestimonialsTab />}
             {tab === "social" && <SocialTab />}
+            {tab === "blogusers" && <BlogUsersTab />}
+            {tab === "blogs" && <BlogPostsTab />}
           </motion.div>
         </AnimatePresence>
       </div>
