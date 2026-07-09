@@ -21,11 +21,13 @@ export default function MobileBrandMarquee() {
 
   // Duplicate the array multiple times to ensure the marquee fills the screen and scrolls seamlessly
   const duplicated = [...brands, ...brands, ...brands, ...brands, ...brands, ...brands];
+  const duration = Math.max(30, brands.length * 6);
 
   return (
     <div className="block lg:hidden w-full overflow-hidden bg-white py-6 border-b border-gray-100">
       <div 
         className="flex w-max animate-marquee-left items-center hover:[animation-play-state:paused]"
+        style={{ animationDuration: `${duration}s` }}
       >
         {duplicated.map((item, i) => {
           const finalUrl = getLocalImageUrl(item.imageUrl);
