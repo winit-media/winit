@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useAdmin } from "./AdminProvider";
 
 export default function Navbar() {
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [showNav, setShowNav] = useState(true);
   const lastScrollY = useRef(0);
   const { data } = useAdmin();
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => {
@@ -51,14 +53,29 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, [data.navLinks]);
 
+  useEffect(() => {
+    const match = data.navLinks.find((link) => link.href.startsWith("/") && pathname.startsWith(link.href));
+    if (match) {
+      setActiveSection(match.href);
+    }
+  }, [pathname, data.navLinks]);
+
   const handleClick = (href: string) => {
     setOpen(false);
+    if (href === "#contact") {
+      window.dispatchEvent(new CustomEvent("open-contact-modal"));
+      return;
+    }
     if (href.startsWith("/")) {
       window.location.href = href;
       return;
     }
     const el = document.querySelector(href);
-    el?.scrollIntoView({ behavior: "smooth" });
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = `/${href}`;
+    }
   };
 
   return (

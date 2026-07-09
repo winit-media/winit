@@ -87,11 +87,13 @@ function ImageUpload({
   onChange,
   folder,
   label,
+  hideUrl,
 }: {
   value: string;
   onChange: (url: string) => void;
   folder?: string;
   label?: string;
+  hideUrl?: boolean;
 }) {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -132,13 +134,15 @@ function ImageUpload({
           {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
           {uploading ? "Uploading..." : "Upload File"}
         </button>
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-          placeholder="Or paste URL"
-        />
+        {!hideUrl && (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+            placeholder="Or paste URL"
+          />
+        )}
       </div>
     </div>
   );
@@ -220,7 +224,6 @@ function ContentTab() {
 
       <Section title="Hero">
         <Field label="Heading Text" value={local.heroHeading} onChange={(v) => field("heroHeading", v)} />
-        <Field label="Subtext" value={local.heroSubtext} onChange={(v) => field("heroSubtext", v)} textarea />
         <Field label="CTA Button Text" value={local.heroCtaText} onChange={(v) => field("heroCtaText", v)} />
       </Section>
 
@@ -482,6 +485,15 @@ function VideosTab() {
     updateContent(updated);
   };
 
+  const updateVideoName = (id: string, name: string) => {
+    const updated = {
+      ...local,
+      carouselVideos: local.carouselVideos.map((v) => (v.id === id ? { ...v, name } : v)),
+    };
+    setLocal(updated);
+    updateContent(updated);
+  };
+
   return (
     <div className="space-y-6">
       <Section title="Default Fallback Video">
@@ -578,31 +590,55 @@ function VideosTab() {
         {local.carouselVideos.length === 0 ? (
           <p className="text-gray-400 text-sm">No videos added yet</p>
         ) : (
-          <div className="space-y-2">
-            {local.carouselVideos.map((v) => (
-              <div key={v.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  {v.url ? (
-                    <video
-                      src={v.url}
-                      className="h-12 w-16 object-cover rounded border bg-gray-900"
-                      muted
-                      preload="metadata"
-                    />
-                  ) : (
-                    <Film size={16} className="text-gray-400" />
-                  )}
-                  <div>
-                    <p className="font-medium text-sm">{v.name}</p>
-                    <p className="text-xs text-gray-400 truncate max-w-[300px]">{v.url}</p>
+          (() => {
+            const mid = Math.ceil(local.carouselVideos.length / 2);
+            const topRow = local.carouselVideos.slice(0, mid);
+            const bottomRow = local.carouselVideos.slice(mid);
+            const renderRow = (videos: typeof local.carouselVideos) => (
+              <div className="space-y-2">
+                {videos.map((v) => (
+                  <div key={v.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      {v.url ? (
+                        <video
+                          src={v.url}
+                          className="h-12 w-16 object-cover rounded border bg-gray-900"
+                          muted
+                          preload="metadata"
+                        />
+                      ) : (
+                        <Film size={16} className="text-gray-400" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <input
+                          type="text"
+                          value={v.name}
+                          onChange={(e) => updateVideoName(v.id, e.target.value)}
+                          className="font-medium text-sm bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand focus:outline-none w-full px-1 py-0.5 rounded"
+                        />
+                        <p className="text-xs text-gray-400 truncate max-w-[300px]">{v.url}</p>
+                      </div>
+                    </div>
+                    <button onClick={() => removeVideo(v.id)} className="text-red-400 hover:text-red-600 p-1">
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                </div>
-                <button onClick={() => removeVideo(v.id)} className="text-red-400 hover:text-red-600 p-1">
-                  <Trash2 size={16} />
-                </button>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Top Row ({topRow.length})</p>
+                  {renderRow(topRow)}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Bottom Row ({bottomRow.length})</p>
+                  {renderRow(bottomRow)}
+                </div>
+              </div>
+            );
+          })()
         )}
       </Section>
     </div>
@@ -662,26 +698,26 @@ function ServicesTab() {
       </div>
 
       {local.services.map((s, i) => (
-        <div key={i} className="bg-white rounded-xl p-5 shadow-sm border">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className={`w-4 h-4 rounded ${s.bg}`} />
-              <span className="font-semibold text-sm">{s.sub}</span>
+        <div key={i} className="bg-white rounded-lg shadow-sm border">
+          <div className="px-4 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className={`w-3 h-3 rounded-sm flex-shrink-0 ${s.bg}`} />
+              <span className="font-medium text-sm">{s.sub}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setEditing(editing === i ? null : i)}
-                className="text-brand hover:text-brand-dark text-sm font-medium"
+                className="text-brand hover:text-brand-dark text-sm font-medium px-2 py-1"
               >
                 {editing === i ? "Close" : "Edit"}
               </button>
               <button onClick={() => remove(i)} className="text-red-400 hover:text-red-600 p-1">
-                <Trash2 size={14} />
+                <Trash2 size={13} />
               </button>
             </div>
           </div>
           {editing === i && (
-            <div className="space-y-3 pt-3 border-t">
+            <div className="px-4 pb-4 pt-2 space-y-3 border-t">
               <Field label="Service Name" value={s.sub} onChange={(v) => update(i, "sub", v)} />
               <Field label="Description" value={s.content} onChange={(v) => update(i, "content", v)} textarea />
               <div>
@@ -757,33 +793,24 @@ function BrandsTab() {
             <div key={b.id} className="bg-gray-50 rounded-lg p-4 relative group">
               <button
                 onClick={() => remove(b.id)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-3 right-3 text-red-400 hover:text-red-600 p-1"
               >
-                <Trash2 size={12} />
+                <Trash2 size={14} />
               </button>
 
-              {b.imageUrl && (
-                <img src={b.imageUrl} alt={b.name} className="h-16 w-auto object-contain mb-3 mx-auto" />
-              )}
+              <div className="flex items-center gap-3 mb-3">
+                <input
+                  value={b.name}
+                  onChange={(e) => updateField(b.id, "name", e.target.value)}
+                  className="flex-1 px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                  placeholder="Brand name"
+                />
+              </div>
 
               <ImageUpload
                 value={b.imageUrl}
                 onChange={(v) => updateField(b.id, "imageUrl", v)}
                 folder="winit/brands"
-              />
-
-              <input
-                value={b.name}
-                onChange={(e) => updateField(b.id, "name", e.target.value)}
-                className="w-full mt-3 px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                placeholder="Brand name"
-              />
-
-              <input
-                value={b.link || ""}
-                onChange={(e) => updateField(b.id, "link", e.target.value)}
-                className="w-full mt-2 px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                placeholder="Link (https://...)"
               />
             </div>
           ))}
