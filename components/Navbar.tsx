@@ -15,6 +15,9 @@ export default function Navbar() {
   const lastScrollY = useRef(0);
   const { data } = useAdmin();
   const pathname = usePathname();
+  const isHome = pathname === "/";
+  const isBlogs = pathname.startsWith("/blogs");
+  const canBeTransparent = isHome || isBlogs;
 
   useEffect(() => {
     const onScroll = () => {
@@ -83,7 +86,7 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 md:translate-y-0 ${
           showNav ? "translate-y-0" : "-translate-y-full"
-        } ${scrolled ? "bg-brand/90 backdrop-blur-sm shadow-md" : "bg-transparent"}`}
+        } ${canBeTransparent && !scrolled ? "bg-transparent" : "bg-brand/90 backdrop-blur-sm shadow-md"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
