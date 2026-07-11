@@ -11,6 +11,25 @@ export default function VideoSection() {
   const [inView, setInView] = useState(false);
   const [muted, setMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showControls, setShowControls] = useState(false);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const toggleControls = () => {
+    setShowControls((prev) => {
+      const next = !prev;
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      if (next) {
+        hideTimerRef.current = setTimeout(() => setShowControls(false), 4000);
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, []);
 
   const videoSrc = data.defaultVideoUrl || "/fallback-video.mp4";
 
@@ -62,7 +81,11 @@ export default function VideoSection() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full aspect-video overflow-hidden bg-black group">
+    <div
+      ref={containerRef}
+      className="relative w-full aspect-video overflow-hidden bg-black group"
+      onClick={toggleControls}
+    >
       <video
         ref={videoRef}
         src={videoSrc}
@@ -74,8 +97,8 @@ export default function VideoSection() {
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="flex items-center gap-4">
+      <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+        <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={togglePlay}
             className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-4 transition-colors"

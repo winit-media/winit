@@ -74,9 +74,28 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
   const [isLandscape, setIsLandscape] = useState(false);
   const [inView, setInView] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [tapRevealed, setTapRevealed] = useState(false);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { videoUrl, posterUrl } = getOptimizedMedia(video.url);
 
   const shouldMountVideo = inView || isHovered;
+
+  const handleTapReveal = () => {
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+    setTapRevealed((prev) => {
+      const next = !prev;
+      if (next) {
+        tapTimerRef.current = setTimeout(() => setTapRevealed(false), 4000);
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -121,7 +140,10 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
   return (
     <div
       ref={containerRef}
-      onClick={handleClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleTapReveal();
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02] border-2 border-white`}
@@ -152,8 +174,8 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
           }}
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+      <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 ${tapRevealed ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
+      <div className={`absolute bottom-3 left-3 right-3 flex items-center justify-between transition-all duration-500 translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
         <span className="text-white text-sm font-medium truncate drop-shadow-md">{video.name}</span>
         {canPlayMedia && (
           <button
@@ -164,8 +186,14 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
           </button>
         )}
       </div>
-      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-y-2 group-hover:translate-y-0">
-        <div className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300">
+      <div className={`absolute top-3 right-3 transition-all duration-500 -translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
+        <div
+          className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick();
+          }}
+        >
           <Play size={14} className="text-white fill-white" />
         </div>
       </div>
