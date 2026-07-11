@@ -153,7 +153,7 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
           ref={videoRef}
           src={videoUrl}
           poster={posterUrl}
-          className="w-full h-full object-cover bg-black"
+          className="w-full h-full object-cover bg-black pointer-events-none"
           loop
           playsInline
           muted={muted}

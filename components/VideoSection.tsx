@@ -89,7 +89,7 @@ export default function VideoSection() {
       <video
         ref={videoRef}
         src={videoSrc}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover pointer-events-none"
         muted
         loop
         playsInline
