@@ -6,6 +6,7 @@ import { Poppins } from "next/font/google";
 import { fetchBlogPostBySlug, BlogPost } from "@/lib/firebase";
 import { Calendar, Tag, ArrowLeft, User, Loader2 } from "lucide-react";
 import { AdminProvider } from "@/components/AdminProvider";
+import DOMPurify from "dompurify";
 import Navbar from "@/components/Navbar";
 import PatternOverlay from "@/components/PatternOverlay";
 
@@ -122,7 +123,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
           <div
             className="prose prose-lg max-w-none prose-headings:font-display prose-a:text-brand prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-blockquote:border-brand prose-blockquote:text-gray-600"
             style={{ fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif" }}
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"] }) }}
           />
         </article>
         </div>

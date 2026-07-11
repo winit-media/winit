@@ -34,7 +34,7 @@ export default function MobileBrandMarquee() {
           return (
             <div
               key={`${item.id}-${i}`}
-              className="flex-shrink-0 mx-8 w-[100px] h-[40px] relative flex items-center justify-center transition-all duration-300"
+              className="flex-shrink-0 mx-4 w-[80px] h-[32px] relative flex items-center justify-center transition-all duration-300"
             >
               {finalUrl ? (
                 <Image

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { Poppins } from "next/font/google";
 import { fetchBlogPosts, BlogPost } from "@/lib/firebase";
 import { Calendar, ArrowRight, Tag, X, User } from "lucide-react";
 import { AdminProvider } from "@/components/AdminProvider";
+import DOMPurify from "dompurify";
 import Navbar from "@/components/Navbar";
 import PatternOverlay from "@/components/PatternOverlay";
 import FloatingCTA from "@/components/FloatingCTA";
@@ -95,7 +95,7 @@ function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
           <div
             className="prose prose-lg max-w-none prose-headings:font-display prose-a:text-brand prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-blockquote:border-brand prose-blockquote:text-gray-600"
             style={{ fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif" }}
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"] }) }}
           />
         </div>
       </div>

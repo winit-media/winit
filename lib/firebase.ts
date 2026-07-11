@@ -285,8 +285,8 @@ export async function fetchSiteContent(): Promise<SiteContent> {
     if (snap.exists()) {
       const raw = snap.data() as Partial<SiteContent>;
       
-      // Auto-sync new stats if they don't have the 4 required stats
-      if (raw.stats && raw.stats.length !== 4) {
+      // Auto-sync social links to have 5 logos
+      if (raw.stats && raw.stats.length === 0) {
         raw.stats = defaultSiteContent.stats;
         saveSiteContent({ ...defaultSiteContent, ...raw, stats: raw.stats } as SiteContent);
       }
