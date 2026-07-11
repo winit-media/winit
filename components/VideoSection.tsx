@@ -31,7 +31,14 @@ export default function VideoSection() {
     };
   }, []);
 
-  const videoSrc = data.defaultVideoUrl || "/fallback-video.mp4";
+  const rawSrc = data.defaultVideoUrl || "/fallback-video.mp4";
+  const isCloudinary = rawSrc.includes("cloudinary.com");
+  const videoSrc = isCloudinary
+    ? rawSrc.replace("/upload/", "/upload/f_auto,q_auto,w_1280,so_0/")
+    : rawSrc;
+  const posterSrc = isCloudinary
+    ? rawSrc.replace("/upload/", "/upload/f_auto,q_auto:eco,w_1280,so_0,eo_3/").replace(/\.[^/.]+$/, ".webp")
+    : undefined;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -89,6 +96,7 @@ export default function VideoSection() {
       <video
         ref={videoRef}
         src={videoSrc}
+        poster={posterSrc}
         className="w-full h-full object-cover pointer-events-none"
         muted
         loop
