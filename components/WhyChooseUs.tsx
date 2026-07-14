@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, memo } from "react";
 import { motion, useInView } from "framer-motion";
-import { TrendingUp, Users, Award, Target, Lightbulb, Megaphone } from "lucide-react";
+import { Users, Briefcase, Megaphone, Eye, Globe, MapPin, Layers, TrendingDown } from "lucide-react";
 import PatternOverlay from "./PatternOverlay";
 import { useAdmin } from "./AdminProvider";
 
@@ -32,7 +32,7 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
   );
 }
 
-const iconMap = [Target, Users, Award, TrendingUp, Lightbulb, Megaphone];
+const iconMap = [Users, Briefcase, Megaphone, Eye, Globe, MapPin, Layers, TrendingDown];
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -43,11 +43,11 @@ const cardVariants = {
   }),
 };
 
-export default function WhyChooseUs() {
+export default memo(function WhyChooseUs() {
   const { data } = useAdmin();
 
   return (
-    <section className="relative bg-brand min-h-screen pt-24 lg:pt-32 pb-10 lg:pb-20">
+    <section className="relative bg-brand min-h-dvh pt-16 lg:pt-16 pb-6 lg:pb-10" data-theme="dark">
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center mb-6 lg:mb-16 leading-[1.1]">
@@ -84,4 +84,4 @@ export default function WhyChooseUs() {
       </div>
     </section>
   );
-}
+});

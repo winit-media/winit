@@ -7,10 +7,17 @@ import { Section, Field } from "../components/FormElements";
 import { SaveButton } from "../components/SaveIndicator";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { useToast } from "@/components/ui/Toast";
+import { uid } from "@/lib/uid";
 
 export default function VideosTab() {
-  const { data, updateContent } = useAdmin();
+  const { data, updateContent, revertedCount } = useAdmin();
   const [local, setLocal] = useState(data);
+  const [prevReverted, setPrevReverted] = useState(revertedCount);
+
+  if (revertedCount !== prevReverted) {
+    setPrevReverted(revertedCount);
+    setLocal(data);
+  }
   const [videoName, setVideoName] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -24,7 +31,7 @@ export default function VideosTab() {
       ...local,
       carouselVideos: [
         ...local.carouselVideos,
-        { id: crypto.randomUUID(), name: videoName || "Untitled", url: videoUrl.trim() },
+        { id: uid(), name: videoName || "Untitled", url: videoUrl.trim() },
       ],
     };
     setLocal(updated);
@@ -50,7 +57,7 @@ export default function VideosTab() {
             prev.map((p, idx) => (idx === i ? { ...p, percent } : p))
           );
         });
-        newVideos.push({ id: crypto.randomUUID(), name, url });
+        newVideos.push({ id: uid(), name, url });
         setUploadProgress((prev) =>
           prev.map((p, idx) => (idx === i ? { ...p, percent: 100 } : p))
         );
@@ -234,6 +241,7 @@ export default function VideosTab() {
                             src={v.url}
                             className="h-12 w-16 object-cover rounded border bg-gray-900"
                             muted
+                            playsInline
                             preload="metadata"
                           />
                         ) : (

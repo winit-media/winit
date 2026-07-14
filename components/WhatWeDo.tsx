@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState, useEffect, memo } from "react";
+import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useAdmin } from "./AdminProvider";
+import { scrollToTarget } from "@/hooks/useLenis";
 
-const CARD_WIDTH = 440;
-const CARD_HEIGHT = 440;
 const ROTATION_AMOUNT = 15;
 
 function StackedCard({
@@ -18,7 +17,7 @@ function StackedCard({
   item: { sub: string; content: string; bg: string };
   index: number;
   total: number;
-  progress: any;
+  progress: MotionValue<number>;
   onClick: () => void;
 }) {
   const isLast = index === total - 1;
@@ -33,7 +32,7 @@ function StackedCard({
   const y = useTransform(
     progress,
     [startFly, endFly],
-    ["0vh", isLast ? "0vh" : "-100vh"]
+    ["0vh", isLast ? "0vh" : "-100dvh"]
   );
 
   const rotate = useTransform(
@@ -59,7 +58,7 @@ function StackedCard({
   return (
     <motion.div
       onClick={onClick}
-      className="absolute inset-0 flex items-center justify-center origin-center cursor-pointer"
+      className="absolute inset-0 flex items-center justify-center origin-center cursor-pointer whatwedo-card"
       style={{
         y,
         rotate,
@@ -78,10 +77,18 @@ function StackedCard({
   );
 }
 
-export default function WhatWeDo() {
+export default memo(function WhatWeDo() {
   const { data } = useAdmin();
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardData = data.services;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -89,20 +96,20 @@ export default function WhatWeDo() {
   });
 
   const handleCardClick = () => {
-    window.scrollBy({
-      top: window.innerHeight * 0.8,
-      behavior: "smooth",
-    });
+    const scrollAmount = (window.visualViewport?.height ?? window.innerHeight) * 0.8;
+    const currentScroll = window.scrollY ?? window.pageYOffset ?? 0;
+    scrollToTarget(currentScroll + scrollAmount);
   };
 
   return (
     <section
       id="services"
       ref={sectionRef}
+      data-theme="light"
       className="relative bg-white w-full"
-      style={{ height: `${cardData.length * 80}vh` }}
+      style={{ height: `calc(${cardData.length * (isMobile ? 70 : 60)}dvh)` }}
     >
-      <div className="sticky top-0 h-screen w-full flex items-center overflow-hidden z-0">
+      <div className="sticky top-0 h-dvh w-full flex items-center overflow-hidden z-0">
         <div className="absolute inset-0 z-0">
           <div
             className="w-full h-full bg-cover bg-center"
@@ -114,7 +121,7 @@ export default function WhatWeDo() {
         </div>
 
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row h-full relative z-10">
-          <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-28 lg:pt-0">
+          <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-20 lg:pt-0">
             <div className="relative flex items-center justify-center lg:justify-start">
               <span
                 className="absolute text-brand font-display font-medium opacity-25 select-none pointer-events-none"
@@ -138,7 +145,7 @@ export default function WhatWeDo() {
             </div>
           </div>
 
-          <div className="w-full lg:w-7/12 flex items-center justify-center h-[65%] lg:h-full pb-10 lg:pb-0">
+          <div className="w-full lg:w-7/12 flex items-center justify-center h-[65%] lg:h-full pb-6 lg:pb-0">
             <div className="relative w-full aspect-square max-w-[340px] sm:max-w-[400px] lg:max-w-[440px] flex items-center justify-center">
               {cardData.map((item, i) => (
                 <StackedCard
@@ -156,4 +163,4 @@ export default function WhatWeDo() {
       </div>
     </section>
   );
-}
+});

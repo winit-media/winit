@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { useAdmin } from "./AdminProvider";
 import Image from "next/image";
 
@@ -13,18 +14,18 @@ const getLocalImageUrl = (url: string) => {
   return url;
 };
 
-export default function MobileBrandMarquee() {
+export default memo(function MobileBrandMarquee() {
   const { data } = useAdmin();
   const brands = data?.brands || [];
 
   if (brands.length === 0) return null;
 
   // Duplicate the array multiple times to ensure the marquee fills the screen and scrolls seamlessly
-  const duplicated = [...brands, ...brands, ...brands, ...brands, ...brands, ...brands];
+  const duplicated = [...brands, ...brands];
   const duration = Math.max(30, brands.length * 6);
 
   return (
-    <div className="block lg:hidden w-full overflow-hidden bg-white py-6 border-b border-gray-100">
+    <div className="block lg:hidden w-full overflow-hidden bg-white py-4 border-b border-gray-100">
       <div 
         className="flex w-max animate-marquee-left items-center hover:[animation-play-state:paused]"
         style={{ animationDuration: `${duration}s` }}
@@ -34,7 +35,7 @@ export default function MobileBrandMarquee() {
           return (
             <div
               key={`${item.id}-${i}`}
-              className="flex-shrink-0 mx-4 w-[80px] h-[32px] relative flex items-center justify-center transition-all duration-300"
+              className="flex-shrink-0 mx-2 w-[80px] h-[32px] relative flex items-center justify-center transition-all duration-300"
             >
               {finalUrl ? (
                 <Image
@@ -54,4 +55,4 @@ export default function MobileBrandMarquee() {
       </div>
     </div>
   );
-}
+});

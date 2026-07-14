@@ -13,8 +13,19 @@ export function useUnsavedWarning(hasChanges: boolean) {
       e.returnValue = "";
     };
 
+    // iOS Safari fires pagehide instead of beforeunload
+    const pageHideHandler = (e: PageTransitionEvent) => {
+      if (!e.persisted && hasChanges) {
+        e.preventDefault();
+      }
+    };
+
     window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
+    window.addEventListener("pagehide", pageHideHandler);
+    return () => {
+      window.removeEventListener("beforeunload", handler);
+      window.removeEventListener("pagehide", pageHideHandler);
+    };
   }, [hasChanges]);
 
   const confirmNavigation = useCallback(() => {

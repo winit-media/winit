@@ -1,15 +1,16 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+import { Pagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
+import "swiper/css";
+import "swiper/css/pagination";
 import { useAdmin, SiteContent } from "./AdminProvider";
 import { ChevronLeft, ChevronRight, Quote, X } from "lucide-react";
 import PatternOverlay from "./PatternOverlay";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 function TestimonialCard({
   t,
@@ -71,16 +72,15 @@ function TestimonialModal({
   t: SiteContent["testimonials"][0];
   onClose: () => void;
 }) {
+  const containerRef = useFocusTrap(true);
+  useScrollLock(true);
+
   useEffect(() => {
-    document.body.style.overflow = "hidden";
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleEsc);
-    };
+    return () => window.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
   return (
@@ -89,12 +89,17 @@ function TestimonialModal({
       onClick={onClose}
     >
       <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="testimonial-modal-title"
         className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-10"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+          aria-label="Close testimonial"
         >
           <X size={18} />
         </button>
@@ -126,7 +131,7 @@ function TestimonialModal({
           </p>
 
           <div className="border-t border-gray-100 pt-5 w-full">
-            <p className="font-semibold text-brand text-[15px]">{t.name}</p>
+            <p id="testimonial-modal-title" className="font-semibold text-brand text-[15px]">{t.name}</p>
             <p className="text-gray-500 text-sm mt-1">
               {t.designation}
               {t.company && (
@@ -140,11 +145,10 @@ function TestimonialModal({
   );
 }
 
-export default function Testimonials() {
+export default memo(function Testimonials() {
   const { data } = useAdmin();
   const testimonials = data.testimonials;
-  const prevRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [selected, setSelected] = useState<
     SiteContent["testimonials"][0] | null
   >(null);
@@ -154,7 +158,7 @@ export default function Testimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-16 pb-10 lg:pt-32 lg:pb-16 overflow-hidden min-h-screen flex flex-col justify-center">
+    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center" data-theme="light">
       <PatternOverlay opacity={0.06} />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-6 lg:mb-6">
@@ -173,67 +177,57 @@ export default function Testimonials() {
         </div>
 
         <div className="relative group">
-          <Swiper
-            modules={[Navigation, Pagination]}
-            spaceBetween={0}
-            slidesPerView={1}
-            centeredSlides={true}
-            loop={true}
-            speed={500}
-            pagination={{
-              clickable: true,
-              el: ".testimonial-pagination",
-            }}
-            navigation={{
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-            }}
-            onBeforeInit={(swiper: SwiperType) => {
-              if (
-                swiper.params.navigation &&
-                typeof swiper.params.navigation !== "boolean"
-              ) {
-                swiper.params.navigation.prevEl = prevRef.current;
-                swiper.params.navigation.nextEl = nextRef.current;
-              }
-            }}
-            breakpoints={{
-              640: {
-                slidesPerView: 1.5,
-                spaceBetween: 0,
-              },
-              768: {
-                slidesPerView: 2.2,
-                spaceBetween: 0,
-              },
-              1024: {
-                slidesPerView: 3,
-                spaceBetween: 0,
-              },
-            }}
-            className="testimonial-swiper pb-4"
-          >
-            {testimonials.map((t, index) => (
-              <SwiperSlide key={`${t.id}-${index}`} className="py-4">
-                <TestimonialCard
-                  t={t}
-                  onReadMore={() => setSelected(t)}
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+            <Swiper
+              modules={[Pagination]}
+              spaceBetween={0}
+              slidesPerView={1}
+              centeredSlides={true}
+              loop={true}
+              speed={500}
+              pagination={{
+                clickable: true,
+                el: ".testimonial-pagination",
+              }}
+              onSwiper={setSwiperInstance}
+              breakpoints={{
+                640: {
+                  slidesPerView: 1.5,
+                  spaceBetween: 0,
+                },
+                768: {
+                  slidesPerView: 2.2,
+                  spaceBetween: 0,
+                },
+                1024: {
+                  slidesPerView: 3,
+                  spaceBetween: 0,
+                },
+              }}
+              className="testimonial-swiper pb-2"
+            >
+              {testimonials.map((t, index) => (
+                <SwiperSlide key={`${t.id}-${index}`} className="py-2">
+                  <TestimonialCard
+                    t={t}
+                    onReadMore={() => setSelected(t)}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
 
           <div className="flex items-center justify-center gap-4 mt-6 lg:mt-8">
             <button
-              ref={prevRef}
+              onClick={() => swiperInstance?.slidePrev()}
               className="md:absolute md:left-0 lg:-left-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
+              aria-label="Previous testimonial"
             >
               <ChevronLeft size={20} />
             </button>
             <div className="testimonial-pagination !w-auto flex justify-center gap-2" />
             <button
-              ref={nextRef}
+              onClick={() => swiperInstance?.slideNext()}
               className="md:absolute md:right-0 lg:-right-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
+              aria-label="Next testimonial"
             >
               <ChevronRight size={20} />
             </button>
@@ -244,4 +238,4 @@ export default function Testimonials() {
       {selected && <TestimonialModal t={selected} onClose={handleClose} />}
     </section>
   );
-}
+});

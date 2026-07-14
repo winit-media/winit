@@ -28,13 +28,20 @@ function LoginGate({ onLogin }: { onLogin: () => void }) {
       await signInWithEmailAndPassword(auth, email, password);
       onLogin();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      const code = (err as { code?: string }).code || "";
+      if (code.includes("user-not-found") || code.includes("wrong-password") || code.includes("invalid-credential")) {
+        setError("Invalid email or password.");
+      } else if (code.includes("too-many-requests")) {
+        setError("Too many attempts. Please try again later.");
+      } else {
+        setError("Login failed. Please try again.");
+      }
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Blog Manager</h1>
@@ -169,7 +176,7 @@ function BlogDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-dvh bg-gray-50">
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -286,7 +293,7 @@ function BlogDashboard() {
                     <span className={`text-xs font-medium px-2 py-0.5 rounded ${post.published ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                       {post.published ? "Published" : "Draft"}
                     </span>
-                    <span className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</span>
+                    <span className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
                   </div>
                   <p className="font-semibold text-sm truncate">{post.title || "Untitled"}</p>
                   <p className="text-xs text-gray-400 mt-0.5 truncate">/{post.slug}</p>
@@ -338,7 +345,7 @@ export default function BlogAdminPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-dvh bg-gray-50 flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-brand" />
       </div>
     );
@@ -355,7 +362,7 @@ export default function BlogAdminPage() {
   if (!authorized) {
     return (
       <ToastProvider>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-dvh bg-gray-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
             <h1 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h1>
             <p className="text-gray-500 text-sm mb-6">

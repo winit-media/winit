@@ -9,8 +9,14 @@ import DragReorder from "@/components/ui/DragReorder";
 import { useToast } from "@/components/ui/Toast";
 
 export default function SocialTab() {
-  const { data, updateContent } = useAdmin();
+  const { data, updateContent, revertedCount } = useAdmin();
   const [local, setLocal] = useState(data);
+  const [prevReverted, setPrevReverted] = useState(revertedCount);
+
+  if (revertedCount !== prevReverted) {
+    setPrevReverted(revertedCount);
+    setLocal(data);
+  }
   const { toast } = useToast();
 
   const update = (i: number, key: "label" | "href", value: string) => {

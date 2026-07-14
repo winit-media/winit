@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, memo } from "react";
 import { useAdmin } from "./AdminProvider";
 import { Volume2, VolumeX, Play, Pause } from "lucide-react";
+import { useDeviceCapabilities } from "@/hooks/useDeviceCapabilities";
 
-export default function VideoSection() {
+export default memo(function VideoSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { data } = useAdmin();
@@ -12,7 +13,10 @@ export default function VideoSection() {
   const [muted, setMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const [manualPlay, setManualPlay] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const canPlayMedia = useDeviceCapabilities();
 
   const toggleControls = () => {
     setShowControls((prev) => {
@@ -44,6 +48,11 @@ export default function VideoSection() {
     const container = containerRef.current;
     if (!container) return;
 
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         setInView(entry.isIntersecting);
@@ -59,16 +68,39 @@ export default function VideoSection() {
     const video = videoRef.current;
     if (!video) return;
 
-    if (inView) {
-      video.play().catch(() => {});
-      setIsPlaying(true);
+    if (inView && (canPlayMedia || manualPlay)) {
+      video.play().then(() => {
+        setAutoplayBlocked(false);
+      }).catch(() => {
+        setAutoplayBlocked(true);
+        setIsPlaying(false);
+      });
     } else {
       video.pause();
       setIsPlaying(false);
     }
-  }, [inView]);
+  }, [inView, canPlayMedia, manualPlay]);
+
+  // Pause when tab is hidden (iOS backgrounding)
+  useEffect(() => {
+    const handleVisibility = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      if (document.hidden) {
+        video.pause();
+      } else if (inView && (canPlayMedia || manualPlay)) {
+        video.play().catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [inView, canPlayMedia, manualPlay]);
 
   const togglePlay = () => {
+    if (!canPlayMedia && !manualPlay) {
+      setManualPlay(true);
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
     if (isPlaying) {
@@ -88,23 +120,34 @@ export default function VideoSection() {
   };
 
   return (
-    <div
+    <section
       ref={containerRef}
+      data-theme="dark"
       className="relative w-full aspect-video overflow-hidden bg-black group"
       onClick={toggleControls}
     >
-      <video
-        ref={videoRef}
-        src={videoSrc}
-        poster={posterSrc}
-        className="w-full h-full object-cover pointer-events-none"
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-      />
+      {(canPlayMedia || manualPlay) ? (
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          poster={posterSrc}
+          className="w-full h-full object-cover pointer-events-none"
+          muted={muted}
+          loop
+          playsInline
+          preload="metadata"
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+        />
+      ) : (
+        <img
+          src={posterSrc || rawSrc}
+          alt="Video thumbnail"
+          className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
       <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
         <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
           <button
@@ -129,6 +172,16 @@ export default function VideoSection() {
           </button>
         </div>
       </div>
-    </div>
+      {(autoplayBlocked || !canPlayMedia) && !isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={togglePlay}
+            className="bg-white/90 hover:bg-white rounded-full p-6 shadow-2xl transition-all hover:scale-110"
+          >
+            <Play size={40} className="text-brand fill-brand" />
+          </button>
+        </div>
+      )}
+    </section>
   );
-}
+});

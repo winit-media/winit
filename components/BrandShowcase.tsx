@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
 import Image from "next/image";
@@ -25,7 +26,7 @@ function VerticalCarousel({
   variant?: "minimal" | "glass";
   duration?: number;
 }) {
-  const duplicated = [...items, ...items, ...items, ...items];
+  const duplicated = [...items, ...items];
 
   const variantClasses = {
     minimal: "bg-white border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:border-brand/40",
@@ -33,7 +34,7 @@ function VerticalCarousel({
   };
 
   return (
-    <div className="overflow-hidden h-full pt-8 pb-8">
+    <div className="overflow-hidden h-full pt-4 pb-4">
       <div
         className={
           direction === "down" ? "animate-marquee-down" : "animate-marquee-up"
@@ -68,18 +69,18 @@ function VerticalCarousel({
   );
 }
 
-export default function BrandShowcase() {
+export default memo(function BrandShowcase() {
   const { data } = useAdmin();
   const brands = data.brands;
   const duration = Math.max(20, brands.length * 4);
 
   return (
-    <section className="relative bg-[#fcfcfc] h-screen overflow-hidden">
+    <section className="relative bg-[#fcfcfc] h-dvh overflow-hidden" data-theme="light">
       <PatternOverlay opacity={0.05} />
       <div className="relative z-10 h-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center lg:gap-12 lg:px-8">
         
         {/* Title Section */}
-        <div className="w-full lg:w-2/5 flex items-center justify-center lg:justify-start pt-20 pb-6 lg:pt-0 lg:pb-0 shrink-0 z-20">
+        <div className="hidden lg:flex w-full lg:w-2/5 items-center justify-center lg:justify-start pt-10 pb-4 lg:pt-0 lg:pb-0 shrink-0 z-20">
           <div className="px-6 lg:p-0 text-center lg:text-left">
             <h2 className="font-display font-bold text-brand drop-shadow-sm lg:drop-shadow-none" style={{ fontSize: "clamp(3.5rem, 8vw, 7rem)", lineHeight: "0.95" }}>
               Our<br className="hidden lg:block" /> Brands
@@ -114,4 +115,4 @@ export default function BrandShowcase() {
       </div>
     </section>
   );
-}
+});

@@ -1,46 +1,69 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, memo } from "react";
 import { motion } from "framer-motion";
 import PatternOverlay from "./PatternOverlay";
 import { useAdmin } from "./AdminProvider";
 
 const TYPING_SPEED = 80;
 
-export default function Hero() {
+export default memo(function Hero() {
   const { data } = useAdmin();
-  const [typedText, setTypedText] = useState("");
-  const [typingDone, setTypingDone] = useState(false);
+  const typedRef = useRef<HTMLSpanElement>(null);
+  const cursorRef = useRef<HTMLSpanElement>(null);
   const indexRef = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const headingText = data.heroHeading;
 
   useEffect(() => {
     indexRef.current = 0;
-    setTypedText("");
-    setTypingDone(false);
+    if (typedRef.current) typedRef.current.textContent = "";
+    if (cursorRef.current) cursorRef.current.style.display = "inline-block";
 
-    const interval = setInterval(() => {
-      indexRef.current += 1;
-      if (indexRef.current <= headingText.length) {
-        setTypedText(headingText.slice(0, indexRef.current));
-      } else {
-        clearInterval(interval);
-        setTypingDone(true);
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const startTyping = () => {
+      timer = setInterval(() => {
+        indexRef.current += 1;
+        if (indexRef.current <= headingText.length && typedRef.current) {
+          typedRef.current.textContent = headingText.slice(0, indexRef.current);
+        } else {
+          if (timer) clearInterval(timer);
+          if (cursorRef.current) cursorRef.current.style.display = "none";
+        }
+      }, TYPING_SPEED);
+      timerRef.current = timer;
+    };
+
+    startTyping();
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (timer) clearInterval(timer);
+      } else if (indexRef.current < headingText.length) {
+        if (timer) clearInterval(timer);
+        startTyping();
       }
-    }, TYPING_SPEED);
-    return () => clearInterval(interval);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      if (timer) clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [headingText]);
 
   return (
     <section
       id="home"
-      className="relative pt-24 pb-24 md:py-0 h-auto md:min-h-screen flex items-center justify-center bg-brand overflow-hidden"
+      data-theme="dark"
+      className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-dvh flex items-center justify-center bg-brand overflow-hidden"
     >
-      <PatternOverlay opacity={0.16} />
+      <PatternOverlay opacity={0.16} mobileOpacity={0.35} />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
-          initial={{ y: "-100vh" }}
+          initial={{ y: "-100dvh" }}
           animate={{ y: 0 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
         >
@@ -62,27 +85,16 @@ export default function Hero() {
                 </span>
               ))}
             </span>
-            {/* Actual typed text */}
+            {/* Actual typed text — updated via ref to avoid React re-renders */}
             <span className="absolute top-0 left-0 w-full h-full">
-              {typedText.split(' ').map((word, index, array) => (
-                <span key={index}>
-                  {word}
-                  {index === 0 && index < array.length - 1 && (
-                    <>
-                      <br className="block md:hidden" />
-                      <span className="hidden md:inline"> </span>
-                    </>
-                  )}
-                  {index === 1 && index < array.length - 1 && <br className="block" />}
-                </span>
-              ))}
-              {!typingDone && <span className="dot-cursor inline-block align-baseline" />}
+              <span ref={typedRef} />
+              <span ref={cursorRef} className="dot-cursor inline-block align-baseline" />
             </span>
           </h1>
         </motion.div>
 
         <motion.div
-          initial={{ y: "-100vh" }}
+          initial={{ y: "-100dvh" }}
           animate={{ y: 0 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="mt-6 md:mt-8"
@@ -99,4 +111,4 @@ export default function Hero() {
       </div>
     </section>
   );
-}
+});

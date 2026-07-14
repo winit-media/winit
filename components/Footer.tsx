@@ -1,20 +1,22 @@
 "use client";
 
+import { memo } from "react";
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
+import { scrollToTarget } from "@/hooks/useLenis";
 import { Phone, MapPin, Mail } from "lucide-react";
 
-export default function Footer() {
+export default memo(function Footer() {
   const { data } = useAdmin();
 
   const scrollTo = (href: string) => {
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    scrollToTarget(href);
   };
 
   return (
-    <footer id="contact" className="relative bg-brand overflow-hidden">
+    <footer id="contact" className="relative bg-brand overflow-hidden" data-theme="dark">
       <PatternOverlay opacity={0.08} />
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
           {/* Left Column — Brand */}
           <div className="flex flex-col gap-2 lg:gap-4 order-1 md:order-1 pr-2 min-w-0">
@@ -86,7 +88,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/20 mt-8 lg:mt-12 pt-6 lg:pt-8 text-center">
+        <div className="border-t border-white/20 mt-6 lg:mt-10 pt-4 lg:pt-6 text-center">
           <p className="text-white/60 text-xs lg:text-sm">
             {data.footerCopyright}
           </p>
@@ -94,7 +96,7 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+});
 
 function SocialIcon({ label }: { label: string }) {
   const s = 16;

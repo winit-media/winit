@@ -7,12 +7,19 @@ import { Section, Field } from "../components/FormElements";
 import ImageUpload from "../components/ImageUpload";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
+import { uid } from "@/lib/uid";
 
 type Testimonial = SiteContent["testimonials"][0];
 
 export default function TestimonialsTab() {
-  const { data, updateContent } = useAdmin();
+  const { data, updateContent, revertedCount } = useAdmin();
   const [local, setLocal] = useState(data);
+  const [prevReverted, setPrevReverted] = useState(revertedCount);
+
+  if (revertedCount !== prevReverted) {
+    setPrevReverted(revertedCount);
+    setLocal(data);
+  }
   const [editing, setEditing] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     name: "", designation: "", company: "", service: "", review: "", website: "", logoUrl: "",
@@ -56,7 +63,7 @@ export default function TestimonialsTab() {
     }
     const updated = {
       ...local,
-      testimonials: [...local.testimonials, { id: crypto.randomUUID(), ...form }],
+      testimonials: [...local.testimonials, { id: uid(), ...form }],
     };
     setLocal(updated);
     updateContent(updated);

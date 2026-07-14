@@ -1,17 +1,23 @@
+"use client";
+
 import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import VideoSection from "@/components/VideoSection";
-import MobileBrandMarquee from "@/components/MobileBrandMarquee";
-import WhatWeDo from "@/components/WhatWeDo";
-import MediaCarousel from "@/components/MediaCarousel";
-import BrandShowcase from "@/components/BrandShowcase";
-import WhyChooseUs from "@/components/WhyChooseUs";
-import Testimonials from "@/components/Testimonials";
-import Footer from "@/components/Footer";
-import FloatingCTA from "@/components/FloatingCTA";
+import { useLenis } from "@/hooks/useLenis";
+import dynamic from "next/dynamic";
+
+const VideoSection = dynamic(() => import("@/components/VideoSection"), { ssr: false });
+const MobileBrandMarquee = dynamic(() => import("@/components/MobileBrandMarquee"), { ssr: false });
+const WhatWeDo = dynamic(() => import("@/components/WhatWeDo"), { ssr: false });
+const MediaCarousel = dynamic(() => import("@/components/MediaCarousel"), { ssr: false });
+const BrandShowcase = dynamic(() => import("@/components/BrandShowcase"), { ssr: false });
+const WhyChooseUs = dynamic(() => import("@/components/WhyChooseUs"), { ssr: false });
+const Testimonials = dynamic(() => import("@/components/Testimonials"), { ssr: false });
+const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
+const FloatingCTA = dynamic(() => import("@/components/FloatingCTA"), { ssr: false });
 
 export default function Home() {
+  useLenis();
   return (
     <AdminProvider>
       <Navbar />
@@ -21,7 +27,7 @@ export default function Home() {
         <MobileBrandMarquee />
         <WhatWeDo />
         <MediaCarousel />
-        <BrandShowcase />
+        <div className="hidden lg:block"><BrandShowcase /></div>
         <WhyChooseUs />
         <Testimonials />
       </main>

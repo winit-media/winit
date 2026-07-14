@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, memo, createContext, useContext } from "react";
 import { X, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 import PatternOverlay from "./PatternOverlay";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useScrollLock } from "@/hooks/useScrollLock";
+import { useDeviceCapabilities, getMaxConcurrentVideos } from "@/hooks/useDeviceCapabilities";
+import { uid } from "@/lib/uid";
 
 const getOptimizedMedia = (url: string) => {
-  if (!url || !url.includes('cloudinary.com')) return { videoUrl: url, posterUrl: url };
+  if (!url || !url.includes('cloudinary.com')) return { videoUrl: url, posterUrl: "" };
   const [baseUrl, path] = url.split('/upload/');
   return {
     videoUrl: `${baseUrl}/upload/f_auto,q_auto:eco,c_limit,w_400,so_0,eo_5/${path}`,
@@ -15,10 +19,12 @@ const getOptimizedMedia = (url: string) => {
 };
 
 const getHighQualityMedia = (url: string) => {
-  if (!url || !url.includes('cloudinary.com')) return { videoUrl: url };
+  if (!url || !url.includes('cloudinary.com')) return { videoUrl: url, posterUrl: undefined as string | undefined };
   const [baseUrl, path] = url.split('/upload/');
+  const posterUrl = `${baseUrl}/upload/f_auto,q_auto:eco,so_0,eo_3/${path}`.replace(/\.[^/.]+$/, ".webp");
   return {
     videoUrl: `${baseUrl}/upload/f_auto,q_auto:good/${path}`,
+    posterUrl,
   };
 };
 
@@ -33,32 +39,7 @@ const defaultVideos = [
   { id: "8", name: "Campaign 8", url: "/fallback-video.mp4" },
 ];
 
-const useDeviceCapabilities = () => {
-  const [canPlayMedia, setCanPlayMedia] = useState(true);
-
-  useEffect(() => {
-    try {
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      
-      // @ts-ignore
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      const saveData = connection?.saveData === true;
-      const slowConnection = connection?.effectiveType === 'slow-2g' || connection?.effectiveType === '2g';
-      
-      // @ts-ignore
-      const lowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
-      const lowCPU = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
-
-      if (prefersReducedMotion || saveData || slowConnection || lowMemory || lowCPU) {
-        setCanPlayMedia(false);
-      }
-    } catch (e) {
-      // Ignore errors, default to true
-    }
-  }, []);
-
-  return canPlayMedia;
-};
+const ActiveVideoContext = createContext<{ activeIds: Set<string> }>({ activeIds: new Set() });
 
 interface VideoCardProps {
   video: { id: string; url: string; name: string };
@@ -77,8 +58,11 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
   const [tapRevealed, setTapRevealed] = useState(false);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { videoUrl, posterUrl } = getOptimizedMedia(video.url);
+  const { activeIds } = useContext(ActiveVideoContext);
+  const [cardId] = useState(() => `${video.id}-${uid()}`);
 
-  const shouldMountVideo = inView || isHovered;
+  const isActive = activeIds.has(cardId);
+  const shouldMountVideo = canPlayMedia && (inView || isHovered) && isActive;
 
   const handleTapReveal = () => {
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
@@ -101,11 +85,16 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
     const container = containerRef.current;
     if (!container || !canPlayMedia) return;
 
+    if (typeof IntersectionObserver === "undefined") {
+      queueMicrotask(() => setInView(true));
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         setInView(entry.isIntersecting);
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     observer.observe(container);
@@ -116,12 +105,27 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
     const v = videoRef.current;
     if (!v || !canPlayMedia) return;
 
-    if (!isPaused && inView) {
+    if (!isPaused && inView && isActive) {
       v.play().catch(() => {});
     } else {
       v.pause();
     }
-  }, [inView, isPaused, shouldMountVideo, canPlayMedia]);
+  }, [inView, isPaused, isActive, canPlayMedia]);
+
+  useEffect(() => {
+    if (!canPlayMedia) return;
+    const handleVisibility = () => {
+      const v = videoRef.current;
+      if (!v) return;
+      if (document.hidden) {
+        v.pause();
+      } else if (inView && !isPaused && isActive) {
+        v.play().catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [inView, isPaused, isActive, canPlayMedia]);
 
   const handleClick = () => {
     onExpand(video);
@@ -140,6 +144,7 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
   return (
     <div
       ref={containerRef}
+      data-card-id={cardId}
       onClick={(e) => {
         e.stopPropagation();
         handleTapReveal();
@@ -148,11 +153,11 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
       onMouseLeave={() => setIsHovered(false)}
       className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02] border-2 border-white`}
     >
-      {canPlayMedia && shouldMountVideo ? (
+      {shouldMountVideo ? (
         <video
           ref={videoRef}
           src={videoUrl}
-          poster={posterUrl}
+          poster={posterUrl || undefined}
           className="w-full h-full object-cover bg-black pointer-events-none"
           loop
           playsInline
@@ -163,16 +168,22 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
             setIsLandscape(v.videoWidth > v.videoHeight);
           }}
         />
-      ) : (
+      ) : posterUrl ? (
         <img
           src={posterUrl}
           alt={video.name}
           className="w-full h-full object-cover bg-black"
+          loading="lazy"
+          decoding="async"
           onLoad={(e) => {
             const img = e.currentTarget;
             setIsLandscape(img.naturalWidth > img.naturalHeight);
           }}
         />
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-brand-dark to-brand flex items-center justify-center">
+          <span className="text-white/40 text-xs font-medium px-2 text-center text-center">{video.name}</span>
+        </div>
       )}
       <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 ${tapRevealed ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
       <div className={`absolute bottom-3 left-3 right-3 flex items-center justify-between transition-all duration-500 translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
@@ -208,21 +219,23 @@ interface ExpandedVideoModalProps {
 
 function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [muted, setMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [aspect, setAspect] = useState<string>("16/9");
-  const { videoUrl } = getHighQualityMedia(video.url);
+  const { videoUrl, posterUrl } = getHighQualityMedia(video.url);
+  const containerRef = useFocusTrap(true);
+  useScrollLock(true);
 
   useEffect(() => {
     const v = videoRef.current;
     if (v) {
       v.currentTime = 0;
-      v.play().catch(() => {});
+      v.play().then(() => {
+        setIsPlaying(true);
+      }).catch(() => {
+        setIsPlaying(false);
+      });
     }
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, []);
 
   useEffect(() => {
@@ -241,13 +254,12 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
     } else {
       v.play();
     }
-    setIsPlaying(!isPlaying);
   };
 
   const toggleAudio = () => {
     const v = videoRef.current;
     if (v) {
-      v.muted = !muted;
+      v.muted = !v.muted;
       setMuted(!muted);
     }
   };
@@ -258,6 +270,10 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
       onClick={onClose}
     >
       <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Play ${video.name}`}
         className="relative mx-4"
         style={{ maxWidth: "90vw", maxHeight: "90vh", aspectRatio: aspect }}
         onClick={(e) => e.stopPropagation()}
@@ -266,6 +282,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
           <video
             ref={videoRef}
             src={videoUrl}
+            poster={posterUrl}
             className="w-full h-full object-contain"
             playsInline
             muted={muted}
@@ -309,15 +326,78 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
   );
 }
 
-export default function MediaCarousel() {
+export default memo(function MediaCarousel() {
   const { data } = useAdmin();
   const videos = data.carouselVideos.length > 0 ? data.carouselVideos : defaultVideos;
   const [expandedVideo, setExpandedVideo] = useState<{ id: string; url: string; name: string } | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const canPlayMedia = useDeviceCapabilities();
+  const [activeIds, setActiveIds] = useState<Set<string>>(new Set());
+  const containerRef = useRef<HTMLElement>(null);
+  const maxConcurrent = getMaxConcurrentVideos();
 
   const row1Videos = videos.slice(0, Math.ceil(videos.length / 2));
   const row2Videos = videos.slice(Math.ceil(videos.length / 2));
+
+  // Pick the N cards closest to the horizontal viewport center to play.
+  // All others show poster images only — zero video decoding cost.
+  useEffect(() => {
+    if (!canPlayMedia || maxConcurrent === 0) {
+      queueMicrotask(() => setActiveIds(new Set()));
+      return;
+    }
+
+    const updateActive = () => {
+      const section = containerRef.current;
+      if (!section) return;
+
+      const viewportCenterX = window.innerWidth / 2;
+      const cards = section.querySelectorAll<HTMLElement>("[data-card-id]");
+      const candidates: { id: string; distance: number }[] = [];
+
+      cards.forEach((card) => {
+        const rect = card.getBoundingClientRect();
+        // Only consider cards that are at least partially visible horizontally
+        if (rect.right > 0 && rect.left < window.innerWidth) {
+          const cardCenterX = rect.left + rect.width / 2;
+          const distance = Math.abs(cardCenterX - viewportCenterX);
+          candidates.push({ id: card.dataset.cardId!, distance });
+        }
+      });
+
+      // Sort by distance to viewport center — closest cards get to play
+      candidates.sort((a, b) => a.distance - b.distance);
+      const newActive = new Set(candidates.slice(0, maxConcurrent).map((c) => c.id));
+
+      // Only update state if the set actually changed (avoids unnecessary re-renders)
+      setActiveIds((prev) => {
+        if (prev.size === newActive.size && [...prev].every((id) => newActive.has(id))) {
+          return prev;
+        }
+        return newActive;
+      });
+    };
+
+    updateActive();
+
+    // Poll at 60fps for smooth handoff as marquee scrolls.
+    // requestAnimationFrame is more efficient than setInterval for this.
+    let rafId: ReturnType<typeof requestAnimationFrame>;
+    const tick = () => {
+      updateActive();
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
+    // Also update on scroll (for when the section enters/leaves viewport)
+    const onScroll = () => updateActive();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [canPlayMedia, maxConcurrent, videos]);
 
   const handleExpand = useCallback((video: { id: string; url: string; name: string }) => {
     setExpandedVideo(video);
@@ -330,74 +410,76 @@ export default function MediaCarousel() {
   }, []);
 
   return (
-    <section id="work" className="relative bg-brand h-screen pt-16 overflow-hidden flex flex-col">
-      <PatternOverlay opacity={0.16} />
-      <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
-        <div className="flex-shrink-0 flex items-end justify-center pt-6 pb-8 px-4 sm:px-6 lg:px-8">
-          <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>
-        </div>
+    <ActiveVideoContext.Provider value={{ activeIds }}>
+      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-dvh pt-14 overflow-hidden flex flex-col">
+        <PatternOverlay opacity={0.16} />
+        <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
+          <div className="flex-shrink-0 flex items-end justify-center pt-4 pb-4 px-4 sm:px-6 lg:px-8">
+            <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>
+          </div>
 
-        <div 
-          className="flex-1 w-full flex flex-col gap-3 sm:gap-4 min-h-0 pb-6 sm:pb-8"
-          style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
-        >
-          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
-            <div className="flex h-full w-max gap-3 media-marquee media-marquee-left">
-              <div className="flex items-center gap-3 shrink-0">
-                {row1Videos.map((video, index) => (
-                  <VideoCard
-                    key={`${video.id}-a-${index}`}
-                    video={video}
-                    onExpand={handleExpand}
-                    isPaused={isPaused}
-                    canPlayMedia={canPlayMedia}
-                  />
-                ))}
+          <div 
+            className="flex-1 w-full flex flex-col gap-3 sm:gap-4 min-h-0 pb-4 sm:pb-4"
+            style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
+          >
+            <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
+              <div className="flex h-full w-max gap-3 media-marquee media-marquee-left">
+                <div className="flex items-center gap-3 shrink-0">
+                  {row1Videos.map((video, index) => (
+                    <VideoCard
+                      key={`${video.id}-a-${index}`}
+                      video={video}
+                      onExpand={handleExpand}
+                      isPaused={isPaused}
+                      canPlayMedia={canPlayMedia}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  {row1Videos.map((video, index) => (
+                    <VideoCard
+                      key={`${video.id}-b-${index}`}
+                      video={video}
+                      onExpand={handleExpand}
+                      isPaused={isPaused}
+                      canPlayMedia={canPlayMedia}
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center gap-3 shrink-0">
-                {row1Videos.map((video, index) => (
-                  <VideoCard
-                    key={`${video.id}-b-${index}`}
-                    video={video}
-                    onExpand={handleExpand}
-                    isPaused={isPaused}
-                    canPlayMedia={canPlayMedia}
-                  />
-                ))}
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
+              <div className="flex h-full w-max gap-3 media-marquee media-marquee-right">
+                <div className="flex items-center gap-3 shrink-0">
+                  {row2Videos.map((video, index) => (
+                    <VideoCard
+                      key={`${video.id}-a-${index}`}
+                      video={video}
+                      onExpand={handleExpand}
+                      isPaused={isPaused}
+                      canPlayMedia={canPlayMedia}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  {row2Videos.map((video, index) => (
+                    <VideoCard
+                      key={`${video.id}-b-${index}`}
+                      video={video}
+                      onExpand={handleExpand}
+                      isPaused={isPaused}
+                      canPlayMedia={canPlayMedia}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="flex-1 min-h-0 overflow-hidden rounded-xl">
-            <div className="flex h-full w-max gap-3 media-marquee media-marquee-right">
-              <div className="flex items-center gap-3 shrink-0">
-                {row2Videos.map((video, index) => (
-                  <VideoCard
-                    key={`${video.id}-a-${index}`}
-                    video={video}
-                    onExpand={handleExpand}
-                    isPaused={isPaused}
-                    canPlayMedia={canPlayMedia}
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                {row2Videos.map((video, index) => (
-                  <VideoCard
-                    key={`${video.id}-b-${index}`}
-                    video={video}
-                    onExpand={handleExpand}
-                    isPaused={isPaused}
-                    canPlayMedia={canPlayMedia}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
 
-      {expandedVideo && <ExpandedVideoModal video={expandedVideo} onClose={handleClose} />}
-    </section>
+        {expandedVideo && <ExpandedVideoModal video={expandedVideo} onClose={handleClose} />}
+      </section>
+    </ActiveVideoContext.Provider>
   );
-}
+});

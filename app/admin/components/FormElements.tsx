@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useId } from "react";
 
 export function Section({ title, children, actions }: { title: string; children: ReactNode; actions?: ReactNode }) {
   return (
@@ -31,10 +31,11 @@ export function Field({
   maxLength?: number;
   showCount?: boolean;
 }) {
+  const id = useId();
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <label htmlFor={id} className="text-sm font-medium text-gray-700">{label}</label>
         {showCount && maxLength && (
           <span className={`text-xs ${value.length > maxLength ? "text-red-500 font-medium" : "text-gray-400"}`}>
             {value.length}/{maxLength}
@@ -43,6 +44,7 @@ export function Field({
       </div>
       {textarea ? (
         <textarea
+          id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand resize-y"
@@ -53,6 +55,7 @@ export function Field({
       ) : (
         <input
           type="text"
+          id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand"

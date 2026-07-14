@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useId } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -24,6 +26,18 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const titleId = useId();
+  const containerRef = useFocusTrap(open);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [open, onCancel]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -35,6 +49,10 @@ export default function ConfirmDialog({
         >
           <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
           <motion.div
+            ref={containerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -48,7 +66,7 @@ export default function ConfirmDialog({
                 </div>
               )}
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+                <h3 id={titleId} className="text-lg font-bold text-gray-900">{title}</h3>
                 <p className="text-sm text-gray-500 mt-1">{message}</p>
               </div>
             </div>
@@ -61,6 +79,7 @@ export default function ConfirmDialog({
               </button>
               <button
                 onClick={onConfirm}
+                autoFocus
                 className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${
                   danger
                     ? "bg-red-600 hover:bg-red-700"

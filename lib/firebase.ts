@@ -1,5 +1,15 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -284,23 +294,6 @@ export async function fetchSiteContent(): Promise<SiteContent> {
     const snap = await getDoc(docRef);
     if (snap.exists()) {
       const raw = snap.data() as Partial<SiteContent>;
-      
-      // Auto-sync social links to have 5 logos
-      if (raw.stats && raw.stats.length === 0) {
-        raw.stats = defaultSiteContent.stats;
-        saveSiteContent({ ...defaultSiteContent, ...raw, stats: raw.stats } as SiteContent);
-      }
-
-      // Auto-sync social links to have 5 logos
-      if (raw.socialLinks && raw.socialLinks.length < 5) {
-        raw.socialLinks = raw.socialLinks.map(link => 
-          link.label === "Twitter" ? { ...link, label: "X" } : link
-        );
-        if (!raw.socialLinks.find(link => link.label === "YouTube")) {
-          raw.socialLinks.push({ label: "YouTube", href: "#" });
-        }
-        saveSiteContent({ ...defaultSiteContent, ...raw, socialLinks: raw.socialLinks } as SiteContent);
-      }
 
       return {
         ...defaultSiteContent,
@@ -338,9 +331,26 @@ export async function fetchSiteContent(): Promise<SiteContent> {
   }
 }
 
+async function getAuthToken(): Promise<string> {
+  const user = getAuth(app).currentUser;
+  if (!user) throw new Error("Not authenticated");
+  return user.getIdToken();
+}
+
 export async function saveSiteContent(content: SiteContent): Promise<void> {
-  const docRef = doc(db, DOC_PATH);
-  await setDoc(docRef, content);
+  const token = await getAuthToken();
+  const res = await fetch("/api/admin/content", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ content }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to save content (${res.status})`);
+  }
 }
 
 // ── Blog Types ──────────────────────────────────────────────
@@ -363,10 +373,9 @@ const BLOGS_COLLECTION = "blogs";
 
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   try {
-    const { getDocs, collection, query, orderBy } = await import("firebase/firestore");
     const q = query(collection(db, BLOGS_COLLECTION), orderBy("createdAt", "desc"));
     const snap = await getDocs(q);
-    return snap.docs.map((d) => d.data() as BlogPost);
+    return snap.docs.map((d) => d.data() as BlogPost).filter((p) => p.published);
   } catch (err) {
     console.error("[Firebase] fetchBlogPosts error:", err);
     return [];
@@ -375,11 +384,11 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
 
 export async function fetchBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const { getDocs, collection, query, where } = await import("firebase/firestore");
     const q = query(collection(db, BLOGS_COLLECTION), where("slug", "==", slug));
     const snap = await getDocs(q);
     if (snap.empty) return null;
-    return snap.docs[0].data() as BlogPost;
+    const post = snap.docs[0].data() as BlogPost;
+    return post.published ? post : null;
   } catch (err) {
     console.error("[Firebase] fetchBlogPostBySlug error:", err);
     return null;
@@ -387,29 +396,46 @@ export async function fetchBlogPostBySlug(slug: string): Promise<BlogPost | null
 }
 
 export async function createBlogPost(post: BlogPost): Promise<void> {
-  try {
-    const { doc, setDoc } = await import("firebase/firestore");
-    await setDoc(doc(db, BLOGS_COLLECTION, post.id), post);
-  } catch (err) {
-    console.error("[Firebase] createBlogPost error:", err);
+  const token = await getAuthToken();
+  const res = await fetch("/api/admin/blog", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ post }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to create blog post (${res.status})`);
   }
 }
 
 export async function updateBlogPost(id: string, partial: Partial<BlogPost>): Promise<void> {
-  try {
-    const { doc, updateDoc } = await import("firebase/firestore");
-    await updateDoc(doc(db, BLOGS_COLLECTION, id), partial);
-  } catch (err) {
-    console.error("[Firebase] updateBlogPost error:", err);
+  const token = await getAuthToken();
+  const res = await fetch("/api/admin/blog", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ id, partial }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to update blog post (${res.status})`);
   }
 }
 
 export async function deleteBlogPost(id: string): Promise<void> {
-  try {
-    const { doc, deleteDoc } = await import("firebase/firestore");
-    await deleteDoc(doc(db, BLOGS_COLLECTION, id));
-  } catch (err) {
-    console.error("[Firebase] deleteBlogPost error:", err);
+  const token = await getAuthToken();
+  const res = await fetch(`/api/admin/blog?id=${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to delete blog post (${res.status})`);
   }
 }
 

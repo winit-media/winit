@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Save, Check } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 
 export default function SaveIndicator({ saving }: { saving: boolean }) {
   if (!saving) return null;
@@ -38,13 +38,5 @@ export function SaveButton({
       {saving ? <Loader2 size={size === "sm" ? 14 : 16} className="animate-spin" /> : <Save size={size === "sm" ? 14 : 16} />}
       {label}
     </button>
-  );
-}
-
-export function SavedBadge() {
-  return (
-    <span className="inline-flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-      <Check size={10} /> Saved
-    </span>
   );
 }

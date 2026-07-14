@@ -21,13 +21,22 @@ export default function LoginGate({ onLogin }: { onLogin: () => void }) {
       await signInWithEmailAndPassword(auth, email, password);
       onLogin();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      const code = (err as { code?: string }).code || "";
+      if (code.includes("user-not-found") || code.includes("wrong-password") || code.includes("invalid-credential")) {
+        setError("Invalid email or password.");
+      } else if (code.includes("too-many-requests")) {
+        setError("Too many attempts. Please try again later.");
+      } else if (code.includes("network-request-failed")) {
+        setError("Network error. Please check your connection.");
+      } else {
+        setError("Login failed. Please try again.");
+      }
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">Admin Dashboard</h1>
         <p className="text-gray-500 text-sm text-center mb-6">Sign in with your email and password</p>

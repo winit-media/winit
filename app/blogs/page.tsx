@@ -1,47 +1,39 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Poppins } from "next/font/google";
 import { fetchBlogPosts, BlogPost } from "@/lib/firebase";
 import { Calendar, ArrowRight, Tag, X, User } from "lucide-react";
-import { AdminProvider } from "@/components/AdminProvider";
-import DOMPurify from "dompurify";
-import Navbar from "@/components/Navbar";
-import PatternOverlay from "@/components/PatternOverlay";
-import FloatingCTA from "@/components/FloatingCTA";
-import Footer from "@/components/Footer";
-
-const poppins = Poppins({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-poppins",
-});
+import { sanitizeBlogContent } from "@/lib/sanitize-blog";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
+  useScrollLock(true);
   useEffect(() => {
-    document.body.style.overflow = "hidden";
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
     return () => {
-      document.body.style.overflow = "";
       window.removeEventListener("keydown", handleEsc);
     };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm overflow-y-auto py-10 px-4"
+      className="fixed inset-0 z-[10000] flex items-start justify-center bg-black/50 backdrop-blur-sm overflow-y-auto py-10 px-4"
       onClick={onClose}
     >
       <div
         className="relative bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="blog-modal-title"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/80 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+          aria-label="Close blog post"
         >
           <X size={18} />
         </button>
@@ -52,6 +44,8 @@ function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
               src={post.coverImage}
               alt={post.title}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         )}
@@ -69,8 +63,8 @@ function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
           </div>
 
           <h1
-            className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4"
-            style={{ fontFamily: "'Clash Display', 'Montserrat', system-ui, sans-serif" }}
+            id="blog-modal-title"
+            className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 font-display"
           >
             {post.title}
           </h1>
@@ -94,8 +88,7 @@ function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
 
           <div
             className="prose prose-lg max-w-none prose-headings:font-display prose-a:text-brand prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-blockquote:border-brand prose-blockquote:text-gray-600"
-            style={{ fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif" }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"] }) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeBlogContent(post.content) }}
           />
         </div>
       </div>
@@ -118,26 +111,28 @@ export default function BlogsPage() {
   }, []);
 
   return (
-    <AdminProvider>
-      {!selected && <Navbar />}
-      <div className={`${poppins.variable} min-h-screen bg-white`}>
-        {/* Header */}
-        <div className="bg-brand relative overflow-hidden">
-          <PatternOverlay opacity={0.16} />
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-[3.75rem]">
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-white mt-4" style={{ fontFamily: "'Clash Display', 'Montserrat', system-ui, sans-serif" }}>
-              Blogs
-            </h1>
-            <p className="text-white/70 mt-2 max-w-xl">
-              Insights, stories, and updates from the WinIt team.
-            </p>
-          </div>
+    <div className="min-h-dvh bg-white">
+      {/* Header */}
+      <div className="bg-brand relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
         </div>
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-[3.75rem]">
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-white mt-4">
+            Blogs
+          </h1>
+          <p className="text-white/70 mt-2 max-w-xl">
+            Insights, stories, and updates from the WinIt team.
+          </p>
+        </div>
+      </div>
 
-        {/* List */}
-        <div className="relative w-full py-12">
-          <PatternOverlay opacity={0.16} />
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4">
+      {/* List */}
+      <div className="relative w-full py-12">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
+        </div>
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4">
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin" />
@@ -161,6 +156,8 @@ export default function BlogsPage() {
                         src={post.coverImage}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   )}
@@ -175,7 +172,7 @@ export default function BlogsPage() {
                         </>
                       )}
                     </div>
-                    <h2 className="font-display font-semibold text-lg text-gray-900 group-hover:text-brand transition-colors mb-2 line-clamp-2" style={{ fontFamily: "'Clash Display', 'Montserrat', system-ui, sans-serif" }}>
+                    <h2 className="font-display font-semibold text-lg text-gray-900 group-hover:text-brand transition-colors mb-2 line-clamp-2">
                       {post.title}
                     </h2>
                     {post.excerpt && (
@@ -201,13 +198,10 @@ export default function BlogsPage() {
               ))}
             </div>
           )}
-          </div>
         </div>
       </div>
 
-      <Footer />
       {selected && <BlogModal post={selected} onClose={handleClose} />}
-      {!selected && <FloatingCTA />}
-    </AdminProvider>
+    </div>
   );
 }

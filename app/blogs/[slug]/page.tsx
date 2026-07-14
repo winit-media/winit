@@ -2,19 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Poppins } from "next/font/google";
 import { fetchBlogPostBySlug, BlogPost } from "@/lib/firebase";
 import { Calendar, Tag, ArrowLeft, User, Loader2 } from "lucide-react";
-import { AdminProvider } from "@/components/AdminProvider";
-import DOMPurify from "dompurify";
-import Navbar from "@/components/Navbar";
-import PatternOverlay from "@/components/PatternOverlay";
-
-const poppins = Poppins({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-poppins",
-});
+import { sanitizeBlogContent } from "@/lib/sanitize-blog";
 
 export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const [post, setPost] = useState<BlogPost | null>(null);
@@ -35,43 +25,36 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
   if (loading) {
     return (
-      <AdminProvider>
-        <Navbar />
-        <div className={`${poppins.variable} min-h-screen bg-white flex items-center justify-center`}>
-          <Loader2 size={32} className="animate-spin text-brand" />
-        </div>
-      </AdminProvider>
+      <div className="min-h-dvh bg-white flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-brand" />
+      </div>
     );
   }
 
   if (!post) {
     return (
-      <AdminProvider>
-        <Navbar />
-        <div className={`${poppins.variable} min-h-screen bg-white flex items-center justify-center`}>
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Post Not Found</h1>
-            <p className="text-gray-500 mb-6">The blog post you are looking for does not exist.</p>
-            <Link href="/blogs" className="text-brand hover:text-brand-dark font-medium transition-colors">
-              &larr; Back to Blogs
-            </Link>
-          </div>
+      <div className="min-h-dvh bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Post Not Found</h1>
+          <p className="text-gray-500 mb-6">The blog post you are looking for does not exist.</p>
+          <Link href="/blogs" className="text-brand hover:text-brand-dark font-medium transition-colors">
+            &larr; Back to Blogs
+          </Link>
         </div>
-      </AdminProvider>
+      </div>
     );
   }
 
   return (
-    <AdminProvider>
-      <Navbar />
-      <div className={`${poppins.variable} min-h-screen bg-white`}>
-        {/* Header */}
-        <div className="bg-brand relative overflow-hidden">
-          <PatternOverlay opacity={0.16} />
-          <div className="relative z-10 max-w-4xl mx-auto px-4 py-20">
-            <h1
+    <div className="min-h-dvh bg-white">
+      {/* Header */}
+      <div className="bg-brand relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-4 py-20">
+          <h1
             className="text-3xl md:text-5xl font-display font-bold text-white mt-4 leading-tight"
-            style={{ fontFamily: "'Clash Display', 'Montserrat', system-ui, sans-serif" }}
           >
             {post.title}
           </h1>
@@ -102,13 +85,21 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
       {/* Content area with pattern */}
       <div className="relative">
-        <PatternOverlay opacity={0.16} />
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
+        </div>
         <div className="relative z-10">
         {/* Cover Image */}
         {post.coverImage && (
           <div className="max-w-4xl mx-auto px-4 -mt-12 relative z-20 mb-8">
             <div className="rounded-xl overflow-hidden shadow-lg">
-              <img src={post.coverImage} alt={post.title} className="w-full h-auto max-h-[500px] object-cover" />
+              <img
+                src={post.coverImage}
+                alt={post.title}
+                className="w-full h-auto max-h-[500px] object-cover"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
           </div>
         )}
@@ -122,8 +113,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
           )}
           <div
             className="prose prose-lg max-w-none prose-headings:font-display prose-a:text-brand prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-blockquote:border-brand prose-blockquote:text-gray-600"
-            style={{ fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif" }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"] }) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeBlogContent(post.content) }}
           />
         </article>
         </div>
@@ -141,6 +131,5 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
         </div>
       </div>
     </div>
-    </AdminProvider>
   );
 }

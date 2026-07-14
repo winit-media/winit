@@ -4,13 +4,15 @@
   --color-brand: #912dbf;
   --color-brand-dark: #7a24a8;
   --color-brand-light: #a84fd4;
-  --font-display: "Clash Display", "Montserrat", system-ui, sans-serif;
-  --font-sans: var(--font-poppins), "Poppins", system-ui, sans-serif;
+  --font-display: var(--font-clash), "Montserrat", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-sans: var(--font-poppins), "Poppins", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 4rem;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -21,7 +23,21 @@ main {
   overflow: visible;
 }
 
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
 
+input, textarea, select, button {
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 16px;
+}
+
+/* Fallback for old iOS that doesn't support dvh units */
+@supports not (height: 100dvh) {
+  .h-dvh { height: 100vh; }
+  .min-h-dvh { min-height: 100vh; }
+}
 
 .swiper-pagination-bullet-active {
   background: #912dbf !important;
@@ -73,9 +89,11 @@ main {
   animation: marquee-right 30s linear infinite;
 }
 
-.animate-marquee-left:hover,
-.animate-marquee-right:hover {
-  animation-play-state: paused;
+@media (hover: hover) {
+  .animate-marquee-left:hover,
+  .animate-marquee-right:hover {
+    animation-play-state: paused;
+  }
 }
 
 .media-marquee {
@@ -94,14 +112,18 @@ main {
   transform: translate3d(0, 0, 0);
 }
 
-.media-marquee-left:hover,
-.media-marquee-right:hover {
-  animation-play-state: paused;
+@media (hover: hover) {
+  .media-marquee-left:hover,
+  .media-marquee-right:hover {
+    animation-play-state: paused;
+  }
 }
 
-.animate-marquee-down:hover,
-.animate-marquee-up:hover {
-  animation-play-state: running;
+@media (hover: hover) {
+  .animate-marquee-down:hover,
+  .animate-marquee-up:hover {
+    animation-play-state: running;
+  }
 }
 
 .dot-cursor {
@@ -144,4 +166,36 @@ main {
   background: #912dbf;
   width: 28px;
   border-radius: 5px;
+}
+
+.whatwedo-card {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.whatwedo-card > div {
+  contain: layout paint;
+}
+
+.pattern-overlay {
+  opacity: var(--pattern-desktop-opacity, 0.16);
+}
+
+@media (max-width: 767px) {
+  .pattern-overlay {
+    opacity: var(--pattern-opacity, 0.35);
+  }
+}
+
+/* Fallback for old iOS without aspect-ratio support */
+@supports not (aspect-ratio: 16/9) {
+  .aspect-video {
+    position: relative;
+    padding-top: 56.25%;
+  }
+  .aspect-square {
+    position: relative;
+    padding-top: 100%;
+  }
 }

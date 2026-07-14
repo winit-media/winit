@@ -223,7 +223,7 @@ export default function BlogPostsTab() {
                   <span className={`text-xs font-medium px-2 py-0.5 rounded ${post.published ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                     {post.published ? "Published" : "Draft"}
                   </span>
-                  <span className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</span>
+                  <span className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
                 </div>
                 <p className="font-semibold text-sm truncate">{post.title || "Untitled"}</p>
                 <p className="text-xs text-gray-400 mt-0.5 truncate">/{post.slug}</p>

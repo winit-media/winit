@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Site content: public read, NO client writes.
+    // All writes go through server-side API routes with firebase-admin.
+    match /siteContent/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Blogs: public read only published posts, authenticated can read all.
+    // All writes go through server-side API routes with firebase-admin.
+    match /blogs/{postId} {
+      allow read: if resource.data.published == true || request.auth != null;
+      allow write: if false;
+    }
+  }
+}

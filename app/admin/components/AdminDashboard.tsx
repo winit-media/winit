@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";import { motion, AnimatePresence } from "framer-motion";
 import {
   Type, Film, Briefcase, ImageIcon, MessageSquare, Link as LinkIcon, Plus,
-  ArrowLeft, LogOut, Moon, Sun,
+  ArrowLeft, LogOut, Moon, Sun, Loader2,
 } from "lucide-react";
 import { useAdmin } from "@/components/AdminProvider";
 import { getAuth, signOut } from "firebase/auth";
 import SaveIndicator from "../components/SaveIndicator";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { useUnsavedWarning } from "@/hooks/useUnsavedWarning";
 import ContentTab from "../tabs/ContentTab";
 import VideosTab from "../tabs/VideosTab";
 import ServicesTab from "../tabs/ServicesTab";
@@ -37,11 +37,21 @@ const tabs: { key: Tab; label: string; icon: typeof Film }[] = [
 ];
 
 export default function AdminDashboard() {
-  const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-  const initialTab = (urlParams?.get("tab") as Tab) || "content";
-  const [tab, setTab] = useState<Tab>(tabs.find((t) => t.key === initialTab) ? initialTab : "content");
-  const { saving, saveNow } = useAdmin();
+  const [tab, setTab] = useState<Tab>("content");
+  const { saving, saveNow, hasChanges, loaded } = useAdmin();
   const { dark, toggle: toggleDark } = useDarkMode();
+  useUnsavedWarning(hasChanges);
+
+  // Sync tab from URL on mount (avoids hydration mismatch)
+  useEffect(() => {
+    queueMicrotask(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTab = urlParams.get("tab") as Tab;
+      if (urlTab && tabs.find((t) => t.key === urlTab)) {
+        setTab(urlTab);
+      }
+    });
+  }, []);
 
   const handleTabChange = useCallback((newTab: Tab) => {
     const url = new URL(window.location.href);
@@ -62,7 +72,7 @@ export default function AdminDashboard() {
   }, [saveNow]);
 
   return (
-    <div className={`min-h-screen transition-colors ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div className={`min-h-dvh transition-colors ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
       <header className={`${dark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} border-b sticky top-0 z-10`}>
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -120,14 +130,22 @@ export default function AdminDashboard() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            {tab === "content" && <ContentTab />}
-            {tab === "videos" && <VideosTab />}
-            {tab === "services" && <ServicesTab />}
-            {tab === "brands" && <BrandsTab />}
-            {tab === "testimonials" && <TestimonialsTab />}
-            {tab === "social" && <SocialTab />}
-            {tab === "blogusers" && <BlogUsersTab />}
-            {tab === "blogs" && <BlogPostsTab />}
+            {!loaded ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 size={24} className="animate-spin text-brand" />
+              </div>
+            ) : (
+              <>
+                {tab === "content" && <ContentTab />}
+                {tab === "videos" && <VideosTab />}
+                {tab === "services" && <ServicesTab />}
+                {tab === "brands" && <BrandsTab />}
+                {tab === "testimonials" && <TestimonialsTab />}
+                {tab === "social" && <SocialTab />}
+                {tab === "blogusers" && <BlogUsersTab />}
+                {tab === "blogs" && <BlogPostsTab />}
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

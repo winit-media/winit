@@ -7,6 +7,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary";
 import DragReorder from "@/components/ui/DragReorder";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
+import { uid } from "@/lib/uid";
 
 function BrandRow({
   brand,
@@ -81,15 +82,21 @@ function BrandRow({
 }
 
 export default function BrandsTab() {
-  const { data, updateContent } = useAdmin();
+  const { data, updateContent, revertedCount } = useAdmin();
   const [local, setLocal] = useState(data);
+  const [prevReverted, setPrevReverted] = useState(revertedCount);
+
+  if (revertedCount !== prevReverted) {
+    setPrevReverted(revertedCount);
+    setLocal(data);
+  }
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const add = () => {
     const updated = {
       ...local,
-      brands: [{ id: crypto.randomUUID(), name: "", imageUrl: "", link: "" }, ...local.brands],
+      brands: [{ id: uid(), name: "", imageUrl: "", link: "" }, ...local.brands],
     };
     setLocal(updated);
     updateContent(updated);

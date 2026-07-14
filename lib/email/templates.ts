@@ -15,9 +15,6 @@ interface SiteContactDetails {
 
 const BRAND_COLOR = "#912dbf";
 const BRAND_DARK = "#7a24a8";
-const BRAND_LIGHT = "#a84fd4";
-
-const patternSvgBase64 = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 810 810"><rect width="810" height="810" fill="none"/><path fill="#912dbf" fill-opacity="0.06" d="M405 0C181.5 0 0 181.5 0 405s181.5 405 405 405 405-181.5 405-405S628.5 0 405 0zm0 720C210.15 720 90 599.85 90 405S210.15 90 405 90s315 120.15 315 315-120.15 315-315 315z"/></svg>`)})")`;
 
 function emailWrapper(children: string): string {
   return `

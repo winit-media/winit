@@ -2,13 +2,18 @@
 
 import { useRef, useState, useEffect } from "react";
 
-export default function PatternOverlay({ opacity = 0.16 }: { opacity?: number }) {
+export default function PatternOverlay({ opacity = 0.16, mobileOpacity }: { opacity?: number; mobileOpacity?: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      queueMicrotask(() => setLoaded(true));
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -32,8 +37,8 @@ export default function PatternOverlay({ opacity = 0.16 }: { opacity?: number })
           alt=""
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover"
-          style={{ opacity }}
+          className="w-full h-full object-cover pattern-overlay"
+          style={{ "--pattern-opacity": mobileOpacity ?? opacity, "--pattern-desktop-opacity": opacity } as React.CSSProperties}
         />
       )}
     </div>

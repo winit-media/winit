@@ -14,46 +14,36 @@ export default function FloatingCTA() {
     window.addEventListener("open-contact-modal", handleOpen);
 
     const checkBackground = () => {
-      // The button is roughly 52px from bottom and right
-      const x = window.innerWidth - 52;
-      const y = window.innerHeight - 52;
-      
-      // Get all elements at the button's center
-      const elements = document.elementsFromPoint(x, y);
-      
-      // Find the structural section/footer behind it
-      const container = elements.find(
-        (el) => el.tagName === "SECTION" || el.tagName === "FOOTER"
+      const sections = document.querySelectorAll<HTMLElement>("[data-theme]");
+      if (sections.length === 0) return;
+
+      if (typeof IntersectionObserver === "undefined") {
+        setIsDarkBg(sections[0]?.getAttribute("data-theme") === "dark");
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setIsDarkBg(entry.target.getAttribute("data-theme") === "dark");
+            }
+          });
+        },
+        { threshold: 0.3 }
       );
 
-      if (container) {
-        const className = container.className || "";
-        const id = container.id || "";
-        
-        // Check if the container is a dark/purple section
-        if (
-          className.includes("bg-brand") || 
-          className.includes("bg-black") || 
-          id === "hero" ||
-          className.includes("from-[#1a0a2e]")
-        ) {
-          setIsDarkBg(true);
-        } else {
-          setIsDarkBg(false);
-        }
-      }
+      sections.forEach((s) => observer.observe(s));
+
+      return () => observer.disconnect();
     };
 
-    window.addEventListener("scroll", checkBackground, { passive: true });
-    window.addEventListener("resize", checkBackground, { passive: true });
-    
-    // Initial check
-    setTimeout(checkBackground, 100);
+    // Small delay to ensure sections are rendered
+    const cleanup = checkBackground();
 
     return () => {
       window.removeEventListener("open-contact-modal", handleOpen);
-      window.removeEventListener("scroll", checkBackground);
-      window.removeEventListener("resize", checkBackground);
+      cleanup?.();
     };
   }, []);
 
@@ -67,11 +57,15 @@ export default function FloatingCTA() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(true)}
-          className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-[0_8px_30px_rgba(145,45,191,0.4)] flex items-center justify-center transition-colors duration-500 ${
+          className={`fixed z-50 w-14 h-14 rounded-full shadow-[0_8px_30px_rgba(145,45,191,0.4)] flex items-center justify-center transition-colors duration-500 ${
             isDarkBg
-              ? "bg-white text-brand hover:bg-gray-100" // On purple BG: white button, purple icon
-              : "bg-brand text-white hover:bg-[#8025a8]" // On white BG: purple button, white icon
+              ? "bg-white text-brand hover:bg-gray-100"
+              : "bg-brand text-white hover:bg-[#8025a8]"
           }`}
+          style={{
+            bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
+            right: "calc(1.5rem + env(safe-area-inset-right))",
+          }}
           aria-label="Open contact form"
         >
           <MessageSquarePlus size={24} />

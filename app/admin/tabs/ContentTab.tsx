@@ -9,8 +9,14 @@ import { SaveButton } from "../components/SaveIndicator";
 import DragReorder from "@/components/ui/DragReorder";
 
 export default function ContentTab() {
-  const { data, updateContent } = useAdmin();
+  const { data, updateContent, revertedCount } = useAdmin();
   const [local, setLocal] = useState(data);
+  const [prevReverted, setPrevReverted] = useState(revertedCount);
+
+  if (revertedCount !== prevReverted) {
+    setPrevReverted(revertedCount);
+    setLocal(data);
+  }
 
   const field = (key: keyof SiteContent, value: unknown) => {
     setLocal((p) => ({ ...p, [key]: value }));
