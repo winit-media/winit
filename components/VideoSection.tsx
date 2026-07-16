@@ -123,7 +123,7 @@ export default memo(function VideoSection() {
     <section
       ref={containerRef}
       data-theme="dark"
-      className="relative w-full aspect-video overflow-hidden bg-black group ios-gpu-stable"
+      className="relative w-full aspect-video overflow-hidden bg-black group ios-gpu-stable section-lazy"
       onClick={toggleControls}
     >
       {(canPlayMedia || manualPlay) ? (
@@ -152,7 +152,7 @@ export default memo(function VideoSection() {
         <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={togglePlay}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-4 transition-colors"
+            className="bg-white/30 hover:bg-white/40 backdrop-blur-sm rounded-full p-4 transition-colors"
           >
             {isPlaying ? (
               <Pause size={28} className="text-white" />
@@ -162,7 +162,7 @@ export default memo(function VideoSection() {
           </button>
           <button
             onClick={toggleMute}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-4 transition-colors"
+            className="bg-white/30 hover:bg-white/40 backdrop-blur-sm rounded-full p-4 transition-colors"
           >
             {muted ? (
               <VolumeX size={28} className="text-white" />

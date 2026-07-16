@@ -55,14 +55,12 @@ function getCanPlayMedia() {
 
 function detectDevice(): "ios" | "mobile" | "desktop" {
   if (typeof window === "undefined") return "desktop";
-  const nav = navigator as unknown as Record<string, unknown>;
-  const ua = nav.userAgent as string;
-  const isIOS =
-    (nav.maxTouchPoints as number) > 0 &&
-    /Safari/.test(ua) &&
-    !/Chrome|CriOS|FxiOS/.test(ua);
-  const isMobile = (nav.maxTouchPoints as number) > 0 || /Mobi|Android/i.test(ua);
-  if (isIOS) return "ios";
+  const ua = navigator.userAgent || "";
+  // Detect ALL iOS browsers: Safari, Chrome (CriOS), Firefox (FxiOS),
+  // and iPadOS 13+ which spoofs a Macintosh UA.
+  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+  if (navigator.maxTouchPoints > 1 && /Macintosh/i.test(ua)) return "ios";
+  const isMobile = navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(ua);
   if (isMobile) return "mobile";
   return "desktop";
 }
@@ -88,7 +86,7 @@ export function getMaxConcurrentVideos(): number {
       return 0;
 
     const device = detectDevice();
-    if (device === "ios") return 2;
+    if (device === "ios") return 1;
     if (device === "mobile") return 3;
     return 5;
   } catch {

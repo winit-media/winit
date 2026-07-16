@@ -116,7 +116,7 @@ export default function Navbar() {
         aria-label="Main navigation"
         className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${
           showNav ? "translate-y-0" : "-translate-y-full"
-        } ${canBeTransparent && !scrolled ? "bg-transparent" : "bg-brand/90 backdrop-blur-sm shadow-md"}`}
+        } ${canBeTransparent && !scrolled ? "bg-transparent" : "bg-brand/95 backdrop-blur-sm shadow-md"}`}
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

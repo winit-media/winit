@@ -114,16 +114,7 @@ export default memo(function WhatWeDo() {
       className="relative bg-white w-full ios-gpu-stable"
       style={{ height: `calc(${cardData.length * (isMobile ? 70 : 60)}vh)` }}
     >
-      <div className="sticky top-0 h-dvh w-full flex items-center overflow-hidden z-0 ios-gpu-stable">
-        <div className="absolute inset-0 z-0">
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage: "url(/pattern.svg)",
-              opacity: 0.12,
-            }}
-          />
-        </div>
+      <div className="sticky top-0 h-dvh w-full flex items-center overflow-hidden z-0 ios-gpu-stable pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
 
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row h-full relative z-10">
           <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-20 lg:pt-0">

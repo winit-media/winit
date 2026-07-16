@@ -114,13 +114,11 @@ input, textarea, select, button {
 
 .media-marquee-left {
   animation: marquee-left 30s linear infinite;
-  will-change: transform;
   transform: translate3d(0, 0, 0);
 }
 
 .media-marquee-right {
   animation: marquee-right 30s linear infinite;
-  will-change: transform;
   transform: translate3d(0, 0, 0);
 }
 
@@ -181,7 +179,6 @@ input, textarea, select, button {
 }
 
 .whatwedo-card {
-  will-change: transform, opacity;
   backface-visibility: hidden;
   transform: translate3d(0, 0, 0);
 }
@@ -190,14 +187,47 @@ input, textarea, select, button {
   contain: layout paint;
 }
 
-.pattern-overlay {
-  opacity: var(--pattern-desktop-opacity, 0.16);
+/* ── Pattern overlay via CSS pseudo-element ──
+   Replaces the old <img>-per-section approach. The browser caches
+   pattern.svg once and reuses it — 9 image decodes → 1 cached asset.
+   Each section sets --pattern-opacity (and optionally --pattern-mobile-opacity)
+   via inline style to control the intensity. */
+.pattern-bg {
+  position: relative;
+}
+
+.pattern-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/pattern.svg');
+  background-size: cover;
+  background-position: center;
+  opacity: var(--pattern-opacity, 0.16);
+  pointer-events: none;
+  z-index: 0;
 }
 
 @media (max-width: 767px) {
-  .pattern-overlay {
-    opacity: var(--pattern-opacity, 0.35);
+  .pattern-bg::before {
+    opacity: var(--pattern-mobile-opacity, var(--pattern-opacity, 0.16));
   }
+}
+
+/* ── Section containment ──
+   Tells the browser that a section's paint + style don't leak out.
+   Avoids 'layout' containment since WhatWeDo uses position:sticky
+   inside a section — layout containment would break sticky. */
+section {
+  contain: style paint;
+}
+
+/* ── content-visibility for below-fold sections ──
+   Lets the browser skip layout/paint/compositing for off-screen content.
+   contain-intrinsic-size prevents layout shift when sections pop into view. */
+.section-lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100dvh;
 }
 
 /* Fallback for old iOS without aspect-ratio support */
@@ -210,4 +240,15 @@ input, textarea, select, button {
     position: relative;
     padding-top: 100%;
   }
+}
+
+/* ── iOS WebKit performance overrides ──
+   backdrop-filter: blur() is extremely expensive on iOS's tiled GPU.
+   Each instance creates a separate compositing layer that requires
+   real-time gaussian blur on every frame. Disabling it on iOS and
+   letting components use solid-color fallbacks prevents scroll jank.
+   The .is-ios class is added to <html> by useIOSBodyClass(). */
+.is-ios * {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }

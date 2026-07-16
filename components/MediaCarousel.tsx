@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback, memo, createContext, useContext } from "react";
 import { X, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
-import PatternOverlay from "./PatternOverlay";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useDeviceCapabilities, getMaxConcurrentVideos } from "@/hooks/useDeviceCapabilities";
@@ -185,7 +184,7 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
           <span className="text-white/40 text-xs font-medium px-2 text-center text-center">{video.name}</span>
         </div>
       )}
-      <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 ${tapRevealed ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
+      <div className={`absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-500 ${tapRevealed ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
       <div className={`absolute bottom-3 left-3 right-3 flex items-center justify-between transition-all duration-500 translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
         <span className="text-white text-sm font-medium truncate drop-shadow-md">{video.name}</span>
         {canPlayMedia && (
@@ -266,7 +265,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/95 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -380,15 +379,21 @@ export default memo(function MediaCarousel() {
 
     let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
     let inView = false;
+    let lastTickTime = 0;
+    const THROTTLE_MS = 250; // ~4fps — no need for per-frame precision
 
-    const tick = () => {
-      updateActive();
+    const tick = (now: number) => {
+      if (now - lastTickTime >= THROTTLE_MS) {
+        updateActive();
+        lastTickTime = now;
+      }
       rafId = requestAnimationFrame(tick);
     };
 
     const startLoop = () => {
       if (rafId != null) return;
       updateActive();
+      lastTickTime = performance.now();
       rafId = requestAnimationFrame(tick);
     };
 
@@ -450,8 +455,7 @@ export default memo(function MediaCarousel() {
 
   return (
     <ActiveVideoContext.Provider value={{ activeIds }}>
-      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-dvh pt-14 overflow-hidden flex flex-col ios-gpu-stable">
-        <PatternOverlay opacity={0.16} />
+      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-dvh pt-14 overflow-hidden flex flex-col ios-gpu-stable section-lazy pattern-bg" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
         <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
           <div className="flex-shrink-0 flex items-end justify-center pt-4 pb-4 px-4 sm:px-6 lg:px-8">
             <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>

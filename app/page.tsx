@@ -4,6 +4,7 @@ import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import { useLenis } from "@/hooks/useLenis";
+import { useIOSBodyClass } from "@/hooks/useIOSDetect";
 import dynamic from "next/dynamic";
 
 const VideoSection = dynamic(() => import("@/components/VideoSection"), { ssr: false });
@@ -18,6 +19,7 @@ const FloatingCTA = dynamic(() => import("@/components/FloatingCTA"), { ssr: fal
 
 export default function Home() {
   useLenis();
+  useIOSBodyClass();
   return (
     <AdminProvider>
       <Navbar />

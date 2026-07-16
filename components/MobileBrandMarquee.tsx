@@ -25,7 +25,7 @@ export default memo(function MobileBrandMarquee() {
   const duration = Math.max(30, brands.length * 6);
 
   return (
-    <div className="block lg:hidden w-full overflow-hidden bg-white py-4 border-b border-gray-100">
+    <div className="block lg:hidden w-full overflow-hidden bg-white py-4 border-b border-gray-100 section-lazy">
       <div 
         className="flex w-max animate-marquee-left items-center hover:[animation-play-state:paused]"
         style={{ animationDuration: `${duration}s` }}

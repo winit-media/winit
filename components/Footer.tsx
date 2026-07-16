@@ -2,7 +2,6 @@
 
 import { memo } from "react";
 import { useAdmin } from "./AdminProvider";
-import PatternOverlay from "./PatternOverlay";
 import { scrollToTarget } from "@/hooks/useLenis";
 import { Phone, MapPin, Mail } from "lucide-react";
 
@@ -14,8 +13,7 @@ export default memo(function Footer() {
   };
 
   return (
-    <footer id="contact" className="relative bg-brand overflow-hidden" data-theme="dark">
-      <PatternOverlay opacity={0.08} />
+    <footer id="contact" className="relative bg-brand overflow-hidden section-lazy pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.08' } as React.CSSProperties}>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
           {/* Left Column — Brand */}

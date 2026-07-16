@@ -8,7 +8,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { useAdmin, SiteContent } from "./AdminProvider";
 import { ChevronLeft, ChevronRight, Quote, X } from "lucide-react";
-import PatternOverlay from "./PatternOverlay";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
@@ -85,7 +84,7 @@ function TestimonialModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
       onClick={onClose}
     >
       <div
@@ -158,8 +157,7 @@ export default memo(function Testimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center" data-theme="light">
-      <PatternOverlay opacity={0.06} />
+    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy pattern-bg" data-theme="light" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-6 lg:mb-6">
           <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">

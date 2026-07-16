@@ -7,7 +7,6 @@ import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
-import PatternOverlay from "@/components/PatternOverlay";
 
 export default function Error({
   error,
@@ -23,8 +22,7 @@ export default function Error({
   return (
     <AdminProvider>
       <Navbar />
-      <main className="min-h-dvh bg-white flex flex-col items-center justify-center relative overflow-hidden">
-        <PatternOverlay opacity={0.06} />
+      <main className="min-h-dvh bg-white flex flex-col items-center justify-center relative overflow-hidden pattern-bg" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
         <div className="relative z-10 text-center px-4">
           <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertTriangle size={32} />

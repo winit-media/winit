@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send } from "lucide-react";
-import PatternOverlay from "./PatternOverlay";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
@@ -111,11 +110,10 @@ export default function ContactModal({
         >
           {/* Purple-White Gradient Backdrop Overlay */}
           <div
-            className="absolute inset-0 bg-gradient-to-br from-brand via-[#b955eb] to-white/90 backdrop-blur-md cursor-pointer"
+            className="absolute inset-0 bg-gradient-to-br from-brand via-[#b955eb] to-white/90 cursor-pointer pattern-bg"
             onClick={onClose}
-          >
-            <PatternOverlay opacity={0.15} />
-          </div>
+            style={{ '--pattern-opacity': '0.15' } as React.CSSProperties}
+          />
 
           {/* Modal Card */}
           <motion.div

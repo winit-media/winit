@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, memo } from "react";
 import { motion } from "framer-motion";
-import PatternOverlay from "./PatternOverlay";
 import { useAdmin } from "./AdminProvider";
 
 const TYPING_SPEED = 80;
@@ -58,9 +57,9 @@ export default memo(function Hero() {
     <section
       id="home"
       data-theme="dark"
-      className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-dvh flex items-center justify-center bg-brand overflow-hidden ios-gpu-stable"
+      className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-dvh flex items-center justify-center bg-brand overflow-hidden ios-gpu-stable pattern-bg"
+      style={{ '--pattern-opacity': '0.16', '--pattern-mobile-opacity': '0.35' } as React.CSSProperties}
     >
-      <PatternOverlay opacity={0.16} mobileOpacity={0.35} />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
           initial={{ y: "-100dvh" }}

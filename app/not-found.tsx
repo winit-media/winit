@@ -5,14 +5,12 @@ import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
-import PatternOverlay from "@/components/PatternOverlay";
 
 export default function NotFound() {
   return (
     <AdminProvider>
       <Navbar />
-      <main className="min-h-dvh bg-white flex flex-col items-center justify-center relative overflow-hidden">
-        <PatternOverlay opacity={0.06} />
+      <main className="min-h-dvh bg-white flex flex-col items-center justify-center relative overflow-hidden pattern-bg" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
         <div className="relative z-10 text-center px-4">
           <p className="text-brand font-display font-bold text-[8rem] sm:text-[10rem] leading-none select-none mb-0">
             404
