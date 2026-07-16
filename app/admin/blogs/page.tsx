@@ -86,6 +86,7 @@ function BlogDashboard() {
   const [saving, setSaving] = useState(false);
   const [userEmail] = useState(() => auth.currentUser?.email || "");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"all" | "published" | "draft">("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -156,14 +157,15 @@ function BlogDashboard() {
   };
 
   const filteredPosts = posts.filter((post) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      post.title.toLowerCase().includes(q) ||
-      post.slug.toLowerCase().includes(q) ||
-      post.author.toLowerCase().includes(q) ||
-      post.tags.some((t) => t.toLowerCase().includes(q))
-    );
+    const matchesSearch = !searchQuery ||
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = filterStatus === "all" ||
+      (filterStatus === "published" && post.published) ||
+      (filterStatus === "draft" && !post.published);
+    return matchesSearch && matchesStatus;
   });
 
   const updateEditing = (partial: Partial<BlogPost>) => {
@@ -211,15 +213,32 @@ function BlogDashboard() {
         </div>
 
         {posts.length > 0 && (
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by title, author, or tag..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-            />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by title, author, or tag..."
+                className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+              />
+            </div>
+            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+              {(["all", "published", "draft"] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${
+                    filterStatus === status
+                      ? "bg-white text-brand shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

@@ -43,7 +43,9 @@ export default function BlogUsersTab() {
   return (
     <div className="space-y-6">
       <Section title="Add Blog User">
-        <p className="text-sm text-gray-500">Users added here can sign in to manage blog posts at <strong>blogs.winitmedia.com</strong></p>
+        <p className="text-sm text-gray-500">
+          Users in this list can sign in on the blog subdomain to manage posts. Anyone not listed here is blocked from the blog manager.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Email" value={newEmail} onChange={setNewEmail} placeholder="user@example.com" />
           <Field label="Display Name" value={newName} onChange={setNewName} placeholder="John Doe" />

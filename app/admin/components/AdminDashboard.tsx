@@ -17,13 +17,14 @@ import BrandsTab from "../tabs/BrandsTab";
 import TestimonialsTab from "../tabs/TestimonialsTab";
 import SocialTab from "../tabs/SocialTab";
 import BlogUsersTab from "../tabs/BlogUsersTab";
-import BlogPostsTab from "../tabs/BlogPostsTab";
 import Link from "next/link";
 import { app } from "@/lib/firebase";
 
 const auth = getAuth(app);
 
-type Tab = "content" | "videos" | "services" | "brands" | "testimonials" | "social" | "blogusers" | "blogs";
+// Blog posts are managed on a dedicated subdomain (/admin/blogs) with its
+// own login + allowlist. The main dashboard handles site content only.
+type Tab = "content" | "videos" | "services" | "brands" | "testimonials" | "social" | "blogusers";
 
 const tabs: { key: Tab; label: string; icon: typeof Film }[] = [
   { key: "content", label: "Content", icon: Type },
@@ -33,7 +34,6 @@ const tabs: { key: Tab; label: string; icon: typeof Film }[] = [
   { key: "testimonials", label: "Testimonials", icon: MessageSquare },
   { key: "social", label: "Social Links", icon: LinkIcon },
   { key: "blogusers", label: "Blog Users", icon: Plus },
-  { key: "blogs", label: "Blog Posts", icon: Type },
 ];
 
 export default function AdminDashboard() {
@@ -51,6 +51,20 @@ export default function AdminDashboard() {
         setTab(urlTab);
       }
     });
+  }, []);
+
+  // Respond to browser back/forward so the visible tab follows the URL
+  useEffect(() => {
+    const onPopState = () => {
+      const urlTab = new URLSearchParams(window.location.search).get("tab") as Tab | null;
+      if (urlTab && tabs.find((t) => t.key === urlTab)) {
+        setTab(urlTab);
+      } else {
+        setTab("content");
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
   const handleTabChange = useCallback((newTab: Tab) => {
@@ -143,7 +157,6 @@ export default function AdminDashboard() {
                 {tab === "testimonials" && <TestimonialsTab />}
                 {tab === "social" && <SocialTab />}
                 {tab === "blogusers" && <BlogUsersTab />}
-                {tab === "blogs" && <BlogPostsTab />}
               </>
             )}
           </motion.div>
