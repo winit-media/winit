@@ -29,10 +29,15 @@ function StackedCard({
   const dir = -1;
   const initialRotation = dir * index * ROTATION_AMOUNT;
 
+  // Use percentage units (not vh) so the translate resolves against the
+  // card's own bounding box rather than window.innerHeight. On iOS Safari,
+  // innerHeight is the small viewport but CSS 100vh is the large viewport;
+  // using "vh" here makes cards under-travel and leave a visible sliver
+  // that the next card overlaps — the iOS-only stacking glitch.
   const y = useTransform(
     progress,
     [startFly, endFly],
-    ["0vh", isLast ? "0vh" : "-100vh"]
+    ["0%", isLast ? "0%" : "-100%"]
   );
 
   const rotate = useTransform(
@@ -109,7 +114,7 @@ export default memo(function WhatWeDo() {
       className="relative bg-white w-full ios-gpu-stable"
       style={{ height: `calc(${cardData.length * (isMobile ? 70 : 60)}vh)` }}
     >
-      <div className="sticky top-0 h-screen w-full flex items-center overflow-hidden z-0 ios-gpu-stable">
+      <div className="sticky top-0 h-dvh w-full flex items-center overflow-hidden z-0 ios-gpu-stable">
         <div className="absolute inset-0 z-0">
           <div
             className="w-full h-full bg-cover bg-center"
