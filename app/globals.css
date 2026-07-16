@@ -180,22 +180,15 @@ input, textarea, select, button {
 
 .whatwedo-card {
   backface-visibility: hidden;
-  transform: translate3d(0, 0, 0);
 }
 
-.whatwedo-card > div {
-  contain: layout paint;
-}
+
 
 /* ── Pattern overlay via CSS pseudo-element ──
    Replaces the old <img>-per-section approach. The browser caches
    pattern.svg once and reuses it — 9 image decodes → 1 cached asset.
    Each section sets --pattern-opacity (and optionally --pattern-mobile-opacity)
    via inline style to control the intensity. */
-.pattern-bg {
-  position: relative;
-}
-
 .pattern-bg::before {
   content: '';
   position: absolute;
@@ -216,10 +209,14 @@ input, textarea, select, button {
 
 /* ── Section containment ──
    Tells the browser that a section's paint + style don't leak out.
-   Avoids 'layout' containment since WhatWeDo uses position:sticky
-   inside a section — layout containment would break sticky. */
+   Avoids 'layout' and 'paint' containment on sections that use
+   position: sticky — both create a containing block that breaks sticky. */
 section {
-  contain: style paint;
+  contain: style;
+}
+
+#services {
+  contain: none;
 }
 
 /* ── content-visibility for below-fold sections ──
