@@ -1,10 +1,10 @@
-function Shimmer({ className }: { className: string }) {
+﻿function Shimmer({ className }: { className: string }) {
   return <div className={`bg-gray-200 rounded animate-pulse ${className}`} />;
 }
 
 export default function BlogsLoading() {
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="min-h-svh bg-white">
       {/* Header skeleton */}
       <div className="bg-brand relative overflow-hidden">
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-[3.75rem]">

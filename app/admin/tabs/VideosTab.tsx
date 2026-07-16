@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { Plus, Trash2, Film, Upload, ChevronUp, ChevronDown, ArrowLeftRight } from "lucide-react";

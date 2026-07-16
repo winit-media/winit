@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email/smtp";
 import {
   visitorAutoResponseTemplate,

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { memo } from "react";
 import { useAdmin } from "./AdminProvider";
@@ -16,7 +16,7 @@ export default memo(function Footer() {
     <footer id="contact" className="relative bg-brand overflow-hidden section-lazy pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.08' } as React.CSSProperties}>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
-          {/* Left Column — Brand */}
+          {/* Left Column â€” Brand */}
           <div className="flex flex-col gap-2 lg:gap-4 order-1 md:order-1 pr-2 min-w-0">
             <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerTitle}</h3>
             <p className="text-white/70 text-xs lg:text-sm leading-relaxed max-w-xs">
@@ -38,7 +38,7 @@ export default memo(function Footer() {
             </div>
           </div>
 
-          {/* Middle Column — Quick Links */}
+          {/* Middle Column â€” Quick Links */}
           <div className="flex flex-col gap-2 lg:gap-4 order-3 md:order-2 col-span-2 md:col-span-1 mt-2 md:mt-0 min-w-0">
             <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerQuickLinksTitle}</h3>
             <div className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-1.5 lg:gap-2.5">
@@ -54,7 +54,7 @@ export default memo(function Footer() {
             </div>
           </div>
 
-          {/* Right Column — Contact Us */}
+          {/* Right Column â€” Contact Us */}
           <div className="flex flex-col gap-2 lg:gap-4 order-2 md:order-3 min-w-0">
             <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerContactTitle}</h3>
             <div className="flex flex-col gap-2 lg:gap-3.5">

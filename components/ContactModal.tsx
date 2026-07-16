@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -125,7 +125,7 @@ export default function ContactModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="contact-modal-title"
-            className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]"
+            className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90svh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

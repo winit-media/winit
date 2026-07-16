@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import Link from "next/link";
@@ -22,7 +22,7 @@ export default function Error({
   return (
     <AdminProvider>
       <Navbar />
-      <main className="min-h-dvh bg-white flex flex-col items-center justify-center relative overflow-hidden pattern-bg" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
+      <main className="min-h-svh bg-white flex flex-col items-center justify-center relative overflow-hidden pattern-bg" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
         <div className="relative z-10 text-center px-4">
           <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertTriangle size={32} />

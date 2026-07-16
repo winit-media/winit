@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, useCallback, memo, createContext, useContext } from "react";
 import { X, Volume2, VolumeX, Play, Pause } from "lucide-react";
@@ -339,7 +339,7 @@ export default memo(function MediaCarousel() {
   const row2Videos = videos.slice(Math.ceil(videos.length / 2));
 
   // Pick the N cards closest to the horizontal viewport center to play.
-  // All others show poster images only — zero video decoding cost.
+  // All others show poster images only â€” zero video decoding cost.
   useEffect(() => {
     if (!canPlayMedia || maxConcurrent === 0) {
       queueMicrotask(() => setActiveIds(new Set()));
@@ -364,7 +364,7 @@ export default memo(function MediaCarousel() {
         }
       });
 
-      // Sort by distance to viewport center — closest cards get to play
+      // Sort by distance to viewport center â€” closest cards get to play
       candidates.sort((a, b) => a.distance - b.distance);
       const newActive = new Set(candidates.slice(0, maxConcurrent).map((c) => c.id));
 
@@ -380,7 +380,7 @@ export default memo(function MediaCarousel() {
     let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
     let inView = false;
     let lastTickTime = 0;
-    const THROTTLE_MS = 250; // ~4fps — no need for per-frame precision
+    const THROTTLE_MS = 250; // ~4fps â€” no need for per-frame precision
 
     const tick = (now: number) => {
       if (now - lastTickTime >= THROTTLE_MS) {
@@ -405,7 +405,7 @@ export default memo(function MediaCarousel() {
     };
 
     // Run the polling loop only while the section is on-screen and the
-    // tab visible — prevents an unbounded 60fps getBoundingClientRect
+    // tab visible â€” prevents an unbounded 60fps getBoundingClientRect
     // hammer that thrashes layout and janks iOS WebKit.
     let io: IntersectionObserver | null = null;
     const section = containerRef.current;
@@ -455,7 +455,7 @@ export default memo(function MediaCarousel() {
 
   return (
     <ActiveVideoContext.Provider value={{ activeIds }}>
-      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-dvh pt-14 overflow-hidden flex flex-col ios-gpu-stable section-lazy pattern-bg" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
+      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-svh pt-14 overflow-hidden flex flex-col ios-gpu-stable section-lazy pattern-bg" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
         <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
           <div className="flex-shrink-0 flex items-end justify-center pt-4 pb-4 px-4 sm:px-6 lg:px-8">
             <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>

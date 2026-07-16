@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Trash2, Loader2, LogOut, ArrowLeft, Search } from "lucide-react";
@@ -41,7 +41,7 @@ function LoginGate({ onLogin }: { onLogin: () => void }) {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-svh bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Blog Manager</h1>
@@ -178,7 +178,7 @@ function BlogDashboard() {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-50">
+    <div className="min-h-svh bg-gray-50">
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -364,7 +364,7 @@ export default function BlogAdminPage() {
 
   if (checking) {
     return (
-      <div className="min-h-dvh bg-gray-50 flex items-center justify-center">
+      <div className="min-h-svh bg-gray-50 flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-brand" />
       </div>
     );
@@ -381,7 +381,7 @@ export default function BlogAdminPage() {
   if (!authorized) {
     return (
       <ToastProvider>
-        <div className="min-h-dvh bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-svh bg-gray-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
             <h1 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h1>
             <p className="text-gray-500 text-sm mb-6">

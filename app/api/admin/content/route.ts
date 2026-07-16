@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { verifyAdmin, AuthError } from "@/lib/admin-auth";
 

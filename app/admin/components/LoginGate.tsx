@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -36,7 +36,7 @@ export default function LoginGate({ onLogin }: { onLogin: () => void }) {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-svh bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">Admin Dashboard</h1>
         <p className="text-gray-500 text-sm text-center mb-6">Sign in with your email and password</p>

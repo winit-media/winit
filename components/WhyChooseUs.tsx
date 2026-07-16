@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useEffect, useState, memo } from "react";
 import { motion, useInView } from "framer-motion";
@@ -46,7 +46,7 @@ export default memo(function WhyChooseUs() {
   const { data } = useAdmin();
 
   return (
-    <section className="relative bg-brand min-h-dvh pt-16 lg:pt-16 pb-6 lg:pb-10 ios-gpu-stable section-lazy pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
+    <section className="relative bg-brand min-h-svh pt-16 lg:pt-16 pb-6 lg:pb-10 ios-gpu-stable section-lazy pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center mb-6 lg:mb-16 leading-[1.1]">
           {data.whyChooseUsTitle.replace(/Choose /i, "Choose \n").split('\n').map((line, i, arr) => (

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { AdminProvider } from "@/components/AdminProvider";
@@ -10,7 +10,7 @@ export default function NotFound() {
   return (
     <AdminProvider>
       <Navbar />
-      <main className="min-h-dvh bg-white flex flex-col items-center justify-center relative overflow-hidden pattern-bg" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
+      <main className="min-h-svh bg-white flex flex-col items-center justify-center relative overflow-hidden pattern-bg" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
         <div className="relative z-10 text-center px-4">
           <p className="text-brand font-display font-bold text-[8rem] sm:text-[10rem] leading-none select-none mb-0">
             404

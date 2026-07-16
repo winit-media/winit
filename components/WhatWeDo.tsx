@@ -33,7 +33,7 @@ function StackedCard({
   // card's own bounding box rather than window.innerHeight. On iOS Safari,
   // innerHeight is the small viewport but CSS 100vh is the large viewport;
   // using "vh" here makes cards under-travel and leave a visible sliver
-  // that the next card overlaps — the iOS-only stacking glitch.
+  // that the next card overlaps â€” the iOS-only stacking glitch.
   const y = useTransform(
     progress,
     [startFly, endFly],
@@ -89,8 +89,14 @@ export default memo(function WhatWeDo() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
+    let lastWidth = window.innerWidth;
+    const check = () => {
+      if (window.innerWidth !== lastWidth) {
+        setIsMobile(window.innerWidth < 768);
+        lastWidth = window.innerWidth;
+      }
+    };
+    setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
@@ -114,7 +120,7 @@ export default memo(function WhatWeDo() {
       className="relative bg-white w-full"
       style={{ height: `calc(${cardData.length * (isMobile ? 70 : 60)}vh)` }}
     >
-      <div className="sticky top-0 h-dvh w-full flex items-center overflow-hidden z-0 ios-gpu-stable pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
+      <div className="sticky top-0 h-svh w-full flex items-center overflow-hidden z-0 ios-gpu-stable pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
 
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row h-full relative z-10">
           <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-20 lg:pt-0">

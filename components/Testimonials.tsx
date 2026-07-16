@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, memo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -92,7 +92,7 @@ function TestimonialModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="testimonial-modal-title"
-        className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85dvh] overflow-y-auto p-10"
+        className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85svh] overflow-y-auto p-10"
         onClick={(e) => e.stopPropagation()}
       >
         <button

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
@@ -180,7 +180,7 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
-            className="fixed top-0 right-0 h-dvh w-72 bg-white shadow-2xl z-[9999] md:hidden"
+            className="fixed top-0 right-0 h-svh w-72 bg-white shadow-2xl z-[9999] md:hidden"
             style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
           >
             <div className="flex justify-end p-4">

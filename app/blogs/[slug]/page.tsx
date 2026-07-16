@@ -25,7 +25,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
   if (loading) {
     return (
-      <div className="min-h-dvh bg-white flex items-center justify-center">
+      <div className="min-h-svh bg-white flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-brand" />
       </div>
     );
@@ -33,7 +33,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
   if (!post) {
     return (
-      <div className="min-h-dvh bg-white flex items-center justify-center">
+      <div className="min-h-svh bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Post Not Found</h1>
           <p className="text-gray-500 mb-6">The blog post you are looking for does not exist.</p>
@@ -46,7 +46,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
   }
 
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="min-h-svh bg-white">
       {/* Header */}
       <div className="bg-brand relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none z-0">

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { verifyAdmin, AuthError } from "@/lib/admin-auth";
 

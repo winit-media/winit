@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, memo } from "react";
 import { motion } from "framer-motion";
@@ -57,12 +57,12 @@ export default memo(function Hero() {
     <section
       id="home"
       data-theme="dark"
-      className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-dvh flex items-center justify-center bg-brand overflow-hidden ios-gpu-stable pattern-bg"
+      className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-svh flex items-center justify-center bg-brand overflow-hidden ios-gpu-stable pattern-bg"
       style={{ '--pattern-opacity': '0.16', '--pattern-mobile-opacity': '0.35' } as React.CSSProperties}
     >
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
-          initial={{ y: "-100dvh" }}
+          initial={{ y: "-100svh" }}
           animate={{ y: 0 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
         >
@@ -84,7 +84,7 @@ export default memo(function Hero() {
                 </span>
               ))}
             </span>
-            {/* Actual typed text — updated via ref to avoid React re-renders */}
+            {/* Actual typed text â€” updated via ref to avoid React re-renders */}
             <span className="absolute top-0 left-0 w-full h-full">
               <span ref={typedRef} />
               <span ref={cursorRef} className="dot-cursor inline-block align-baseline" />
@@ -93,7 +93,7 @@ export default memo(function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ y: "-100dvh" }}
+          initial={{ y: "-100svh" }}
           animate={{ y: 0 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="mt-6 md:mt-8"

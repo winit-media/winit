@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @theme inline {
   --color-brand: #912dbf;
@@ -43,12 +43,12 @@ input, textarea, select, button {
   -webkit-transform: translate3d(0, 0, 0);
 }
 
-/* Fallback for old iOS that doesn't support dvh units.
+/* Fallback for old iOS that doesn't support svh units.
    -webkit-fill-available dynamically adjusts to the visible viewport
    (excludes URL bar / toolbar), unlike 100vh which overflows. */
-@supports not (height: 100dvh) {
-  .h-dvh { height: -webkit-fill-available; height: 100vh; }
-  .min-h-dvh { min-height: -webkit-fill-available; min-height: 100vh; }
+@supports not (height: 100svh) {
+  .h-svh { height: -webkit-fill-available; height: 100vh; }
+  .min-h-svh { min-height: -webkit-fill-available; min-height: 100vh; }
 }
 
 .swiper-pagination-bullet-active {
@@ -184,9 +184,9 @@ input, textarea, select, button {
 
 
 
-/* ── Pattern overlay via CSS pseudo-element ──
+/* â”€â”€ Pattern overlay via CSS pseudo-element â”€â”€
    Replaces the old <img>-per-section approach. The browser caches
-   pattern.svg once and reuses it — 9 image decodes → 1 cached asset.
+   pattern.svg once and reuses it â€” 9 image decodes â†’ 1 cached asset.
    Each section sets --pattern-opacity (and optionally --pattern-mobile-opacity)
    via inline style to control the intensity. */
 .pattern-bg::before {
@@ -207,10 +207,10 @@ input, textarea, select, button {
   }
 }
 
-/* ── Section containment ──
+/* â”€â”€ Section containment â”€â”€
    Tells the browser that a section's paint + style don't leak out.
    Avoids 'layout' and 'paint' containment on sections that use
-   position: sticky — both create a containing block that breaks sticky. */
+   position: sticky â€” both create a containing block that breaks sticky. */
 section {
   contain: style;
 }
@@ -219,12 +219,12 @@ section {
   contain: none;
 }
 
-/* ── content-visibility for below-fold sections ──
+/* â”€â”€ content-visibility for below-fold sections â”€â”€
    Lets the browser skip layout/paint/compositing for off-screen content.
    contain-intrinsic-size prevents layout shift when sections pop into view. */
 .section-lazy {
   content-visibility: auto;
-  contain-intrinsic-size: auto 100dvh;
+  contain-intrinsic-size: auto 100svh;
 }
 
 /* Fallback for old iOS without aspect-ratio support */
@@ -239,7 +239,7 @@ section {
   }
 }
 
-/* ── iOS WebKit performance overrides ──
+/* â”€â”€ iOS WebKit performance overrides â”€â”€
    backdrop-filter: blur() is extremely expensive on iOS's tiled GPU.
    Each instance creates a separate compositing layer that requires
    real-time gaussian blur on every frame. Disabling it on iOS and

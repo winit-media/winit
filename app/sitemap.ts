@@ -1,4 +1,4 @@
-import { MetadataRoute } from "next";
+﻿import { MetadataRoute } from "next";
 import { fetchBlogPosts } from "@/lib/firebase";
 
 export const revalidate = 3600;

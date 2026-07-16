@@ -4,7 +4,7 @@ function Shimmer({ className }: { className: string }) {
 
 export default function BlogPostLoading() {
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="min-h-svh bg-white">
       {/* Header skeleton */}
       <div className="bg-brand relative overflow-hidden">
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20">

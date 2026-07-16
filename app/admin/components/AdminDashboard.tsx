@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
   }, [saveNow]);
 
   return (
-    <div className={`min-h-dvh transition-colors ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div className={`min-h-svh transition-colors ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
       <header className={`${dark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} border-b sticky top-0 z-10`}>
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">

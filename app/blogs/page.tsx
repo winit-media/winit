@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { fetchBlogPosts, BlogPost } from "@/lib/firebase";
@@ -111,7 +111,7 @@ export default function BlogsPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="min-h-svh bg-white">
       {/* Header */}
       <div className="bg-brand relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none z-0">

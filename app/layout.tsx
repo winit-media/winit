@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -95,7 +95,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.variable} ${clashDisplay.variable}`}>
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-svh antialiased">{children}</body>
     </html>
   );
 }

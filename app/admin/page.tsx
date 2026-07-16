@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
@@ -39,7 +39,7 @@ export default function AdminPage() {
 
   if (checking) {
     return (
-      <div className="min-h-dvh bg-gray-50 flex items-center justify-center">
+      <div className="min-h-svh bg-gray-50 flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-brand" />
       </div>
     );
@@ -56,7 +56,7 @@ export default function AdminPage() {
   if (!authorized) {
     return (
       <ToastProvider>
-        <div className="min-h-dvh bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-svh bg-gray-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
             <h1 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h1>
             <p className="text-gray-500 text-sm mb-2">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
