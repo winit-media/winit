@@ -7,12 +7,15 @@ let lenisInstance: Lenis | null = null;
 
 function isIOS(): boolean {
   if (typeof window === "undefined") return false;
-  const nav = navigator as unknown as Record<string, unknown>;
-  const ua = (nav.userAgent as string) || "";
+  const ua = navigator.userAgent || "";
+  // iOS Chrome (CriOS) and iOS Firefox (FxiOS) are WebKit under the hood
+  // and share Safari's sticky/dvh quirks, so they must also skip Lenis.
+  // iPadOS 13+ reports as Macintosh but is still iOS WebKit — detect via
+  // maxTouchPoints on a Mac UA.
+  if (/iPhone|iPad|iPod/i.test(ua)) return true;
   return (
-    (nav.maxTouchPoints as number) > 0 &&
-    /Safari/.test(ua) &&
-    !/Chrome|CriOS|FxiOS/.test(ua)
+    navigator.maxTouchPoints > 1 &&
+    /Macintosh/i.test(ua)
   );
 }
 
