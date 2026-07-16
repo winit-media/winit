@@ -29,7 +29,7 @@ function VerticalCarousel({
 
   const variantClasses = {
     minimal: "bg-white border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:border-brand/40",
-    glass: "bg-white/40 backdrop-blur-md border border-white/60 shadow-[0_4px_24px_rgb(0,0,0,0.02)] hover:-translate-y-1 hover:bg-white/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] hover:border-brand/50"
+    glass: "bg-white/90 md:bg-white/40 md:backdrop-blur-md border border-white/60 shadow-[0_4px_24px_rgb(0,0,0,0.02)] hover:-translate-y-1 hover:bg-white/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] hover:border-brand/50"
   };
 
   return (
