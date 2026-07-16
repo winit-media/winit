@@ -47,7 +47,7 @@ export default memo(function WhyChooseUs() {
   const { data } = useAdmin();
 
   return (
-    <section className="relative bg-brand min-h-dvh pt-16 lg:pt-16 pb-6 lg:pb-10" data-theme="dark">
+    <section className="relative bg-brand min-h-dvh pt-16 lg:pt-16 pb-6 lg:pb-10 ios-gpu-stable" data-theme="dark">
       <PatternOverlay opacity={0.16} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center mb-6 lg:mb-16 leading-[1.1]">

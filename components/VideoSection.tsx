@@ -123,7 +123,7 @@ export default memo(function VideoSection() {
     <section
       ref={containerRef}
       data-theme="dark"
-      className="relative w-full aspect-video overflow-hidden bg-black group"
+      className="relative w-full aspect-video overflow-hidden bg-black group ios-gpu-stable"
       onClick={toggleControls}
     >
       {(canPlayMedia || manualPlay) ? (

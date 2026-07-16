@@ -75,7 +75,7 @@ export default memo(function BrandShowcase() {
   const duration = Math.max(20, brands.length * 4);
 
   return (
-    <section className="relative bg-[#fcfcfc] h-dvh overflow-hidden" data-theme="light">
+    <section className="relative bg-[#fcfcfc] h-dvh overflow-hidden ios-gpu-stable" data-theme="light">
       <PatternOverlay opacity={0.05} />
       <div className="relative z-10 h-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center lg:gap-12 lg:px-8">
         

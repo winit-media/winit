@@ -5,11 +5,29 @@ import Lenis from "lenis";
 
 let lenisInstance: Lenis | null = null;
 
+function isIOS(): boolean {
+  if (typeof window === "undefined") return false;
+  const nav = navigator as unknown as Record<string, unknown>;
+  const ua = (nav.userAgent as string) || "";
+  return (
+    (nav.maxTouchPoints as number) > 0 &&
+    /Safari/.test(ua) &&
+    !/Chrome|CriOS|FxiOS/.test(ua)
+  );
+}
+
 export function useLenis() {
   const rafRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // iOS WebKit + Lenis conflict with `position: sticky` and `dvh`-based
+    // scroll-linked animations: native touch scroll already provides
+    // momentum, and Lenis's RAF loop desyncs framer-motion's `useScroll`
+    // sampling, causing sticky sections to clip and overlap. Let iOS use
+    // native scrolling; desktop and Android keep Lenis untouched.
+    if (isIOS()) return;
 
     const lenis = new Lenis({
       duration: 1.2,

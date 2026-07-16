@@ -32,7 +32,7 @@ function StackedCard({
   const y = useTransform(
     progress,
     [startFly, endFly],
-    ["0vh", isLast ? "0vh" : "-100dvh"]
+    ["0vh", isLast ? "0vh" : "-100vh"]
   );
 
   const rotate = useTransform(
@@ -106,10 +106,10 @@ export default memo(function WhatWeDo() {
       id="services"
       ref={sectionRef}
       data-theme="light"
-      className="relative bg-white w-full"
-      style={{ height: `calc(${cardData.length * (isMobile ? 70 : 60)}dvh)` }}
+      className="relative bg-white w-full ios-gpu-stable"
+      style={{ height: `calc(${cardData.length * (isMobile ? 70 : 60)}vh)` }}
     >
-      <div className="sticky top-0 h-dvh w-full flex items-center overflow-hidden z-0">
+      <div className="sticky top-0 h-screen w-full flex items-center overflow-hidden z-0 ios-gpu-stable">
         <div className="absolute inset-0 z-0">
           <div
             className="w-full h-full bg-cover bg-center"

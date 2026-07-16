@@ -127,7 +127,7 @@ export default function ContactModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="contact-modal-title"
-            className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

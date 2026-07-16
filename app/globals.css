@@ -17,6 +17,7 @@ html {
 
 body {
   font-family: var(--font-sans);
+  overscroll-behavior-y: none;
 }
 
 main {
@@ -33,10 +34,21 @@ input, textarea, select, button {
   font-size: 16px;
 }
 
-/* Fallback for old iOS that doesn't support dvh units */
+/* Force GPU compositing on iOS WebKit to prevent sections from
+   being clipped / disappearing during scroll animations. */
+.ios-gpu-stable {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}
+
+/* Fallback for old iOS that doesn't support dvh units.
+   -webkit-fill-available dynamically adjusts to the visible viewport
+   (excludes URL bar / toolbar), unlike 100vh which overflows. */
 @supports not (height: 100dvh) {
-  .h-dvh { height: 100vh; }
-  .min-h-dvh { min-height: 100vh; }
+  .h-dvh { height: -webkit-fill-available; height: 100vh; }
+  .min-h-dvh { min-height: -webkit-fill-available; min-height: 100vh; }
 }
 
 .swiper-pagination-bullet-active {

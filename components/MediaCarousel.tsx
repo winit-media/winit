@@ -378,24 +378,63 @@ export default memo(function MediaCarousel() {
       });
     };
 
-    updateActive();
+    let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
+    let inView = false;
 
-    // Poll at 60fps for smooth handoff as marquee scrolls.
-    // requestAnimationFrame is more efficient than setInterval for this.
-    let rafId: ReturnType<typeof requestAnimationFrame>;
     const tick = () => {
       updateActive();
       rafId = requestAnimationFrame(tick);
     };
-    rafId = requestAnimationFrame(tick);
 
-    // Also update on scroll (for when the section enters/leaves viewport)
-    const onScroll = () => updateActive();
+    const startLoop = () => {
+      if (rafId != null) return;
+      updateActive();
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const stopLoop = () => {
+      if (rafId != null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    };
+
+    // Run the polling loop only while the section is on-screen and the
+    // tab visible — prevents an unbounded 60fps getBoundingClientRect
+    // hammer that thrashes layout and janks iOS WebKit.
+    let io: IntersectionObserver | null = null;
+    const section = containerRef.current;
+    if (section && typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        ([entry]) => {
+          inView = entry.isIntersecting;
+          if (inView && !document.hidden) startLoop();
+          else stopLoop();
+        },
+        { threshold: 0 }
+      );
+      io.observe(section);
+    } else {
+      inView = true;
+      startLoop();
+    }
+
+    const onScroll = () => {
+      if (inView && !document.hidden) updateActive();
+    };
+    const onVisibility = () => {
+      if (document.hidden) stopLoop();
+      else if (inView) startLoop();
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      stopLoop();
+      io?.disconnect();
       window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [canPlayMedia, maxConcurrent, videos]);
 
@@ -411,7 +450,7 @@ export default memo(function MediaCarousel() {
 
   return (
     <ActiveVideoContext.Provider value={{ activeIds }}>
-      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-dvh pt-14 overflow-hidden flex flex-col">
+      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-dvh pt-14 overflow-hidden flex flex-col ios-gpu-stable">
         <PatternOverlay opacity={0.16} />
         <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
           <div className="flex-shrink-0 flex items-end justify-center pt-4 pb-4 px-4 sm:px-6 lg:px-8">
