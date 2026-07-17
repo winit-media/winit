@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useCallback, memo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -83,16 +84,24 @@ function TestimonialModal({
   }, [onClose]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 px-4"
       onClick={onClose}
     >
-      <div
+      <motion.div
         ref={containerRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="testimonial-modal-title"
-        className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85svh] overflow-y-auto p-10"
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85svh] overflow-y-auto ios-scroll p-10"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -139,8 +148,8 @@ function TestimonialModal({
             </p>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -157,7 +166,7 @@ export default memo(function Testimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy pattern-bg" data-theme="light" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
+    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy ios-gpu-stable pattern-bg" data-theme="light" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-6 lg:mb-6">
           <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">
@@ -233,7 +242,9 @@ export default memo(function Testimonials() {
         </div>
       </div>
 
-      {selected && <TestimonialModal t={selected} onClose={handleClose} />}
+      <AnimatePresence>
+        {selected && <TestimonialModal t={selected} onClose={handleClose} />}
+      </AnimatePresence>
     </section>
   );
 });

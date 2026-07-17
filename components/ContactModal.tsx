@@ -11,7 +11,7 @@ const fieldVariants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.15 + i * 0.07, duration: 0.4, ease: "easeOut" as const },
+    transition: { delay: 0.1 + i * 0.05, duration: 0.4, ease: "easeOut" as const },
   }),
 };
 
@@ -106,7 +106,8 @@ export default function ContactModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-hidden"
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-hidden"
         >
           {/* Purple-White Gradient Backdrop Overlay */}
           <div
@@ -157,7 +158,7 @@ export default function ContactModal({
             <div className="mx-6 border-t border-gray-100" />
 
             {/* Scrollable Form Body */}
-            <div className="px-6 pb-6 pt-4 overflow-y-auto">
+            <div className="px-6 pb-6 pt-4 overflow-y-auto ios-scroll">
               {status === "success" ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}

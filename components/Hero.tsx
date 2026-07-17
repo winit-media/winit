@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useAdmin } from "./AdminProvider";
 
 const TYPING_SPEED = 80;
+const TYPING_DELAY = 400;
 
 export default memo(function Hero() {
   const { data } = useAdmin();
@@ -14,6 +15,8 @@ export default memo(function Hero() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const headingText = data.heroHeading;
+  const prefersReducedMotion = typeof window !== "undefined"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
     indexRef.current = 0;
@@ -35,7 +38,16 @@ export default memo(function Hero() {
       timerRef.current = timer;
     };
 
-    startTyping();
+    if (prefersReducedMotion) {
+      if (typedRef.current) typedRef.current.textContent = headingText;
+      if (cursorRef.current) cursorRef.current.style.display = "none";
+    } else {
+      const delayTimer = setTimeout(startTyping, TYPING_DELAY);
+      return () => {
+        clearTimeout(delayTimer);
+        if (timer) clearInterval(timer);
+      };
+    }
 
     const handleVisibility = () => {
       if (document.hidden) {
@@ -51,7 +63,7 @@ export default memo(function Hero() {
       if (timer) clearInterval(timer);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [headingText]);
+  }, [headingText, prefersReducedMotion]);
 
   return (
     <section
@@ -62,9 +74,9 @@ export default memo(function Hero() {
     >
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
-          initial={{ y: "-100svh" }}
+          initial={prefersReducedMotion ? false : { y: "-100svh" }}
           animate={{ y: 0 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
+          transition={{ duration: 1.0, ease: "easeOut" }}
         >
           <h1
             className="font-display text-white text-5xl leading-[1.1] sm:text-6xl md:text-7xl lg:text-8xl font-black mt-8 mb-4 md:mt-16 md:mb-2 relative tracking-wide"
@@ -93,9 +105,9 @@ export default memo(function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ y: "-100svh" }}
+          initial={prefersReducedMotion ? false : { y: "-100svh" }}
           animate={{ y: 0 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
+          transition={{ duration: 1.0, ease: "easeOut" }}
           className="mt-6 md:mt-8"
         >
           <motion.button

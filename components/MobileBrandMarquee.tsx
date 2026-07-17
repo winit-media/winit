@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { memo } from "react";
+import { memo, useRef, useState, useEffect } from "react";
 import { useAdmin } from "./AdminProvider";
 import Image from "next/image";
 
@@ -17,6 +17,19 @@ const getLocalImageUrl = (url: string) => {
 export default memo(function MobileBrandMarquee() {
   const { data } = useAdmin();
   const brands = data?.brands || [];
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(true);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   if (brands.length === 0) return null;
 
@@ -25,7 +38,7 @@ export default memo(function MobileBrandMarquee() {
   const duration = Math.max(30, brands.length * 6);
 
   return (
-    <div className="block lg:hidden w-full overflow-hidden bg-white py-4 border-b border-gray-100 section-lazy">
+    <div ref={sectionRef} className={`block lg:hidden w-full overflow-hidden bg-white py-4 border-b border-gray-100 section-lazy ios-gpu-stable ${isInView ? "" : "animate-marquee-paused"}`}>
       <div 
         className="flex w-max animate-marquee-left items-center hover:[animation-play-state:paused]"
         style={{ animationDuration: `${duration}s` }}

@@ -13,7 +13,7 @@ export default memo(function Footer() {
   };
 
   return (
-    <footer id="contact" className="relative bg-brand overflow-hidden section-lazy pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.08' } as React.CSSProperties}>
+    <footer id="contact" className="relative bg-brand overflow-hidden section-lazy ios-gpu-stable pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.08' } as React.CSSProperties}>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
           {/* Left Column â€” Brand */}
@@ -30,7 +30,7 @@ export default memo(function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="bg-white/15 hover:bg-white/25 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors shrink-0"
+                  className="bg-white/15 hover:bg-white/25 text-white rounded-full w-11 h-11 flex items-center justify-center transition-colors shrink-0"
                 >
                   <SocialIcon label={social.label} />
                 </a>

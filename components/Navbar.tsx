@@ -114,7 +114,7 @@ export default function Navbar() {
       <nav
         role="navigation"
         aria-label="Main navigation"
-        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-[100] transition-transform transition-colors duration-300 ${
           showNav ? "translate-y-0" : "-translate-y-full"
         } ${canBeTransparent && !scrolled ? "bg-transparent" : "bg-brand/95 md:backdrop-blur-sm shadow-md"}`}
         style={{ paddingTop: "env(safe-area-inset-top)" }}
@@ -163,7 +163,8 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-[9998] md:hidden"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black z-[99] md:hidden"
             onClick={() => setOpen(false)}
           />
         )}
@@ -180,7 +181,7 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
-            className="fixed top-0 right-0 h-svh w-72 bg-white shadow-2xl z-[9999] md:hidden"
+            className="fixed top-0 right-0 h-svh w-72 bg-white shadow-2xl z-[100] md:hidden"
             style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
           >
             <div className="flex justify-end p-4">
@@ -188,7 +189,7 @@ export default function Navbar() {
                 <X size={24} />
               </button>
             </div>
-            <div className="flex flex-col items-start px-8 space-y-6 mt-4 overflow-y-auto overscroll-contain flex-1">
+            <div className="flex flex-col items-start px-8 space-y-6 mt-4 overflow-y-auto ios-scroll overscroll-contain flex-1">
               {data.navLinks.map((link) => (
                 <button
                   key={link.href}

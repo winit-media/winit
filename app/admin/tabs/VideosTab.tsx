@@ -241,7 +241,7 @@ export default function VideosTab() {
                             src={v.url}
                             className="h-12 w-16 object-cover rounded border bg-gray-900"
                             muted
-                            playsInline
+                            playsInline webkit-playsinline="true"
                             preload="metadata"
                           />
                         ) : (

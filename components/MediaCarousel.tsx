@@ -1,26 +1,26 @@
 ﻿"use client";
 
 import { useEffect, useRef, useState, useCallback, memo, createContext, useContext } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useDeviceCapabilities, getMaxConcurrentVideos } from "@/hooks/useDeviceCapabilities";
-import { uid } from "@/lib/uid";
 
 const getOptimizedMedia = (url: string) => {
   if (!url || !url.includes('cloudinary.com')) return { videoUrl: url, posterUrl: "" };
   const [baseUrl, path] = url.split('/upload/');
   return {
     videoUrl: `${baseUrl}/upload/f_auto,q_auto:eco,c_limit,w_400,so_0,eo_5/${path}`,
-    posterUrl: `${baseUrl}/upload/f_auto,q_auto:eco,c_limit,w_400,so_0/${path}`.replace(/\.[^/.]+$/, ".webp")
+    posterUrl: `${baseUrl}/upload/q_auto:eco,c_limit,w_400,so_0/${path}`.replace(/\.[^/.]+$/, ".jpg")
   };
 };
 
 const getHighQualityMedia = (url: string) => {
   if (!url || !url.includes('cloudinary.com')) return { videoUrl: url, posterUrl: undefined as string | undefined };
   const [baseUrl, path] = url.split('/upload/');
-  const posterUrl = `${baseUrl}/upload/f_auto,q_auto:eco,so_0,eo_3/${path}`.replace(/\.[^/.]+$/, ".webp");
+  const posterUrl = `${baseUrl}/upload/q_auto:good,w_800,so_0,eo_3/${path}`.replace(/\.[^/.]+$/, ".jpg");
   return {
     videoUrl: `${baseUrl}/upload/f_auto,q_auto:good/${path}`,
     posterUrl,
@@ -42,12 +42,13 @@ const ActiveVideoContext = createContext<{ activeIds: Set<string> }>({ activeIds
 
 interface VideoCardProps {
   video: { id: string; url: string; name: string };
+  cardKey: string;
   onExpand: (video: { id: string; url: string; name: string }) => void;
   isPaused: boolean;
   canPlayMedia: boolean;
 }
 
-function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) {
+function VideoCard({ video, cardKey, onExpand, isPaused, canPlayMedia }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
@@ -58,9 +59,8 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { videoUrl, posterUrl } = getOptimizedMedia(video.url);
   const { activeIds } = useContext(ActiveVideoContext);
-  const [cardId] = useState(() => `${video.id}-${uid()}`);
 
-  const isActive = activeIds.has(cardId);
+  const isActive = activeIds.has(cardKey);
   const shouldMountVideo = canPlayMedia && (inView || isHovered) && isActive;
 
   const handleTapReveal = () => {
@@ -143,7 +143,7 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
   return (
     <div
       ref={containerRef}
-      data-card-id={cardId}
+      data-card-id={cardKey}
       onClick={(e) => {
         e.stopPropagation();
         handleTapReveal();
@@ -159,7 +159,7 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
           poster={posterUrl || undefined}
           className="w-full h-full object-cover bg-black pointer-events-none"
           loop
-          playsInline
+          playsInline webkit-playsinline="true"
           muted={muted}
           preload="metadata"
           onLoadedMetadata={(e) => {
@@ -185,20 +185,20 @@ function VideoCard({ video, onExpand, isPaused, canPlayMedia }: VideoCardProps) 
         </div>
       )}
       <div className={`absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-500 ${tapRevealed ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
-      <div className={`absolute bottom-3 left-3 right-3 flex items-center justify-between transition-all duration-500 translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
+      <div className={`absolute bottom-3 left-3 right-3 flex items-center justify-between transition-opacity transition-transform duration-500 translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
         <span className="text-white text-sm font-medium truncate drop-shadow-md">{video.name}</span>
         {canPlayMedia && (
           <button
             onClick={toggleAudio}
-            className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300"
+            className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-colors duration-300"
           >
             {muted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
           </button>
         )}
       </div>
-      <div className={`absolute top-3 right-3 transition-all duration-500 -translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
+      <div className={`absolute top-3 right-3 transition-opacity transition-transform duration-500 -translate-y-2 group-hover:translate-y-0 ${tapRevealed ? "opacity-100 translate-y-0" : "opacity-0"}`}>
         <div
-          className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-all duration-300"
+          className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full p-2 transition-colors duration-300"
           onClick={(e) => {
             e.stopPropagation();
             handleClick();
@@ -264,15 +264,23 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/95 md:backdrop-blur-sm"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95"
       onClick={onClose}
     >
-      <div
+      <motion.div
         ref={containerRef}
         role="dialog"
         aria-modal="true"
         aria-label={`Play ${video.name}`}
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
         className="relative mx-4"
         style={{ maxWidth: "90vw", maxHeight: "90vh", aspectRatio: aspect }}
         onClick={(e) => e.stopPropagation()}
@@ -283,7 +291,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
             src={videoUrl}
             poster={posterUrl}
             className="w-full h-full object-contain"
-            playsInline
+            playsInline webkit-playsinline="true"
             muted={muted}
             preload="metadata"
             onPlay={() => setIsPlaying(true)}
@@ -320,8 +328,8 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
           </button>
           <span className="text-white/80 text-sm font-medium">{video.name}</span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -424,21 +432,16 @@ export default memo(function MediaCarousel() {
       startLoop();
     }
 
-    const onScroll = () => {
-      if (inView && !document.hidden) updateActive();
-    };
     const onVisibility = () => {
       if (document.hidden) stopLoop();
       else if (inView) startLoop();
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       stopLoop();
       io?.disconnect();
-      window.removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [canPlayMedia, maxConcurrent, videos]);
@@ -471,6 +474,7 @@ export default memo(function MediaCarousel() {
                   {row1Videos.map((video, index) => (
                     <VideoCard
                       key={`${video.id}-a-${index}`}
+                      cardKey={`${video.id}-a-${index}`}
                       video={video}
                       onExpand={handleExpand}
                       isPaused={isPaused}
@@ -482,6 +486,7 @@ export default memo(function MediaCarousel() {
                   {row1Videos.map((video, index) => (
                     <VideoCard
                       key={`${video.id}-b-${index}`}
+                      cardKey={`${video.id}-b-${index}`}
                       video={video}
                       onExpand={handleExpand}
                       isPaused={isPaused}
@@ -498,6 +503,7 @@ export default memo(function MediaCarousel() {
                   {row2Videos.map((video, index) => (
                     <VideoCard
                       key={`${video.id}-a-${index}`}
+                      cardKey={`${video.id}-a-${index}`}
                       video={video}
                       onExpand={handleExpand}
                       isPaused={isPaused}
@@ -509,6 +515,7 @@ export default memo(function MediaCarousel() {
                   {row2Videos.map((video, index) => (
                     <VideoCard
                       key={`${video.id}-b-${index}`}
+                      cardKey={`${video.id}-b-${index}`}
                       video={video}
                       onExpand={handleExpand}
                       isPaused={isPaused}
@@ -521,7 +528,9 @@ export default memo(function MediaCarousel() {
           </div>
         </div>
 
-        {expandedVideo && <ExpandedVideoModal video={expandedVideo} onClose={handleClose} />}
+        <AnimatePresence>
+          {expandedVideo && <ExpandedVideoModal video={expandedVideo} onClose={handleClose} />}
+        </AnimatePresence>
       </section>
     </ActiveVideoContext.Provider>
   );

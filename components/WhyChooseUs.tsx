@@ -5,13 +5,13 @@ import { motion, useInView } from "framer-motion";
 import { Users, Briefcase, Megaphone, Eye, Globe, MapPin, Layers, TrendingDown } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 
-function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
+function AnimatedCounter({ target, suffix = "", showFinal }: { target: number; suffix?: string; showFinal?: boolean }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || showFinal) return;
     let start = 0;
     const duration = 2000;
     const step = (timestamp: number) => {
@@ -21,11 +21,14 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
-  }, [inView, target]);
+  }, [inView, target, showFinal]);
+
+  const displayCount = showFinal ? target : count;
+  const formatted = displayCount.toLocaleString("en-IN");
 
   return (
     <span ref={ref}>
-      {count.toLocaleString("en-IN")}
+      {formatted}
       {suffix}
     </span>
   );
@@ -44,6 +47,8 @@ const cardVariants = {
 
 export default memo(function WhyChooseUs() {
   const { data } = useAdmin();
+  const prefersReducedMotion = typeof window !== "undefined"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
     <section className="relative bg-brand min-h-svh pt-16 lg:pt-16 pb-6 lg:pb-10 ios-gpu-stable section-lazy pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
@@ -65,14 +70,14 @@ export default memo(function WhyChooseUs() {
                 key={i}
                 custom={i}
                 variants={cardVariants}
-                initial="hidden"
+                initial={prefersReducedMotion ? "visible" : "hidden"}
                 whileInView="visible"
                 viewport={{ once: true }}
                 className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg text-center flex flex-col items-center justify-center"
               >
                 <Icon className="text-brand mb-2 lg:mb-4" size={28} />
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-brand font-display mb-1 lg:mb-2">
-                  <AnimatedCounter target={stat.number} suffix={stat.suffix} />
+                  <AnimatedCounter target={stat.number} suffix={stat.suffix} showFinal={prefersReducedMotion} />
                 </div>
                 <p className="text-gray-600 font-medium text-xs sm:text-sm lg:text-base leading-tight">{stat.label}</p>
               </motion.div>

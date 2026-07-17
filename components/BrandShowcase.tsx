@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { memo } from "react";
+import { memo, useRef, useState, useEffect } from "react";
 import { useAdmin } from "./AdminProvider";
 import Image from "next/image";
 
@@ -33,7 +33,7 @@ function VerticalCarousel({
   };
 
   return (
-    <div className="overflow-hidden h-full pt-4 pb-4">
+    <div className="overflow-hidden h-full pt-4 pb-4" style={{ contain: "layout" }}>
       <div
         className={
           direction === "down" ? "animate-marquee-down" : "animate-marquee-up"
@@ -72,9 +72,22 @@ export default memo(function BrandShowcase() {
   const { data } = useAdmin();
   const brands = data.brands;
   const duration = Math.max(20, brands.length * 4);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isInView, setIsInView] = useState(true);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section className="relative bg-[#fcfcfc] h-svh overflow-hidden ios-gpu-stable section-lazy pattern-bg" data-theme="light" style={{ '--pattern-opacity': '0.05' } as React.CSSProperties}>
+    <section ref={sectionRef} className={`relative bg-[#fcfcfc] h-svh overflow-hidden ios-gpu-stable section-lazy pattern-bg ${isInView ? "" : "animate-marquee-paused"}`} data-theme="light" style={{ '--pattern-opacity': '0.05' } as React.CSSProperties}>
       <div className="relative z-10 h-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center lg:gap-12 lg:px-8">
         
         {/* Title Section */}

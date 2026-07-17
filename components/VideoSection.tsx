@@ -41,7 +41,7 @@ export default memo(function VideoSection() {
     ? rawSrc.replace("/upload/", "/upload/f_auto,q_auto,w_1280,so_0/")
     : rawSrc;
   const posterSrc = isCloudinary
-    ? rawSrc.replace("/upload/", "/upload/f_auto,q_auto:eco,w_1280,so_0,eo_3/").replace(/\.[^/.]+$/, ".webp")
+    ? rawSrc.replace("/upload/", "/upload/q_auto:eco,w_1280,so_0,eo_3/").replace(/\.[^/.]+$/, ".jpg")
     : undefined;
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default memo(function VideoSection() {
     return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, [inView, canPlayMedia, manualPlay]);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!canPlayMedia && !manualPlay) {
       setManualPlay(true);
       return;
@@ -106,9 +106,12 @@ export default memo(function VideoSection() {
     if (isPlaying) {
       v.pause();
     } else {
-      v.play();
+      try {
+        await v.play();
+      } catch {
+        setAutoplayBlocked(true);
+      }
     }
-    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = () => {
@@ -134,7 +137,7 @@ export default memo(function VideoSection() {
           className="w-full h-full object-cover pointer-events-none"
           muted={muted}
           loop
-          playsInline
+          playsInline webkit-playsinline="true"
           preload="metadata"
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
@@ -176,7 +179,7 @@ export default memo(function VideoSection() {
         <div className="absolute inset-0 flex items-center justify-center bg-black/30" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={togglePlay}
-            className="bg-white/90 hover:bg-white rounded-full p-6 shadow-2xl transition-all hover:scale-110"
+            className="bg-white/90 hover:bg-white rounded-full p-6 shadow-2xl transition-transform hover:scale-110"
           >
             <Play size={40} className="text-brand fill-brand" />
           </button>

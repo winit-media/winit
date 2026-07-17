@@ -21,7 +21,12 @@ const firebaseConfig = {
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
+let db: ReturnType<typeof getFirestore> | null = null;
+try {
+  db = getFirestore(app);
+} catch (e) {
+  console.error("[Firebase] getFirestore failed — likely iOS Private Browsing or IndexedDB issue:", e);
+}
 
 export { app };
 
@@ -290,6 +295,7 @@ const DOC_PATH = "siteContent/main";
 
 export async function fetchSiteContent(): Promise<SiteContent> {
   try {
+    if (!db) return defaultSiteContent;
     const docRef = doc(db, DOC_PATH);
     const snap = await getDoc(docRef);
     if (snap.exists()) {
@@ -373,6 +379,7 @@ const BLOGS_COLLECTION = "blogs";
 
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   try {
+    if (!db) return [];
     const q = query(collection(db, BLOGS_COLLECTION), orderBy("createdAt", "desc"));
     const snap = await getDocs(q);
     return snap.docs.map((d) => d.data() as BlogPost).filter((p) => p.published);
@@ -384,6 +391,7 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
 
 export async function fetchBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
+    if (!db) return null;
     const q = query(collection(db, BLOGS_COLLECTION), where("slug", "==", slug));
     const snap = await getDocs(q);
     if (snap.empty) return null;

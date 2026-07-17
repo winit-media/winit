@@ -77,10 +77,12 @@ input, textarea, select, button {
 
 .animate-marquee-down {
   animation: marquee-down 30s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-up {
   animation: marquee-up 30s linear infinite;
+  will-change: transform;
 }
 
 @keyframes marquee-left {
@@ -101,6 +103,14 @@ input, textarea, select, button {
   animation: marquee-right 30s linear infinite;
 }
 
+.animate-marquee-paused,
+.animate-marquee-paused .animate-marquee-down,
+.animate-marquee-paused .animate-marquee-up,
+.animate-marquee-paused .animate-marquee-left,
+.animate-marquee-paused .animate-marquee-right {
+  animation-play-state: paused;
+}
+
 @media (hover: hover) {
   .animate-marquee-left:hover,
   .animate-marquee-right:hover {
@@ -109,7 +119,7 @@ input, textarea, select, button {
 }
 
 .media-marquee {
-  contain: layout paint;
+  contain: layout;
 }
 
 .media-marquee-left {
@@ -207,24 +217,21 @@ input, textarea, select, button {
   }
 }
 
-/* â”€â”€ Section containment â”€â”€
-   Tells the browser that a section's paint + style don't leak out.
-   Avoids 'layout' and 'paint' containment on sections that use
-   position: sticky â€” both create a containing block that breaks sticky. */
-section {
-  contain: style;
-}
-
+/* â”€â”€ content-visibility for below-fold sections â”€â”€
+   Lets the browser skip layout/paint/compositing for off-screen content.
+   contain-intrinsic-size prevents layout shift when sections pop into view.
+   Note: section { contain: style } was intentionally removed because on
+   iOS WebKit it breaks position: sticky and clips overflow.
+   #services remain uncontained for the same reason. */
 #services {
   contain: none;
 }
 
-/* â”€â”€ content-visibility for below-fold sections â”€â”€
-   Lets the browser skip layout/paint/compositing for off-screen content.
-   contain-intrinsic-size prevents layout shift when sections pop into view. */
-.section-lazy {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 100svh;
+@supports (content-visibility: auto) {
+  .section-lazy {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 100svh;
+  }
 }
 
 /* Fallback for old iOS without aspect-ratio support */
@@ -248,4 +255,9 @@ section {
 .is-ios * {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+}
+
+/* iOS momentum scroll — add alongside overflow-y-auto / overflow-y-scroll */
+.ios-scroll {
+  -webkit-overflow-scrolling: touch;
 }

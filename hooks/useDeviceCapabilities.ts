@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { isIOS } from "@/lib/isIOS";
 
 function subscribe(callback: () => void) {
   if (typeof window === "undefined") return () => {};
@@ -55,11 +56,8 @@ function getCanPlayMedia() {
 
 function detectDevice(): "ios" | "mobile" | "desktop" {
   if (typeof window === "undefined") return "desktop";
+  if (isIOS()) return "ios";
   const ua = navigator.userAgent || "";
-  // Detect ALL iOS browsers: Safari, Chrome (CriOS), Firefox (FxiOS),
-  // and iPadOS 13+ which spoofs a Macintosh UA.
-  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
-  if (navigator.maxTouchPoints > 1 && /Macintosh/i.test(ua)) return "ios";
   const isMobile = navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(ua);
   if (isMobile) return "mobile";
   return "desktop";

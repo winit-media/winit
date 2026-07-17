@@ -20,7 +20,7 @@ function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-start justify-center bg-black/50 md:backdrop-blur-sm overflow-y-auto py-10 px-4"
+      className="fixed inset-0 z-[10000] flex items-start justify-center bg-black/50 md:backdrop-blur-sm overflow-y-auto ios-scroll py-10 px-4"
       onClick={onClose}
     >
       <div

@@ -2,22 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
+import { isIOS } from "@/lib/isIOS";
 
 let lenisInstance: Lenis | null = null;
-
-function isIOS(): boolean {
-  if (typeof window === "undefined") return false;
-  const ua = navigator.userAgent || "";
-  // iOS Chrome (CriOS) and iOS Firefox (FxiOS) are WebKit under the hood
-  // and share Safari's sticky/dvh quirks, so they must also skip Lenis.
-  // iPadOS 13+ reports as Macintosh but is still iOS WebKit — detect via
-  // maxTouchPoints on a Mac UA.
-  if (/iPhone|iPad|iPod/i.test(ua)) return true;
-  return (
-    navigator.maxTouchPoints > 1 &&
-    /Macintosh/i.test(ua)
-  );
-}
 
 export function useLenis() {
   const rafRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
