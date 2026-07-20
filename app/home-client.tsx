@@ -53,7 +53,7 @@ export default function HomeClient({ initialContent }: { initialContent: SiteCon
   useIOSBodyClass();
   useViewportHeight();
   return (
-    <LazyMotion features={domAnimation} strict>
+    <LazyMotion features={domAnimation}>
       <AdminProvider initialContent={initialContent}>
         <Navbar />
         <main>
