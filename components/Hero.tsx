@@ -74,8 +74,7 @@ export default memo(function Hero() {
     <section
       id="home"
       data-theme="dark"
-      className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-svh flex items-center justify-center bg-brand overflow-hidden ios-gpu-stable pattern-bg"
-      style={{ '--pattern-opacity': '0.16', '--pattern-mobile-opacity': '0.35' } as React.CSSProperties}
+      className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-svh flex items-center justify-center bg-brand overflow-hidden ios-gpu-stable pattern-bg pattern-bg-hero"
     >
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div

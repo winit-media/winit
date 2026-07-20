@@ -113,10 +113,7 @@ export default function BlogsPage() {
   return (
     <div className="min-h-svh bg-white">
       {/* Header */}
-      <div className="bg-brand relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
-        </div>
+      <div className="bg-brand relative overflow-hidden pattern-bg">
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-[3.75rem]">
           <h1 className="text-4xl md:text-5xl font-display font-bold text-white mt-4">
             Blogs
@@ -128,10 +125,7 @@ export default function BlogsPage() {
       </div>
 
       {/* List */}
-      <div className="relative w-full py-12">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
-        </div>
+      <div className="relative w-full py-12 pattern-bg" data-theme="light">
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4">
           {loading ? (
             <div className="flex justify-center py-20">

@@ -514,7 +514,7 @@ export default memo(function MediaCarousel() {
 
   return (
     <ActiveVideoContext.Provider value={{ activeIds }}>
-      <section ref={containerRef} id="work" data-theme="dark" className={`relative bg-brand h-svh pt-14 overflow-clip flex flex-col ios-gpu-stable section-lazy pattern-bg ${marqueePaused ? "animate-marquee-paused" : ""}`} style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
+      <section ref={containerRef} id="work" data-theme="dark" className={`relative bg-brand h-svh pt-14 overflow-clip flex flex-col ios-gpu-stable section-lazy pattern-bg ${marqueePaused ? "animate-marquee-paused" : ""}`}>
         <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
           <div className="flex-shrink-0 flex items-end justify-center pt-4 pb-4 px-4 sm:px-6 lg:px-8">
             <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>

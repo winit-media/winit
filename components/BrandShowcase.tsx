@@ -28,8 +28,8 @@ function VerticalCarousel({
   const duplicated = [...items, ...items];
 
   const variantClasses = {
-    minimal: "bg-white border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:border-brand/40",
-    glass: "bg-white/90 md:bg-white/40 md:backdrop-blur-md border border-white/60 shadow-[0_4px_24px_rgb(0,0,0,0.02)] hover:-translate-y-1 hover:bg-white/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] hover:border-brand/50"
+    minimal: "bg-white border-2 border-brand/30 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:border-brand/60",
+    glass: "bg-white/90 md:bg-white/75 md:backdrop-blur-md border-2 border-brand/30 shadow-[0_4px_24px_rgb(0,0,0,0.02)] hover:-translate-y-1 hover:bg-white/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] hover:border-brand/60"
   };
 
   return (
@@ -87,7 +87,7 @@ export default memo(function BrandShowcase() {
   }, []);
 
   return (
-    <section ref={sectionRef} className={`relative bg-[#fcfcfc] h-svh overflow-hidden ios-gpu-stable section-lazy pattern-bg ${isInView ? "" : "animate-marquee-paused"}`} data-theme="light" style={{ '--pattern-opacity': '0.05' } as React.CSSProperties}>
+    <section ref={sectionRef} className={`relative bg-[#fcfcfc] h-svh overflow-hidden ios-gpu-stable section-lazy pattern-bg ${isInView ? "" : "animate-marquee-paused"}`} data-theme="light">
       <div className="relative z-10 h-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center lg:gap-12 lg:px-8">
         
         {/* Title Section */}

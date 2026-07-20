@@ -175,8 +175,8 @@ input, textarea, select, button {
 }
 
 .testimonial-scroll {
-  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 @keyframes dot-bounce-right {
@@ -230,28 +230,35 @@ input, textarea, select, button {
 
 /* â”€â”€ Pattern overlay via CSS pseudo-element â”€â”€
    Replaces the old <img>-per-section approach. The browser caches
-   pattern.svg once and reuses it â€” 9 image decodes â†’ 1 cached asset.
-   Each section sets --pattern-opacity (and optionally --pattern-mobile-opacity)
-   via inline style to control the intensity. */
+   pattern.png once and reuses it. Uniform opacity across all sections.
+   Dark sections get white lines; light sections get inverted dark lines
+   via [data-theme="light"]. */
 .pattern-bg::before {
   content: '';
   position: absolute;
   inset: 0;
   background: url('/pattern.png');
   background-size: cover;
-  opacity: var(--pattern-opacity, 0.16);
+    opacity: 0.06;
   pointer-events: none;
   z-index: 0;
 }
 
-/* On light backgrounds invert the white pattern lines to dark so they show as grey */
-[data-theme="light"] .pattern-bg::before {
-  filter: invert(1);
+[data-theme="light"] .pattern-bg::before,
+[data-theme="light"].pattern-bg::before {
+  background-image: url('/pattern-dark.png');
+}
+
+.pattern-bg-hero::before {
+  opacity: 0.1;
 }
 
 @media (max-width: 767px) {
   .pattern-bg::before {
-    opacity: var(--pattern-mobile-opacity, var(--pattern-opacity, 0.16));
+    opacity: 0.06;
+  }
+  .pattern-bg-hero::before {
+    opacity: 0.1;
   }
 }
 

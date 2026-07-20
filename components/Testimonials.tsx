@@ -15,7 +15,7 @@ function TestimonialCard({
   onReadMore: () => void;
 }) {
   return (
-    <div className="testimonial-slide bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 p-6 sm:p-10 flex flex-col items-center text-center min-h-[350px] max-h-[480px] snap-center">
+    <div className="testimonial-slide bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border-2 border-brand/20 p-6 sm:p-10 flex flex-col items-center text-center min-h-[350px] max-h-[480px] snap-center">
       {t.logoUrl ? (
         <div className="h-16 mb-5 flex items-center justify-center shrink-0">
           <img
@@ -210,7 +210,7 @@ export default memo(function Testimonials() {
       if (container.scrollLeft < oneSet * 0.1 || container.scrollLeft > oneSet * 1.9) {
         ticking = true;
         requestAnimationFrame(() => {
-          const mid = wrappers[count];
+      const mid = wrappers[count + 2];
           if (mid) {
             jumpingRef.current = true;
             container.scrollLeft = mid.offsetLeft - (container.clientWidth - mid.offsetWidth) / 2;
@@ -253,7 +253,7 @@ export default memo(function Testimonials() {
   if (count === 0) return null;
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy ios-gpu-stable pattern-bg" data-theme="light" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
+    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy ios-gpu-stable pattern-bg" data-theme="light">
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-6 lg:mb-6">
           <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">
@@ -273,7 +273,7 @@ export default memo(function Testimonials() {
         <div className="relative group">
           <div
             ref={scrollRef}
-            className="testimonial-scroll flex overflow-x-auto snap-x snap-mandatory pb-2 scroll-smooth px-[7.5vw] sm:px-[20vw] md:px-[27.5vw] lg:px-[35vw]"
+            className="testimonial-scroll flex overflow-x-auto snap-x snap-mandatory pb-2 scroll-smooth gap-4"
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",
@@ -283,7 +283,7 @@ export default memo(function Testimonials() {
             {tripled.map((t, index) => (
               <div
                 key={`${t.id}-${index}`}
-                className="testimonial-slide-wrapper shrink-0 w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[30vw] px-2"
+                className="testimonial-slide-wrapper shrink-0 w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[calc((100%-2rem)/3)]"
               >
                 <TestimonialCard
                   t={t}
@@ -306,9 +306,9 @@ export default memo(function Testimonials() {
                 key={dotKey}
                 className={`absolute w-7 h-2.5 rounded-full bg-brand ${dotDir === "left" ? "dot-bounce-left" : "dot-bounce-right"}`}
               />
-              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 relative z-10" />
-              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 relative z-10" />
-              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 relative z-10" />
+              <div className="w-2.5 h-2.5 rounded-full bg-brand relative z-10" />
+              <div className="w-2.5 h-2.5 rounded-full bg-brand relative z-10" />
+              <div className="w-2.5 h-2.5 rounded-full bg-brand relative z-10" />
             </div>
             <button
               onClick={goNext}

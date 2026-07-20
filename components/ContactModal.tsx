@@ -118,7 +118,6 @@ export default function ContactModal({
           <div
             className="absolute inset-0 bg-gradient-to-br from-brand via-[#b955eb] to-white/90 cursor-pointer pattern-bg"
             onClick={onClose}
-            style={{ '--pattern-opacity': '0.15' } as React.CSSProperties}
           />
 
           {/* Modal Card */}

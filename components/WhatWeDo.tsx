@@ -152,7 +152,7 @@ export default memo(function WhatWeDo() {
         <style dangerouslySetInnerHTML={{ __html: `@supports (animation-timeline: scroll()) { ${keyframesCSS} }` }} />
       )}
       {prefersReducedMotion ? (
-        <div className="relative w-full min-h-svh flex items-center overflow-hidden ios-gpu-stable pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
+        <div className="relative w-full min-h-svh flex items-center overflow-hidden ios-gpu-stable pattern-bg">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row items-center">
             <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start mb-8 lg:mb-0">
               <div className="relative flex items-center justify-center lg:justify-start">
@@ -174,7 +174,7 @@ export default memo(function WhatWeDo() {
           </div>
         </div>
       ) : (
-        <div className="sticky top-0 h-svh w-full flex items-center overflow-clip z-0 pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
+        <div className="sticky top-0 h-svh w-full flex items-center overflow-clip z-0 pattern-bg">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row h-full relative z-10">
             <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-20 lg:pt-0">
               <div className="relative flex items-center justify-center lg:justify-start">

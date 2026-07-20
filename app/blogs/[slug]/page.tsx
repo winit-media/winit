@@ -48,10 +48,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
   return (
     <div className="min-h-svh bg-white">
       {/* Header */}
-      <div className="bg-brand relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
-        </div>
+      <div className="bg-brand relative overflow-hidden pattern-bg">
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20">
           <h1
             className="text-3xl md:text-5xl font-display font-bold text-white mt-4 leading-tight"
@@ -84,10 +81,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
       </div>
 
       {/* Content area with pattern */}
-      <div className="relative">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <img src="/pattern.svg" alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-16" />
-        </div>
+      <div className="relative pattern-bg" data-theme="light">
         <div className="relative z-10">
         {/* Cover Image */}
         {post.coverImage && (
