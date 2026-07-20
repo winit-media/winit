@@ -77,12 +77,10 @@ input, textarea, select, button {
 
 .animate-marquee-down {
   animation: marquee-down 30s linear infinite;
-  will-change: transform;
 }
 
 .animate-marquee-up {
   animation: marquee-up 30s linear infinite;
-  will-change: transform;
 }
 
 @keyframes marquee-left {
@@ -97,12 +95,10 @@ input, textarea, select, button {
 
 .animate-marquee-left {
   animation: marquee-left 30s linear infinite;
-  will-change: transform;
 }
 
 .animate-marquee-right {
   animation: marquee-right 30s linear infinite;
-  will-change: transform;
 }
 
 .animate-marquee-paused,
@@ -136,13 +132,11 @@ input, textarea, select, button {
 .media-marquee-left {
   animation: marquee-left 30s linear infinite;
   transform: translate3d(0, 0, 0);
-  will-change: transform;
 }
 
 .media-marquee-right {
   animation: marquee-right 30s linear infinite;
   transform: translate3d(0, 0, 0);
-  will-change: transform;
 }
 
 @media (hover: hover) {
@@ -203,7 +197,6 @@ input, textarea, select, button {
 
 .whatwedo-card {
   backface-visibility: hidden;
-  will-change: transform, opacity;
 }
 
 
@@ -288,4 +281,28 @@ input, textarea, select, button {
 /* iOS momentum scroll — add alongside overflow-y-auto / overflow-y-scroll */
 .ios-scroll {
   -webkit-overflow-scrolling: touch;
+}
+
+/* Navbar: ref-driven class toggling avoids React re-renders on scroll */
+.nav-transparent {
+  background-color: transparent;
+}
+.nav-scrolled {
+  background-color: rgba(145, 45, 191, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+@media (min-width: 768px) {
+  .nav-scrolled {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+@media (max-width: 767px) {
+  .nav-scrolled {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -10,10 +10,11 @@ import { useAdmin } from "./AdminProvider";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("#home");
-  const [showNav, setShowNav] = useState(true);
   const lastScrollY = useRef(0);
+  const scrolledRef = useRef(false);
+  const showNavRef = useRef(true);
+  const navRef = useRef<HTMLElement>(null);
   const { data } = useAdmin();
   const pathname = usePathname();
   const router = useRouter();
@@ -30,21 +31,50 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       const currentScrollY = window.scrollY ?? window.pageYOffset ?? 0;
-      setScrolled(currentScrollY > 10);
-      
-      if (currentScrollY < 10) {
-        setShowNav(true);
-      } else if (currentScrollY < lastScrollY.current) {
-        setShowNav(true);
-      } else if (currentScrollY > lastScrollY.current + 10) {
-        setShowNav(false);
+      const nav = navRef.current;
+      if (!nav) return;
+
+      const isScrolled = currentScrollY > 10;
+      if (isScrolled !== scrolledRef.current) {
+        scrolledRef.current = isScrolled;
+        if (isScrolled) {
+          nav.classList.add("nav-scrolled");
+          nav.classList.remove("nav-transparent");
+        } else if (canBeTransparent) {
+          nav.classList.remove("nav-scrolled");
+          nav.classList.add("nav-transparent");
+        }
       }
-      
+
+      let shouldShow = true;
+      if (currentScrollY > 10 && currentScrollY <= lastScrollY.current) {
+        shouldShow = true;
+      } else if (currentScrollY > lastScrollY.current + 10) {
+        shouldShow = false;
+      }
       lastScrollY.current = currentScrollY;
+
+      if (shouldShow !== showNavRef.current) {
+        showNavRef.current = shouldShow;
+        if (shouldShow) {
+          nav.classList.remove("-translate-y-full");
+          nav.classList.add("translate-y-0");
+        } else {
+          nav.classList.remove("translate-y-0");
+          nav.classList.add("-translate-y-full");
+        }
+      }
     };
+
+    const nav = navRef.current;
+    if (nav) {
+      if (canBeTransparent) nav.classList.add("nav-transparent");
+      nav.classList.add("translate-y-0");
+    }
+
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [canBeTransparent]);
 
   useEffect(() => {
     const sections = data.navLinks
@@ -69,7 +99,7 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, [data.navLinks]);
 
-  const handleClick = (href: string) => {
+  const handleClick = useCallback((href: string) => {
     setOpen(false);
     if (href === "#contact") {
       window.dispatchEvent(new CustomEvent("open-contact-modal"));
@@ -85,9 +115,8 @@ export default function Navbar() {
     } else {
       router.push(`/${href}`);
     }
-  };
+  }, [router]);
 
-  // Escape key closes mobile menu
   useEffect(() => {
     if (!open) return;
     const handleEsc = (e: KeyboardEvent) => {
@@ -97,7 +126,6 @@ export default function Navbar() {
     return () => window.removeEventListener("keydown", handleEsc);
   }, [open]);
 
-  // Focus first menu item when mobile menu opens
   useEffect(() => {
     if (!open || !mobileMenuRef.current) return;
     const timer = setTimeout(() => {
@@ -112,11 +140,10 @@ export default function Navbar() {
   return (
     <>
       <nav
+        ref={navRef}
         role="navigation"
         aria-label="Main navigation"
-        className={`fixed top-0 left-0 right-0 z-[100] transition-transform transition-colors duration-300 ${
-          showNav ? "translate-y-0" : "-translate-y-full"
-        } ${canBeTransparent && !scrolled ? "bg-transparent" : "bg-brand/95 md:backdrop-blur-sm shadow-md"}`}
+        className="fixed top-0 left-0 right-0 z-[100] transition-transform transition-colors duration-300"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,85 +1,122 @@
 "use client";
 
 import { useRef, useState, useLayoutEffect, memo } from "react";
-import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useAdmin } from "./AdminProvider";
 import { scrollToTarget } from "@/hooks/useLenis";
 import { getViewportHeight } from "@/hooks/useViewportHeight";
 
 const ROTATION_AMOUNT = 15;
 
-function StackedCard({
-  item,
-  index,
-  total,
-  progress,
-  onClick,
+function StackedCards({
+  cardData,
 }: {
-  item: { sub: string; content: string; bg: string };
-  index: number;
-  total: number;
-  progress: MotionValue<number>;
-  onClick: () => void;
+  cardData: { sub: string; content: string; bg: string }[];
 }) {
-  const isLast = index === total - 1;
-  const step = 1 / total;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  const startFly = index * step;
-  const endFly = startFly + step;
+  useLayoutEffect(() => {
+    const section = containerRef.current?.parentElement?.parentElement;
+    if (!section) return;
 
-  const dir = -1;
-  const initialRotation = dir * index * ROTATION_AMOUNT;
+    let ticking = false;
 
-  // Use percentage units (not vh) so the translate resolves against the
-  // card's own bounding box rather than window.innerHeight. On iOS Safari,
-  // innerHeight is the small viewport but CSS 100vh is the large viewport;
-  // using "vh" here makes cards under-travel and leave a visible sliver
-  // that the next card overlaps â€” the iOS-only stacking glitch.
-  const y = useTransform(
-    progress,
-    [startFly, endFly],
-    ["0%", isLast ? "0%" : "-250%"]
-  );
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const rect = section.getBoundingClientRect();
+        const sectionTop = -rect.top;
+        const sectionH = rect.height - window.innerHeight;
+        const progress = Math.max(0, Math.min(1, sectionTop / sectionH));
 
-  const rotate = useTransform(
-    progress,
-    [0, startFly, endFly],
-    [initialRotation, 0, isLast ? 0 : initialRotation + dir * 45]
-  );
+        const total = cardData.length;
+        const step = 1 / total;
 
-  const opacity = useTransform(
-    progress,
-    [startFly, endFly - step * 0.2],
-    [1, isLast ? 1 : 0]
-  );
+        cardsRef.current.forEach((card, index) => {
+          if (!card) return;
+          const isLast = index === total - 1;
+          const startFly = index * step;
+          const endFly = startFly + step;
+          const dir = -1;
+          const initialRotation = dir * index * ROTATION_AMOUNT;
 
-  const scale = useTransform(
-    progress,
-    [startFly, endFly],
-    [1, isLast ? 1 : 0.8]
-  );
+          let y: number;
+          let rotate: number;
+          let opacity: number;
+          let scale: number;
 
-  const zIndex = total - index;
+          if (progress <= startFly) {
+            y = 0;
+            rotate = initialRotation;
+            opacity = 1;
+            scale = 1;
+          } else if (progress >= endFly) {
+            if (isLast) {
+              y = 0;
+              rotate = 0;
+              opacity = 1;
+              scale = 1;
+            } else {
+              const flyProgress = Math.min(1, (progress - startFly) / step);
+              y = flyProgress * -250;
+              rotate = initialRotation + dir * 45 * flyProgress;
+              opacity = 1 - flyProgress * 1.25;
+              scale = 1 - flyProgress * 0.2;
+            }
+          } else {
+            if (isLast) {
+              y = 0;
+              rotate = 0;
+              opacity = 1;
+              scale = 1;
+            } else {
+              const flyProgress = (progress - startFly) / step;
+              y = flyProgress * -250;
+              rotate = initialRotation + dir * 45 * flyProgress;
+              opacity = 1 - flyProgress * 1.25;
+              scale = 1 - flyProgress * 0.2;
+            }
+          }
+
+          card.style.transform = `translateY(${y}%) rotate(${rotate}deg) scale(${scale})`;
+          card.style.opacity = String(Math.max(0, opacity));
+          card.style.zIndex = String(cardData.length - index);
+        });
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true } as AddEventListenerOptions);
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [cardData.length]);
 
   return (
-    <motion.div
-      onClick={onClick}
-      className="absolute inset-0 flex items-center justify-center origin-center cursor-pointer whatwedo-card"
-      style={{
-        y,
-        rotate,
-        opacity,
-        scale,
-        zIndex,
-      }}
-    >
-      <div
-        className={`${item.bg} w-full h-full rounded-3xl shadow-2xl p-8 lg:p-12 flex flex-col justify-center text-white`}
-      >
-        <h3 className="text-3xl lg:text-4xl font-bold mb-4 font-display">{item.sub}</h3>
-        <p className="text-white/90 text-[15px] lg:text-base leading-relaxed">{item.content}</p>
-      </div>
-    </motion.div>
+    <div ref={containerRef} className="relative w-full aspect-square max-w-[340px] sm:max-w-[400px] lg:max-w-[440px] flex items-center justify-center">
+      {cardData.map((item, i) => (
+        <div
+          key={i}
+          ref={(el) => { cardsRef.current[i] = el; }}
+          onClick={() => {
+            const scrollAmount = (window.visualViewport?.height ?? window.innerHeight) * 0.8;
+            const currentScroll = window.scrollY ?? window.pageYOffset ?? 0;
+            scrollToTarget(currentScroll + scrollAmount);
+          }}
+          className="absolute inset-0 flex items-center justify-center origin-center cursor-pointer whatwedo-card"
+          style={{
+            zIndex: cardData.length - i,
+          }}
+        >
+          <div
+            className={`${item.bg} w-full h-full rounded-3xl shadow-2xl p-8 lg:p-12 flex flex-col justify-center text-white`}
+          >
+            <h3 className="text-3xl lg:text-4xl font-bold mb-4 font-display">{item.sub}</h3>
+            <p className="text-white/90 text-[15px] lg:text-base leading-relaxed">{item.content}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -109,17 +146,6 @@ export default memo(function WhatWeDo() {
       window.visualViewport?.removeEventListener("resize", update);
     };
   }, [cardData.length, isMobile]);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
-
-  const handleCardClick = () => {
-    const scrollAmount = (window.visualViewport?.height ?? window.innerHeight) * 0.8;
-    const currentScroll = window.scrollY ?? window.pageYOffset ?? 0;
-    scrollToTarget(currentScroll + scrollAmount);
-  };
 
   return (
     <section
@@ -164,11 +190,7 @@ export default memo(function WhatWeDo() {
               </div>
             </div>
             <div className="w-full lg:w-7/12 flex items-center justify-center h-[65%] lg:h-full pb-6 lg:pb-0">
-              <div className="relative w-full aspect-square max-w-[340px] sm:max-w-[400px] lg:max-w-[440px] flex items-center justify-center">
-                {cardData.map((item, i) => (
-                  <StackedCard key={i} item={item} index={i} total={cardData.length} progress={scrollYProgress} onClick={handleCardClick} />
-                ))}
-              </div>
+              <StackedCards cardData={cardData} />
             </div>
           </div>
         </div>

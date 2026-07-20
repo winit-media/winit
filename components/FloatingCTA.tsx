@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { MessageSquarePlus } from "lucide-react";
 import ContactModal from "./ContactModal";
@@ -8,42 +8,54 @@ import ContactModal from "./ContactModal";
 export default function FloatingCTA() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkBg, setIsDarkBg] = useState(false);
+  const darkRef = useRef(false);
 
   useEffect(() => {
     const handleOpen = () => setIsOpen(true);
     window.addEventListener("open-contact-modal", handleOpen);
 
-    const checkBackground = () => {
-      const sections = document.querySelectorAll<HTMLElement>("[data-theme]");
-      if (sections.length === 0) return;
-
-      if (typeof IntersectionObserver === "undefined") {
-        setIsDarkBg(sections[0]?.getAttribute("data-theme") === "dark");
-        return;
-      }
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setIsDarkBg(entry.target.getAttribute("data-theme") === "dark");
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const btnY = window.innerHeight * 0.85;
+        const sections = document.querySelectorAll<HTMLElement>("[data-theme]");
+        let found = false;
+        for (const section of sections) {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= btnY && rect.bottom >= btnY) {
+            found = true;
+            const dark = section.getAttribute("data-theme") === "dark";
+            if (dark !== darkRef.current) {
+              darkRef.current = dark;
+              setIsDarkBg(dark);
             }
-          });
-        },
-        { threshold: 0.3 }
-      );
-
-      sections.forEach((s) => observer.observe(s));
-
-      return () => observer.disconnect();
+            break;
+          }
+        }
+        if (!found) {
+          const sectionsArr = Array.from(sections);
+          if (sectionsArr.length > 0) {
+            const last = sectionsArr[sectionsArr.length - 1];
+            const rect = last.getBoundingClientRect();
+            const dark = rect.top <= window.innerHeight;
+            if (dark !== darkRef.current) {
+              darkRef.current = dark;
+              setIsDarkBg(dark);
+            }
+          }
+        }
+      });
     };
 
-    // Small delay to ensure sections are rendered
-    const cleanup = checkBackground();
+    window.addEventListener("scroll", onScroll, { passive: true } as AddEventListenerOptions);
+    onScroll();
 
     return () => {
       window.removeEventListener("open-contact-modal", handleOpen);
-      cleanup?.();
+      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
@@ -69,7 +81,7 @@ export default function FloatingCTA() {
       >
         <MessageSquarePlus size={24} />
       </motion.button>
-      
+
       <ContactModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
