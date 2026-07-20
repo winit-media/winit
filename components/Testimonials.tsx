@@ -1,12 +1,7 @@
 ﻿"use client";
 
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
-import type { Swiper as SwiperType } from "swiper";
-import "swiper/css";
-import "swiper/css/pagination";
 import { useAdmin, SiteContent } from "./AdminProvider";
 import { ChevronLeft, ChevronRight, Quote, X } from "lucide-react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
@@ -20,7 +15,7 @@ function TestimonialCard({
   onReadMore: () => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 p-6 sm:p-10 flex flex-col items-center text-center h-auto min-h-[350px] max-h-[480px] mx-3">
+    <div className="testimonial-slide bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 p-6 sm:p-10 flex flex-col items-center text-center min-h-[350px] max-h-[480px] snap-center">
       {t.logoUrl ? (
         <div className="h-16 mb-5 flex items-center justify-center shrink-0">
           <img
@@ -39,7 +34,7 @@ function TestimonialCard({
 
       <Quote size={24} className="text-brand mb-4 fill-brand/10 shrink-0" />
 
-      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-4 mb-4 overflow-hidden">
+      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-4 mb-4">
         {t.review}
       </p>
 
@@ -157,14 +152,105 @@ function TestimonialModal({
 export default memo(function Testimonials() {
   const { data } = useAdmin();
   const testimonials = data.testimonials;
-  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [selected, setSelected] = useState<
     SiteContent["testimonials"][0] | null
   >(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const jumpingRef = useRef(false);
+  const oneSetWidthRef = useRef(0);
+  const [dotDir, setDotDir] = useState<"left" | "right">("right");
+  const [dotKey, setDotKey] = useState(0);
 
+  const tripled = useMemo(
+    () => [...testimonials, ...testimonials, ...testimonials],
+    [testimonials]
+  );
+
+  const count = testimonials.length;
   const handleClose = useCallback(() => setSelected(null), []);
 
-  if (testimonials.length === 0) return null;
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || count === 0) return;
+
+    requestAnimationFrame(() => {
+      const wrappers = container.querySelectorAll<HTMLElement>(".testimonial-slide-wrapper");
+      if (wrappers.length < count * 2) return;
+      oneSetWidthRef.current = wrappers[count].offsetLeft - wrappers[0].offsetLeft;
+      const mid = wrappers[count];
+      container.scrollLeft = mid.offsetLeft - (container.clientWidth - mid.offsetWidth) / 2;
+    });
+  }, [count]);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || count === 0) return;
+
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (jumpingRef.current) return;
+
+      const wrappers = container.querySelectorAll<HTMLElement>(".testimonial-slide-wrapper");
+      const center = container.scrollLeft + container.clientWidth / 2;
+
+      let closestIdx = 0;
+      let closestDist = Infinity;
+      wrappers.forEach((w, i) => {
+        const wCenter = w.offsetLeft + w.offsetWidth / 2;
+        const d = Math.abs(wCenter - center);
+        if (d < closestDist) { closestDist = d; closestIdx = i; }
+      });
+      setActiveIndex(closestIdx % count);
+
+      const oneSet = oneSetWidthRef.current;
+      if (oneSet <= 0 || ticking) return;
+
+      if (container.scrollLeft < oneSet * 0.1 || container.scrollLeft > oneSet * 1.9) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          const mid = wrappers[count];
+          if (mid) {
+            jumpingRef.current = true;
+            container.scrollLeft = mid.offsetLeft - (container.clientWidth - mid.offsetWidth) / 2;
+            requestAnimationFrame(() => { jumpingRef.current = false; });
+          }
+          ticking = false;
+        });
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [count]);
+
+  const scrollToIndex = useCallback((logicalIndex: number) => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const wrappers = container.querySelectorAll<HTMLElement>(".testimonial-slide-wrapper");
+    const target = wrappers[count + logicalIndex];
+    if (!target) return;
+    container.scrollTo({
+      left: target.offsetLeft - (container.clientWidth - target.offsetWidth) / 2,
+      behavior: "smooth",
+    });
+  }, [count]);
+
+  const goPrev = useCallback(() => {
+    setDotDir("left");
+    setDotKey((k) => k + 1);
+    scrollToIndex((activeIndex - 1 + count) % count);
+  }, [activeIndex, count, scrollToIndex]);
+
+  const goNext = useCallback(() => {
+    setDotDir("right");
+    setDotKey((k) => k + 1);
+    scrollToIndex((activeIndex + 1) % count);
+  }, [activeIndex, count, scrollToIndex]);
+
+  if (count === 0) return null;
 
   return (
     <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy ios-gpu-stable pattern-bg" data-theme="light" style={{ '--pattern-opacity': '0.06' } as React.CSSProperties}>
@@ -185,55 +271,47 @@ export default memo(function Testimonials() {
         </div>
 
         <div className="relative group">
-            <Swiper
-              modules={[Pagination]}
-              spaceBetween={0}
-              slidesPerView={1}
-              centeredSlides={true}
-              loop={true}
-              speed={500}
-              pagination={{
-                clickable: true,
-                el: ".testimonial-pagination",
-              }}
-              onSwiper={setSwiperInstance}
-              breakpoints={{
-                640: {
-                  slidesPerView: 1.5,
-                  spaceBetween: 0,
-                },
-                768: {
-                  slidesPerView: 2.2,
-                  spaceBetween: 0,
-                },
-                1024: {
-                  slidesPerView: 3,
-                  spaceBetween: 0,
-                },
-              }}
-              className="testimonial-swiper pb-2"
-            >
-              {testimonials.map((t, index) => (
-                <SwiperSlide key={`${t.id}-${index}`} className="py-2">
-                  <TestimonialCard
-                    t={t}
-                    onReadMore={() => setSelected(t)}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          <div
+            ref={scrollRef}
+            className="testimonial-scroll flex overflow-x-auto snap-x snap-mandatory pb-2 scroll-smooth px-[7.5vw] sm:px-[20vw] md:px-[27.5vw] lg:px-[35vw]"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {tripled.map((t, index) => (
+              <div
+                key={`${t.id}-${index}`}
+                className="testimonial-slide-wrapper shrink-0 w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[30vw] px-2"
+              >
+                <TestimonialCard
+                  t={t}
+                  onReadMore={() => setSelected(t)}
+                />
+              </div>
+            ))}
+          </div>
 
           <div className="flex items-center justify-center gap-4 mt-6 lg:mt-8">
             <button
-              onClick={() => swiperInstance?.slidePrev()}
+              onClick={goPrev}
               className="md:absolute md:left-0 lg:-left-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
               aria-label="Previous testimonial"
             >
               <ChevronLeft size={20} />
             </button>
-            <div className="testimonial-pagination !w-auto flex justify-center gap-2" />
+            <div className="relative flex items-center justify-center gap-3 h-3">
+              <div
+                key={dotKey}
+                className={`absolute w-7 h-2.5 rounded-full bg-brand ${dotDir === "left" ? "dot-bounce-left" : "dot-bounce-right"}`}
+              />
+              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 relative z-10" />
+              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 relative z-10" />
+              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 relative z-10" />
+            </div>
             <button
-              onClick={() => swiperInstance?.slideNext()}
+              onClick={goNext}
               className="md:absolute md:right-0 lg:-right-6 md:top-1/2 md:-translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand hover:border-brand/30 hover:shadow-lg transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100 shrink-0"
               aria-label="Next testimonial"
             >

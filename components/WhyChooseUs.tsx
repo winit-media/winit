@@ -5,25 +5,38 @@ import { motion, useInView } from "framer-motion";
 import { Users, Briefcase, Megaphone, Eye, Globe, MapPin, Layers, TrendingDown } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 
+const activeCounters = new Map<HTMLSpanElement, { target: number; suffix: string; start: number; duration: number }>();
+let rafId: number | null = null;
+
+function tick(now: number) {
+  activeCounters.forEach((state, el) => {
+    const progress = Math.min((now - state.start) / state.duration, 1);
+    el.textContent = Math.floor(progress * state.target).toLocaleString("en-IN") + state.suffix;
+    if (progress >= 1) activeCounters.delete(el);
+  });
+  if (activeCounters.size > 0) {
+    rafId = requestAnimationFrame(tick);
+  } else {
+    rafId = null;
+  }
+}
+
 function AnimatedCounter({ target, suffix = "", showFinal }: { target: number; suffix?: string; showFinal?: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
-    if (!inView || showFinal) return;
-    if (!ref.current) return;
-    const duration = 2000;
-    const start = performance.now();
-    let raf: number;
-    const step = (now: number) => {
-      const progress = Math.min((now - start) / duration, 1);
-      if (ref.current) {
-        ref.current.textContent = Math.floor(progress * target).toLocaleString("en-IN") + suffix;
+    if (!inView || showFinal || !ref.current) return;
+    const el = ref.current;
+    activeCounters.set(el, { target, suffix, start: performance.now(), duration: 2000 });
+    if (rafId === null) rafId = requestAnimationFrame(tick);
+    return () => {
+      activeCounters.delete(el);
+      if (activeCounters.size === 0 && rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
       }
-      if (progress < 1) raf = requestAnimationFrame(step);
     };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
   }, [inView, target, suffix, showFinal]);
 
   return (

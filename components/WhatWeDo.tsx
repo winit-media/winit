@@ -1,121 +1,74 @@
 "use client";
 
-import { useRef, useState, useEffect, useLayoutEffect, memo } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, useMemo, memo } from "react";
 import { useAdmin } from "./AdminProvider";
 import { scrollToTarget } from "@/hooks/useLenis";
 import { getViewportHeight } from "@/hooks/useViewportHeight";
 
-const ROTATION_AMOUNT = 15;
+const ROTATION_STEP = 15;
 
-function StackedCards({
-  cardData,
+function generateCardKeyframes(total: number): string {
+  let css = "";
+  for (let i = 0; i < total; i++) {
+    const initialRot = i * -ROTATION_STEP;
+    const exitRot = initialRot - 45;
+    const centerPct = (i / total) * 100;
+    const exitPct = ((i + 1) / total) * 100;
+    const isLast = i === total - 1;
+
+    css += `@keyframes whatwedo-card-${i} {`;
+    css += `0%{transform:translateY(0) rotate(${initialRot}deg) scale(1);opacity:1}`;
+    css += `${centerPct.toFixed(2)}%{transform:translateY(0) rotate(0deg) scale(1);opacity:1}`;
+    if (isLast) {
+      css += `100%{transform:translateY(0) rotate(0deg) scale(1);opacity:1}`;
+    } else {
+      css += `${exitPct.toFixed(2)}%{transform:translateY(-250%) rotate(${exitRot}deg) scale(0.8);opacity:0}`;
+      css += `100%{transform:translateY(-250%) rotate(${exitRot}deg) scale(0.8);opacity:0}`;
+    }
+    css += `}`;
+  }
+  return css;
+}
+
+function StackedCard({
+  item,
+  index,
+  total,
+  scrollRange,
+  onClick,
 }: {
-  cardData: { sub: string; content: string; bg: string }[];
+  item: { sub: string; content: string; bg: string };
+  index: number;
+  total: number;
+  scrollRange: [number, number];
+  onClick: () => void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const zIndex = total - index;
 
-  useEffect(() => {
-    const section = containerRef.current?.closest("#services");
-    if (!section) return;
-
-    let ticking = false;
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        const rect = section.getBoundingClientRect();
-        const sectionTop = -rect.top;
-        const sectionH = rect.height - window.innerHeight;
-        const progress = Math.max(0, Math.min(1, sectionTop / sectionH));
-
-        const total = cardData.length;
-        const step = 1 / total;
-
-        cardsRef.current.forEach((card, index) => {
-          if (!card) return;
-          const isLast = index === total - 1;
-          const startFly = index * step;
-          const endFly = startFly + step;
-          const dir = -1;
-          const initialRotation = dir * index * ROTATION_AMOUNT;
-
-          let y: number;
-          let rotate: number;
-          let opacity: number;
-          let scale: number;
-
-          if (progress <= startFly) {
-            y = 0;
-            rotate = initialRotation;
-            opacity = 1;
-            scale = 1;
-          } else if (progress >= endFly) {
-            if (isLast) {
-              y = 0;
-              rotate = 0;
-              opacity = 1;
-              scale = 1;
-            } else {
-              const flyProgress = Math.min(1, (progress - startFly) / step);
-              y = flyProgress * -250;
-              rotate = initialRotation + dir * 45 * flyProgress;
-              opacity = 1 - flyProgress * 1.25;
-              scale = 1 - flyProgress * 0.2;
-            }
-          } else {
-            if (isLast) {
-              y = 0;
-              rotate = 0;
-              opacity = 1;
-              scale = 1;
-            } else {
-              const flyProgress = (progress - startFly) / step;
-              y = flyProgress * -250;
-              rotate = initialRotation + dir * 45 * flyProgress;
-              opacity = 1 - flyProgress * 1.25;
-              scale = 1 - flyProgress * 0.2;
-            }
-          }
-
-          card.style.transform = `translateY(${y}%) rotate(${rotate}deg) scale(${scale})`;
-          card.style.opacity = String(Math.max(0, opacity));
-          card.style.zIndex = String(cardData.length - index);
-        });
-      });
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true } as AddEventListenerOptions);
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [cardData.length]);
+  const prefersReducedMotion = typeof window !== "undefined"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
-    <div ref={containerRef} className="relative w-full aspect-square max-w-[340px] sm:max-w-[400px] lg:max-w-[440px] flex items-center justify-center">
-      {cardData.map((item, i) => (
-        <div
-          key={i}
-          ref={(el) => { cardsRef.current[i] = el; }}
-          onClick={() => {
-            const scrollAmount = (window.visualViewport?.height ?? window.innerHeight) * 0.8;
-            const currentScroll = window.scrollY ?? window.pageYOffset ?? 0;
-            scrollToTarget(currentScroll + scrollAmount);
-          }}
-          className="absolute inset-0 flex items-center justify-center origin-center cursor-pointer whatwedo-card"
-          style={{
-            zIndex: cardData.length - i,
-          }}
-        >
-          <div
-            className={`${item.bg} w-full h-full rounded-3xl shadow-2xl p-8 lg:p-12 flex flex-col justify-center text-white`}
-          >
-            <h3 className="text-3xl lg:text-4xl font-bold mb-4 font-display">{item.sub}</h3>
-            <p className="text-white/90 text-[15px] lg:text-base leading-relaxed">{item.content}</p>
-          </div>
-        </div>
-      ))}
+    <div
+      onClick={onClick}
+      className="absolute inset-0 flex items-center justify-center origin-center cursor-pointer whatwedo-card"
+      style={
+        prefersReducedMotion
+          ? { zIndex }
+          : ({
+              zIndex,
+              animation: `whatwedo-card-${index} linear both`,
+              animationTimeline: "scroll(root block)",
+              animationRange: `${scrollRange[0].toFixed(2)}% ${scrollRange[1].toFixed(2)}%`,
+            } as React.CSSProperties)
+      }
+    >
+      <div
+        className={`${item.bg} w-full h-full rounded-3xl shadow-2xl p-8 lg:p-12 flex flex-col justify-center text-white`}
+      >
+        <h3 className="text-3xl lg:text-4xl font-bold mb-4 font-display">{item.sub}</h3>
+        <p className="text-white/90 text-[15px] lg:text-base leading-relaxed">{item.content}</p>
+      </div>
     </div>
   );
 }
@@ -128,8 +81,14 @@ export default memo(function WhatWeDo() {
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
   const [sectionHeight, setSectionHeight] = useState<number>(0);
+  const [scrollRange, setScrollRange] = useState<[number, number]>([0, 100]);
   const prefersReducedMotion = typeof window !== "undefined"
     && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const keyframesCSS = useMemo(
+    () => generateCardKeyframes(cardData.length),
+    [cardData.length]
+  );
 
   useLayoutEffect(() => {
     const update = () => {
@@ -147,6 +106,40 @@ export default memo(function WhatWeDo() {
     };
   }, [cardData.length, isMobile]);
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || prefersReducedMotion) return;
+
+    const computeRange = () => {
+      const docScrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docScrollHeight <= 0) { setScrollRange([0, 100]); return; }
+      const rect = section.getBoundingClientRect();
+      const sectionTop = window.scrollY + rect.top;
+      const sectionBottom = sectionTop + section.offsetHeight;
+      setScrollRange([
+        Math.max(0, (sectionTop / docScrollHeight) * 100),
+        Math.min(100, (sectionBottom / docScrollHeight) * 100),
+      ]);
+    };
+
+    requestAnimationFrame(computeRange);
+
+    const ro = new ResizeObserver(computeRange);
+    ro.observe(section);
+    window.addEventListener("resize", computeRange);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", computeRange);
+    };
+  }, [prefersReducedMotion, sectionHeight]);
+
+  const handleCardClick = () => {
+    const scrollAmount = (window.visualViewport?.height ?? window.innerHeight) * 0.8;
+    const currentScroll = window.scrollY ?? window.pageYOffset ?? 0;
+    scrollToTarget(currentScroll + scrollAmount);
+  };
+
   return (
     <section
       id="services"
@@ -155,6 +148,9 @@ export default memo(function WhatWeDo() {
       className="relative bg-white w-full"
       style={prefersReducedMotion ? undefined : { height: sectionHeight || undefined }}
     >
+      {!prefersReducedMotion && (
+        <style dangerouslySetInnerHTML={{ __html: `@supports (animation-timeline: scroll()) { ${keyframesCSS} }` }} />
+      )}
       {prefersReducedMotion ? (
         <div className="relative w-full min-h-svh flex items-center overflow-hidden ios-gpu-stable pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row items-center">
@@ -190,7 +186,18 @@ export default memo(function WhatWeDo() {
               </div>
             </div>
             <div className="w-full lg:w-7/12 flex items-center justify-center h-[65%] lg:h-full pb-6 lg:pb-0">
-              <StackedCards cardData={cardData} />
+              <div className="relative w-full aspect-square max-w-[340px] sm:max-w-[400px] lg:max-w-[440px] flex items-center justify-center">
+                {cardData.map((item, i) => (
+                  <StackedCard
+                    key={i}
+                    item={item}
+                    index={i}
+                    total={cardData.length}
+                    scrollRange={scrollRange}
+                    onClick={handleCardClick}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>

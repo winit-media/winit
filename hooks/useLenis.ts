@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Lenis from "lenis";
 import { isIOS } from "@/lib/isIOS";
 
-let lenisInstance: Lenis | null = null;
+let lenisInstance: { raf: (time: number) => void; destroy: () => void; scrollTo: (target: string | number, opts?: { offset?: number }) => void } | null = null;
 
 export function useLenis() {
   const rafRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
@@ -19,23 +18,30 @@ export function useLenis() {
     // native scrolling; desktop and Android keep Lenis untouched.
     if (isIOS()) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      touchMultiplier: 2,
-    });
-    lenisInstance = lenis;
+    let destroyed = false;
 
-    const raf = (time: number) => {
-      lenis.raf(time);
+    import("lenis").then(({ default: Lenis }) => {
+      if (destroyed) return;
+
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        touchMultiplier: 2,
+      });
+      lenisInstance = lenis;
+
+      const raf = (time: number) => {
+        lenis.raf(time);
+        rafRef.current = requestAnimationFrame(raf);
+      };
       rafRef.current = requestAnimationFrame(raf);
-    };
-    rafRef.current = requestAnimationFrame(raf);
+    });
 
     return () => {
+      destroyed = true;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      lenis.destroy();
+      lenisInstance?.destroy();
       lenisInstance = null;
     };
   }, []);
@@ -50,6 +56,6 @@ export function scrollToTarget(target: string | number) {
     const el = document.querySelector(target);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   } else {
-    window.scrollTo({ top: target, behavior: "smooth" });
+    window.scrollTo({ top: target as number, behavior: "smooth" });
   }
 }

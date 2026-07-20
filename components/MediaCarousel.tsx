@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState, useCallback, memo, createContext, useContext, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, memo, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
@@ -38,7 +38,7 @@ const defaultVideos = [
   { id: "8", name: "Campaign 8", url: "/fallback-video.mp4" },
 ];
 
-const ActiveVideoContext = createContext<{ activeIdsRef: React.RefObject<Set<string>> }>({ activeIdsRef: { current: new Set() } });
+const ActiveVideoContext = createContext<{ activeIds: Set<string> }>({ activeIds: new Set() });
 
 interface VideoCardProps {
   video: { id: string; url: string; name: string };
@@ -56,21 +56,11 @@ function VideoCard({ video, cardKey, onExpand, isPaused, canPlayMedia }: VideoCa
   const [inView, setInView] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [tapRevealed, setTapRevealed] = useState(false);
-  const [isActive, setIsActive] = useState(false);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { videoUrl, posterUrl } = getOptimizedMedia(video.url);
-  const { activeIdsRef } = useContext(ActiveVideoContext);
+  const { activeIds } = useContext(ActiveVideoContext);
 
-  useEffect(() => {
-    setIsActive(activeIdsRef.current.has(cardKey));
-    const interval = setInterval(() => {
-      setIsActive((prev) => {
-        const next = activeIdsRef.current.has(cardKey);
-        return prev === next ? prev : next;
-      });
-    }, 250);
-    return () => clearInterval(interval);
-  }, [activeIdsRef, cardKey]);
+  const isActive = activeIds.has(cardKey);
   const shouldMountVideo = canPlayMedia && (inView || isHovered) && isActive;
 
   const handleTapReveal = () => {
@@ -348,9 +338,9 @@ export default memo(function MediaCarousel() {
   const videos = data.carouselVideos.length > 0 ? data.carouselVideos : defaultVideos;
   const [expandedVideo, setExpandedVideo] = useState<{ id: string; url: string; name: string } | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [marqueePaused, setMarqueePaused] = useState(false);
   const canPlayMedia = useDeviceCapabilities();
-  const activeIdsRef = useRef(new Set<string>());
-  const [activeIdsRevision, setActiveIdsRevision] = useState(0);
+  const [activeIds, setActiveIds] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLElement>(null);
   const maxConcurrent = getMaxConcurrentVideos();
 
@@ -371,10 +361,7 @@ export default memo(function MediaCarousel() {
   // auto-stops after 300ms idle — no continuous RAF loop.
   useEffect(() => {
     if (!canPlayMedia || maxConcurrent === 0) {
-      queueMicrotask(() => {
-        activeIdsRef.current = new Set();
-        setActiveIdsRevision((r) => r + 1);
-      });
+      queueMicrotask(() => setActiveIds(new Set()));
       return;
     }
 
@@ -391,10 +378,7 @@ export default memo(function MediaCarousel() {
     const updateActive = () => {
       const section = containerRef.current;
       if (!section || visibleIds.size === 0) {
-        if (activeIdsRef.current.size > 0) {
-          activeIdsRef.current = new Set();
-          setActiveIdsRevision((r) => r + 1);
-        }
+        setActiveIds((prev) => (prev.size === 0 ? prev : new Set()));
         return;
       }
 
@@ -414,10 +398,12 @@ export default memo(function MediaCarousel() {
       candidates.sort((a, b) => a.distance - b.distance);
       const newActive = new Set(candidates.slice(0, maxConcurrent).map((c) => c.id));
 
-      const prev = activeIdsRef.current;
-      if (prev.size === newActive.size && [...prev].every((id) => newActive.has(id))) return;
-      activeIdsRef.current = newActive;
-      setActiveIdsRevision((r) => r + 1);
+      setActiveIds((prev) => {
+        if (prev.size === newActive.size && [...prev].every((id) => newActive.has(id))) {
+          return prev;
+        }
+        return newActive;
+      });
     };
 
     const onScroll = () => {
@@ -505,6 +491,17 @@ export default memo(function MediaCarousel() {
     };
   }, [canPlayMedia, maxConcurrent, videos]);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setMarqueePaused(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const handleExpand = useCallback((video: { id: string; url: string; name: string }) => {
     setExpandedVideo(video);
     setIsPaused(true);
@@ -515,11 +512,9 @@ export default memo(function MediaCarousel() {
     setIsPaused(false);
   }, []);
 
-  const contextValue = useMemo(() => ({ activeIdsRef }), [activeIdsRevision]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
-    <ActiveVideoContext.Provider value={contextValue}>
-      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-svh pt-14 overflow-clip flex flex-col ios-gpu-stable section-lazy pattern-bg" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
+    <ActiveVideoContext.Provider value={{ activeIds }}>
+      <section ref={containerRef} id="work" data-theme="dark" className={`relative bg-brand h-svh pt-14 overflow-clip flex flex-col ios-gpu-stable section-lazy pattern-bg ${marqueePaused ? "animate-marquee-paused" : ""}`} style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
         <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
           <div className="flex-shrink-0 flex items-end justify-center pt-4 pb-4 px-4 sm:px-6 lg:px-8">
             <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>
