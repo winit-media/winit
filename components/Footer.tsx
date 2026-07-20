@@ -15,14 +15,34 @@ export default memo(function Footer() {
   return (
     <footer id="contact" className="relative bg-brand overflow-hidden section-lazy ios-gpu-stable pattern-bg" data-theme="dark" style={{ '--pattern-opacity': '0.08' } as React.CSSProperties}>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-12">
-          {/* Left Column â€” Brand */}
-          <div className="flex flex-col gap-2 lg:gap-4 order-1 md:order-1 pr-2 min-w-0">
+        {/* Mobile: 2-col grid + quick links spanning full width.
+            Desktop: 2-col grid — Brand (40%) + Contact Us (60%). */}
+        <div className="grid grid-cols-2 md:grid-cols-[2fr_3fr] gap-6 lg:gap-12">
+          {/* Left Column — Brand + Quick Links + Social Icons */}
+          <div className="flex flex-col gap-3 lg:gap-4 order-1 md:order-1 col-span-1 min-w-0">
             <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerTitle}</h3>
             <p className="text-white/70 text-xs lg:text-sm leading-relaxed max-w-xs">
               {data.footerTagline}
             </p>
-            <div className="flex flex-wrap gap-3 mt-1 lg:mt-2 max-w-[140px] lg:max-w-none">
+
+            {/* Quick Links — inline inside brand column */}
+            <div className="flex flex-col gap-1 lg:gap-1.5 mt-1 lg:mt-2">
+              <h4 className="text-white font-display text-xs lg:text-sm font-semibold">{data.footerQuickLinksTitle}</h4>
+              <div className="flex flex-row flex-wrap gap-x-4 gap-y-1">
+                {data.footerQuickLinks.map((link) => (
+                  <button
+                    key={link.href}
+                    onClick={() => scrollTo(link.href)}
+                    className="text-white/70 hover:text-white transition-colors text-[10px] lg:text-xs text-left w-fit shrink-0"
+                  >
+                    {link.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Social Icons — single row */}
+            <div className="flex flex-nowrap gap-1.5 lg:gap-2 mt-1 lg:mt-2">
               {data.socialLinks.map((social) => (
                 <a
                   key={social.label}
@@ -30,7 +50,7 @@ export default memo(function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="bg-white/15 hover:bg-white/25 text-white rounded-full w-11 h-11 flex items-center justify-center transition-colors shrink-0"
+                  className="bg-white/15 hover:bg-white/25 text-white rounded-full w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center transition-colors shrink-0"
                 >
                   <SocialIcon label={social.label} />
                 </a>
@@ -38,24 +58,8 @@ export default memo(function Footer() {
             </div>
           </div>
 
-          {/* Middle Column â€” Quick Links */}
-          <div className="flex flex-col gap-2 lg:gap-4 order-3 md:order-2 col-span-2 md:col-span-1 mt-2 md:mt-0 min-w-0">
-            <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerQuickLinksTitle}</h3>
-            <div className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-1.5 lg:gap-2.5">
-              {data.footerQuickLinks.map((link) => (
-                <button
-                  key={link.href}
-                  onClick={() => scrollTo(link.href)}
-                  className="text-white/70 hover:text-white transition-colors text-xs lg:text-sm text-left w-fit shrink-0"
-                >
-                  {link.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Column â€” Contact Us */}
-          <div className="flex flex-col gap-2 lg:gap-4 order-2 md:order-3 min-w-0">
+          {/* Right Column — Contact Us */}
+          <div className="flex flex-col gap-2 lg:gap-4 order-2 md:order-2 col-span-1 min-w-0">
             <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerContactTitle}</h3>
             <div className="flex flex-col gap-2 lg:gap-3.5">
               <a
@@ -81,6 +85,22 @@ export default memo(function Footer() {
                 <Mail className="text-white mt-0.5 flex-shrink-0 w-4 h-4 lg:w-[18px] lg:h-[18px]" />
                 <span className="text-white/80 text-xs lg:text-sm group-hover:text-white transition-colors break-all">{data.contactEmail}</span>
               </a>
+            </div>
+          </div>
+
+          {/* Mobile-only Quick Links row (hidden on md+) */}
+          <div className="flex flex-col gap-1.5 order-3 col-span-2 md:hidden mt-2">
+            <h4 className="text-white font-display text-xs font-semibold">{data.footerQuickLinksTitle}</h4>
+            <div className="flex flex-row flex-wrap gap-x-4 gap-y-1">
+              {data.footerQuickLinks.map((link) => (
+                <button
+                  key={link.href}
+                  onClick={() => scrollTo(link.href)}
+                  className="text-white/70 hover:text-white transition-colors text-[10px] text-left w-fit shrink-0"
+                >
+                  {link.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
