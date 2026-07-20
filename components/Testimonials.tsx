@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo, memo } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAdmin, SiteContent } from "./AdminProvider";
 import { ChevronLeft, ChevronRight, Quote, X } from "lucide-react";
@@ -321,9 +322,12 @@ export default memo(function Testimonials() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {selected && <TestimonialModal t={selected} onClose={handleClose} />}
-      </AnimatePresence>
+      {createPortal(
+        <AnimatePresence>
+          {selected && <TestimonialModal t={selected} onClose={handleClose} />}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   );
 });

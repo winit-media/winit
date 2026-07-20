@@ -6,6 +6,7 @@ import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { AdminProvider } from "@/components/AdminProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { app, fetchSiteContent } from "@/lib/firebase";
+import { SiteContent } from "@/components/AdminProvider";
 import LoginGate from "./components/LoginGate";
 import AdminDashboard from "./components/AdminDashboard";
 
@@ -16,6 +17,7 @@ export default function AdminPage() {
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [siteContent, setSiteContent] = useState<SiteContent | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -24,6 +26,7 @@ export default function AdminPage() {
         setUserEmail(user.email);
         try {
           const content = await fetchSiteContent();
+          setSiteContent(content);
           // Only the configured site admin (contactEmail) may manage the
           // full site. Blog editors are restricted to the blog subdomain
           // (/admin/blogs) and are blocked from the main dashboard.
@@ -79,7 +82,7 @@ export default function AdminPage() {
 
   return (
     <ToastProvider>
-      <AdminProvider>
+      <AdminProvider initialContent={siteContent ?? undefined}>
         <AdminDashboard />
       </AdminProvider>
     </ToastProvider>
