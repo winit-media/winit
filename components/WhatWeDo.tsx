@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useLayoutEffect, memo } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, memo } from "react";
 import { useAdmin } from "./AdminProvider";
 import { scrollToTarget } from "@/hooks/useLenis";
 import { getViewportHeight } from "@/hooks/useViewportHeight";
@@ -15,8 +15,8 @@ function StackedCards({
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  useLayoutEffect(() => {
-    const section = containerRef.current?.parentElement?.parentElement;
+  useEffect(() => {
+    const section = containerRef.current?.closest("#services");
     if (!section) return;
 
     let ticking = false;
