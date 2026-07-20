@@ -372,6 +372,7 @@ export default memo(function MediaCarousel() {
     let tracking = false;
     const SCROLL_THROTTLE_MS = 250;
     const IDLE_TIMEOUT_MS = 300;
+    const scrollOptions: AddEventListenerOptions = { passive: true };
 
     const updateActive = () => {
       const section = containerRef.current;
@@ -414,7 +415,7 @@ export default memo(function MediaCarousel() {
       if (idleTimer != null) clearTimeout(idleTimer);
       idleTimer = setTimeout(() => {
         tracking = false;
-        window.removeEventListener("scroll", onScroll, { passive: true } as any);
+        window.removeEventListener("scroll", onScroll, scrollOptions);
       }, IDLE_TIMEOUT_MS);
     };
 
@@ -422,14 +423,14 @@ export default memo(function MediaCarousel() {
       if (tracking) return;
       tracking = true;
       updateActive();
-      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("scroll", onScroll, scrollOptions);
     };
 
     const stopTracking = () => {
       tracking = false;
       if (scrollThrottleId != null) { clearTimeout(scrollThrottleId); scrollThrottleId = null; }
       if (idleTimer != null) { clearTimeout(idleTimer); idleTimer = null; }
-      window.removeEventListener("scroll", onScroll, { passive: true } as any);
+      window.removeEventListener("scroll", onScroll, scrollOptions);
     };
 
     // Per-card IntersectionObserver: tracks which cards are on-screen + caches DOM refs

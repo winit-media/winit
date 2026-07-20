@@ -77,10 +77,12 @@ input, textarea, select, button {
 
 .animate-marquee-down {
   animation: marquee-down 30s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-up {
   animation: marquee-up 30s linear infinite;
+  will-change: transform;
 }
 
 @keyframes marquee-left {
@@ -95,10 +97,12 @@ input, textarea, select, button {
 
 .animate-marquee-left {
   animation: marquee-left 30s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-right {
   animation: marquee-right 30s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-paused,
@@ -132,11 +136,13 @@ input, textarea, select, button {
 .media-marquee-left {
   animation: marquee-left 30s linear infinite;
   transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 .media-marquee-right {
   animation: marquee-right 30s linear infinite;
   transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 @media (hover: hover) {
@@ -197,6 +203,7 @@ input, textarea, select, button {
 
 .whatwedo-card {
   backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useLayoutEffect, memo } from "react";
+import { useRef, useState, useLayoutEffect, memo } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useAdmin } from "./AdminProvider";
 import { scrollToTarget } from "@/hooks/useLenis";
