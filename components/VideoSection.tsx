@@ -38,10 +38,10 @@ export default memo(function VideoSection() {
   const rawSrc = data.defaultVideoUrl || "/fallback-video.mp4";
   const isCloudinary = rawSrc.includes("cloudinary.com");
   const videoSrc = isCloudinary
-    ? rawSrc.replace("/upload/", "/upload/f_auto,q_auto,w_1280,so_0/")
+    ? rawSrc.replace("/upload/", "/upload/f_auto,q_auto,w_1920,so_0/")
     : rawSrc;
   const posterSrc = isCloudinary
-    ? rawSrc.replace("/upload/", "/upload/q_auto:eco,w_1280,so_0,eo_3/").replace(/\.[^/.]+$/, ".jpg")
+    ? rawSrc.replace("/upload/", "/upload/q_auto:good,w_1920,so_0,eo_3/").replace(/\.[^/.]+$/, ".jpg")
     : undefined;
 
   useEffect(() => {

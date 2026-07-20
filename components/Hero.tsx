@@ -1,8 +1,12 @@
 ﻿"use client";
 
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, memo, useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import { useAdmin } from "./AdminProvider";
+
+const subscribe = () => () => {};
+const getServerViewportHeight = () => 800;
+const getClientViewportHeight = () => window.visualViewport?.height ?? window.innerHeight;
 
 const TYPING_SPEED = 80;
 const TYPING_DELAY = 400;
@@ -13,6 +17,7 @@ export default memo(function Hero() {
   const cursorRef = useRef<HTMLSpanElement>(null);
   const indexRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const viewportHeight = useSyncExternalStore(subscribe, getClientViewportHeight, getServerViewportHeight);
 
   const headingText = data.heroHeading;
   const prefersReducedMotion = typeof window !== "undefined"
@@ -74,7 +79,7 @@ export default memo(function Hero() {
     >
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
-          initial={prefersReducedMotion ? false : { y: "-100svh" }}
+          initial={prefersReducedMotion ? false : { y: -viewportHeight }}
           animate={{ y: 0 }}
           transition={{ duration: 1.0, ease: "easeOut" }}
         >
@@ -105,7 +110,7 @@ export default memo(function Hero() {
         </motion.div>
 
         <motion.div
-          initial={prefersReducedMotion ? false : { y: "-100svh" }}
+          initial={prefersReducedMotion ? false : { y: -viewportHeight }}
           animate={{ y: 0 }}
           transition={{ duration: 1.0, ease: "easeOut" }}
           className="mt-6 md:mt-8"

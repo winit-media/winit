@@ -101,7 +101,8 @@ function TestimonialModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85svh] overflow-y-auto ios-scroll p-10"
+        className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-y-auto ios-scroll p-10"
+        style={{ maxHeight: 'min(85svh, 85vh)' } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()}
       >
         <button

@@ -347,36 +347,55 @@ export default memo(function MediaCarousel() {
   const row2Videos = videos.slice(Math.ceil(videos.length / 2));
 
   // Pick the N cards closest to the horizontal viewport center to play.
-  // All others show poster images only â€” zero video decoding cost.
+  // All others show poster images only — zero video decoding cost.
+  //
+  // Uses IntersectionObserver (zero layout cost) to maintain a Set of
+  // visible card IDs and a cached Map of DOM references, then a throttled
+  // scroll event listener to recompute which visible cards are closest to
+  // the viewport center. Only visible cards are measured with
+  // getBoundingClientRect, keeping layout thrashing proportional to the
+  // number of on-screen cards (not total cards).
+  //
+  // Event-driven: scroll listener starts/stops with section visibility and
+  // auto-stops after 300ms idle — no continuous RAF loop.
   useEffect(() => {
     if (!canPlayMedia || maxConcurrent === 0) {
       queueMicrotask(() => setActiveIds(new Set()));
       return;
     }
 
+    const visibleIds = new Set<string>();
+    const cardElements = new Map<string, HTMLElement>();
+    let inSectionView = false;
+    let scrollThrottleId: ReturnType<typeof setTimeout> | null = null;
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    let tracking = false;
+    const SCROLL_THROTTLE_MS = 250;
+    const IDLE_TIMEOUT_MS = 300;
+
     const updateActive = () => {
       const section = containerRef.current;
-      if (!section) return;
+      if (!section || visibleIds.size === 0) {
+        setActiveIds((prev) => (prev.size === 0 ? prev : new Set()));
+        return;
+      }
 
       const viewportCenterX = window.innerWidth / 2;
-      const cards = section.querySelectorAll<HTMLElement>("[data-card-id]");
       const candidates: { id: string; distance: number }[] = [];
 
-      cards.forEach((card) => {
+      visibleIds.forEach((id) => {
+        const card = cardElements.get(id);
+        if (!card) return;
         const rect = card.getBoundingClientRect();
-        // Only consider cards that are at least partially visible horizontally
         if (rect.right > 0 && rect.left < window.innerWidth) {
           const cardCenterX = rect.left + rect.width / 2;
-          const distance = Math.abs(cardCenterX - viewportCenterX);
-          candidates.push({ id: card.dataset.cardId!, distance });
+          candidates.push({ id, distance: Math.abs(cardCenterX - viewportCenterX) });
         }
       });
 
-      // Sort by distance to viewport center â€” closest cards get to play
       candidates.sort((a, b) => a.distance - b.distance);
       const newActive = new Set(candidates.slice(0, maxConcurrent).map((c) => c.id));
 
-      // Only update state if the set actually changed (avoids unnecessary re-renders)
       setActiveIds((prev) => {
         if (prev.size === newActive.size && [...prev].every((id) => newActive.has(id))) {
           return prev;
@@ -385,63 +404,87 @@ export default memo(function MediaCarousel() {
       });
     };
 
-    let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
-    let inView = false;
-    let lastTickTime = 0;
-    const THROTTLE_MS = 250; // ~4fps â€” no need for per-frame precision
+    const onScroll = () => {
+      if (scrollThrottleId != null) return;
+      scrollThrottleId = setTimeout(() => {
+        scrollThrottleId = null;
+        if (inSectionView && !document.hidden) updateActive();
+      }, SCROLL_THROTTLE_MS);
 
-    const tick = (now: number) => {
-      if (now - lastTickTime >= THROTTLE_MS) {
-        updateActive();
-        lastTickTime = now;
-      }
-      rafId = requestAnimationFrame(tick);
+      if (idleTimer != null) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        tracking = false;
+        window.removeEventListener("scroll", onScroll, { passive: true } as any);
+      }, IDLE_TIMEOUT_MS);
     };
 
-    const startLoop = () => {
-      if (rafId != null) return;
+    const startTracking = () => {
+      if (tracking) return;
+      tracking = true;
       updateActive();
-      lastTickTime = performance.now();
-      rafId = requestAnimationFrame(tick);
+      window.addEventListener("scroll", onScroll, { passive: true });
     };
 
-    const stopLoop = () => {
-      if (rafId != null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
+    const stopTracking = () => {
+      tracking = false;
+      if (scrollThrottleId != null) { clearTimeout(scrollThrottleId); scrollThrottleId = null; }
+      if (idleTimer != null) { clearTimeout(idleTimer); idleTimer = null; }
+      window.removeEventListener("scroll", onScroll, { passive: true } as any);
     };
 
-    // Run the polling loop only while the section is on-screen and the
-    // tab visible â€” prevents an unbounded 60fps getBoundingClientRect
-    // hammer that thrashes layout and janks iOS WebKit.
-    let io: IntersectionObserver | null = null;
+    // Per-card IntersectionObserver: tracks which cards are on-screen + caches DOM refs
+    const cardObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const el = entry.target as HTMLElement;
+          const id = el.dataset.cardId;
+          if (!id) return;
+          if (entry.isIntersecting) {
+            visibleIds.add(id);
+            cardElements.set(id, el);
+          } else {
+            visibleIds.delete(id);
+            cardElements.delete(id);
+          }
+        });
+        if (inSectionView && !document.hidden) updateActive();
+      },
+      { rootMargin: "200px 0px", threshold: 0 }
+    );
+
+    // Section-level IntersectionObserver: only run scroll tracking when section is visible
+    let sectionObserver: IntersectionObserver | null = null;
     const section = containerRef.current;
     if (section && typeof IntersectionObserver !== "undefined") {
-      io = new IntersectionObserver(
+      sectionObserver = new IntersectionObserver(
         ([entry]) => {
-          inView = entry.isIntersecting;
-          if (inView && !document.hidden) startLoop();
-          else stopLoop();
+          inSectionView = entry.isIntersecting;
+          if (inSectionView && !document.hidden) startTracking();
+          else stopTracking();
         },
         { threshold: 0 }
       );
-      io.observe(section);
+      sectionObserver.observe(section);
+
+      section.querySelectorAll<HTMLElement>("[data-card-id]").forEach((card) => {
+        cardObserver.observe(card);
+      });
     } else {
-      inView = true;
-      startLoop();
+      inSectionView = true;
+      startTracking();
     }
 
     const onVisibility = () => {
-      if (document.hidden) stopLoop();
-      else if (inView) startLoop();
+      if (document.hidden) stopTracking();
+      else if (inSectionView) startTracking();
     };
 
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
-      stopLoop();
-      io?.disconnect();
+      stopTracking();
+      cardObserver.disconnect();
+      sectionObserver?.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [canPlayMedia, maxConcurrent, videos]);
@@ -458,7 +501,7 @@ export default memo(function MediaCarousel() {
 
   return (
     <ActiveVideoContext.Provider value={{ activeIds }}>
-      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-svh pt-14 overflow-hidden flex flex-col ios-gpu-stable section-lazy pattern-bg" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
+      <section ref={containerRef} id="work" data-theme="dark" className="relative bg-brand h-svh pt-14 overflow-clip flex flex-col ios-gpu-stable section-lazy pattern-bg" style={{ '--pattern-opacity': '0.16' } as React.CSSProperties}>
         <div className="relative z-10 flex flex-col h-full min-h-0 overflow-hidden justify-center">
           <div className="flex-shrink-0 flex items-end justify-center pt-4 pb-4 px-4 sm:px-6 lg:px-8">
             <h2 className="text-6xl md:text-6xl lg:text-7xl font-display font-bold text-white text-center">{data.carouselTitle}</h2>

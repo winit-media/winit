@@ -1,35 +1,34 @@
 ﻿"use client";
 
-import { useRef, useEffect, useState, memo } from "react";
+import { useRef, useEffect, memo } from "react";
 import { motion, useInView } from "framer-motion";
 import { Users, Briefcase, Megaphone, Eye, Globe, MapPin, Layers, TrendingDown } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 
 function AnimatedCounter({ target, suffix = "", showFinal }: { target: number; suffix?: string; showFinal?: boolean }) {
-  const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
     if (!inView || showFinal) return;
-    let start = 0;
+    if (!ref.current) return;
     const duration = 2000;
-    const step = (timestamp: number) => {
-      if (!start) start = timestamp;
-      const progress = Math.min((timestamp - start) / duration, 1);
-      setCount(Math.floor(progress * target));
-      if (progress < 1) requestAnimationFrame(step);
+    const start = performance.now();
+    let raf: number;
+    const step = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      if (ref.current) {
+        ref.current.textContent = Math.floor(progress * target).toLocaleString("en-IN") + suffix;
+      }
+      if (progress < 1) raf = requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
-  }, [inView, target, showFinal]);
-
-  const displayCount = showFinal ? target : count;
-  const formatted = displayCount.toLocaleString("en-IN");
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, target, suffix, showFinal]);
 
   return (
     <span ref={ref}>
-      {formatted}
-      {suffix}
+      {showFinal ? target.toLocaleString("en-IN") + suffix : ""}
     </span>
   );
 }

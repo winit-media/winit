@@ -47,8 +47,8 @@ input, textarea, select, button {
    -webkit-fill-available dynamically adjusts to the visible viewport
    (excludes URL bar / toolbar), unlike 100vh which overflows. */
 @supports not (height: 100svh) {
-  .h-svh { height: -webkit-fill-available; height: 100vh; }
-  .min-h-svh { min-height: -webkit-fill-available; min-height: 100vh; }
+  .h-svh { height: var(--vh, -webkit-fill-available); height: var(--vh, 100vh); }
+  .min-h-svh { min-height: var(--vh, -webkit-fill-available); min-height: var(--vh, 100vh); }
 }
 
 .swiper-pagination-bullet-active {
@@ -77,12 +77,10 @@ input, textarea, select, button {
 
 .animate-marquee-down {
   animation: marquee-down 30s linear infinite;
-  will-change: transform;
 }
 
 .animate-marquee-up {
   animation: marquee-up 30s linear infinite;
-  will-change: transform;
 }
 
 @keyframes marquee-left {
@@ -120,6 +118,15 @@ input, textarea, select, button {
 
 .media-marquee {
   contain: layout;
+}
+
+/* GPU-optimise marquee children: each item only has one face, so the
+   compositor can skip backface rasterisation. Reduces layer count on iOS. */
+.media-marquee > div > div,
+.animate-marquee-down > div,
+.animate-marquee-up > div {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .media-marquee-left {
@@ -227,10 +234,24 @@ input, textarea, select, button {
   contain: none;
 }
 
+/* Fallback for browsers without overflow:clip support (Safari <16).
+   overflow:hidden creates a scroll container that silently disables
+   position:sticky on iOS WebKit. overflow:clip does not. */
+@supports not (overflow-x: clip) {
+  #services .sticky {
+    overflow: hidden;
+  }
+}
+
 @supports (content-visibility: auto) {
   .section-lazy {
     content-visibility: auto;
-    contain-intrinsic-size: auto 100svh;
+    contain-intrinsic-size: auto var(--vh, 100vh);
+  }
+  /* On iOS, use 0 as initial guess — the auto keyword remembers the real
+     height after first paint, avoiding svh/vh toolbar-collapse mismatch. */
+  .is-ios .section-lazy {
+    contain-intrinsic-size: auto 0;
   }
 }
 

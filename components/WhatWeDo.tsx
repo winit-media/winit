@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState, useEffect, memo } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, memo } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useAdmin } from "./AdminProvider";
 import { scrollToTarget } from "@/hooks/useLenis";
+import { getViewportHeight } from "@/hooks/useViewportHeight";
 
 const ROTATION_AMOUNT = 15;
 
@@ -89,20 +90,25 @@ export default memo(function WhatWeDo() {
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
+  const [sectionHeight, setSectionHeight] = useState<number>(0);
   const prefersReducedMotion = typeof window !== "undefined"
     && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  useEffect(() => {
-    let lastWidth = window.innerWidth;
-    const check = () => {
-      if (window.innerWidth !== lastWidth) {
-        setIsMobile(window.innerWidth < 768);
-        lastWidth = window.innerWidth;
-      }
+  useLayoutEffect(() => {
+    const update = () => {
+      const vh = getViewportHeight();
+      const pct = isMobile ? 70 : 60;
+      setSectionHeight((cardData.length * pct / 100) * vh);
+      setIsMobile(window.innerWidth < 768);
     };
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+    update();
+    window.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("resize", update);
+    };
+  }, [cardData.length, isMobile]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -121,7 +127,7 @@ export default memo(function WhatWeDo() {
       ref={sectionRef}
       data-theme="light"
       className="relative bg-white w-full"
-      style={prefersReducedMotion ? undefined : { height: `calc(${cardData.length * (isMobile ? 70 : 60)}svh)` }}
+      style={prefersReducedMotion ? undefined : { height: sectionHeight || undefined }}
     >
       {prefersReducedMotion ? (
         <div className="relative w-full min-h-svh flex items-center overflow-hidden ios-gpu-stable pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
@@ -146,7 +152,7 @@ export default memo(function WhatWeDo() {
           </div>
         </div>
       ) : (
-        <div className="sticky top-0 h-svh w-full flex items-center overflow-hidden z-0 ios-gpu-stable pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
+        <div className="sticky top-0 h-svh w-full flex items-center overflow-clip z-0 pattern-bg" style={{ '--pattern-opacity': '0.12' } as React.CSSProperties}>
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row h-full relative z-10">
             <div className="w-full lg:w-5/12 flex items-center justify-center lg:justify-start h-[35%] lg:h-full pt-20 lg:pt-0">
               <div className="relative flex items-center justify-center lg:justify-start">

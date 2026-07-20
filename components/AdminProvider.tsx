@@ -1,12 +1,8 @@
 ﻿"use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo, ReactNode } from "react";
-import {
-  fetchSiteContent,
-  saveSiteContent,
-  SiteContent,
-  defaultSiteContent,
-} from "@/lib/firebase";
+import { saveSiteContent } from "@/lib/firebase";
+import { SiteContent, defaultSiteContent } from "@/lib/siteContent";
 import { useToast as useToastSafe } from "@/components/ui/Toast";
 
 function useToast() {
@@ -31,14 +27,13 @@ interface AdminContextType {
 
 const AdminContext = createContext<AdminContextType | null>(null);
 
-export function AdminProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<SiteContent>(defaultSiteContent);
-  const [loaded, setLoaded] = useState(false);
+export function AdminProvider({ children, initialContent }: { children: ReactNode; initialContent?: SiteContent }) {
+  const [data, setData] = useState<SiteContent>(initialContent ?? defaultSiteContent);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [revertedCount, setRevertedCount] = useState(0);
   const { toast } = useToast();
-  const originalRef = useRef<SiteContent>(defaultSiteContent);
+  const originalRef = useRef<SiteContent>(initialContent ?? defaultSiteContent);
   const pendingRef = useRef<SiteContent | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dataRef = useRef<SiteContent>(data);
@@ -46,14 +41,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     dataRef.current = data;
   }, [data]);
-
-  useEffect(() => {
-    fetchSiteContent().then((content) => {
-      setData(content);
-      originalRef.current = content;
-      setLoaded(true);
-    });
-  }, []);
 
   const persist = useCallback(async (updated: SiteContent, silent = false) => {
     setSaving(true);
@@ -111,13 +98,13 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const contextValue = useMemo(() => ({
     data,
-    loaded,
+    loaded: true,
     saving,
     hasChanges,
     revertedCount,
     updateContent,
     saveNow,
-  }), [data, loaded, saving, hasChanges, revertedCount, updateContent, saveNow]);
+  }), [data, saving, hasChanges, revertedCount, updateContent, saveNow]);
 
   return (
     <AdminContext.Provider value={contextValue}>

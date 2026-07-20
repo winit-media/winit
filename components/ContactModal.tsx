@@ -52,26 +52,31 @@ export default function ContactModal({
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isOpen, onClose]);
 
-  // iOS keyboard: shift modal up when virtual keyboard appears
+  // iOS keyboard: shift modal up when virtual keyboard appears.
+  // Uses RAF to batch resize events during the keyboard animation,
+  // preventing forced layout on every frame.
   useEffect(() => {
     if (!isOpen) return;
     const viewport = window.visualViewport;
     if (!viewport) return;
     const modal = containerRef.current;
+    let rafId: number | null = null;
 
     const handleResize = () => {
-      if (!modal) return;
-      const keyboardHeight = window.innerHeight - viewport.height;
-      if (keyboardHeight > 0) {
-        modal.style.transform = `translateY(-${keyboardHeight / 2}px)`;
-      } else {
-        modal.style.transform = "";
-      }
+      if (rafId != null) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (!modal) return;
+        const keyboardHeight = window.innerHeight - viewport.height;
+        modal.style.transform = keyboardHeight > 0
+          ? `translateY(-${keyboardHeight / 2}px)`
+          : "";
+      });
     };
 
     viewport.addEventListener("resize", handleResize);
     return () => {
       viewport.removeEventListener("resize", handleResize);
+      if (rafId != null) cancelAnimationFrame(rafId);
       if (modal) modal.style.transform = "";
     };
   }, [isOpen]);
@@ -126,7 +131,8 @@ export default function ContactModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="contact-modal-title"
-            className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90svh]"
+            className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+            style={{ maxHeight: 'min(90svh, 90vh)' } as React.CSSProperties}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -195,7 +201,7 @@ export default function ContactModal({
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 placeholder:text-gray-400"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] text-gray-900 placeholder:text-gray-400"
                       placeholder="Aditya"
                     />
                   </motion.div>
@@ -210,7 +216,7 @@ export default function ContactModal({
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 placeholder:text-gray-400"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] text-gray-900 placeholder:text-gray-400"
                       placeholder="hi@acaditya10.tech"
                     />
                   </motion.div>
@@ -224,7 +230,7 @@ export default function ContactModal({
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-gray-900 placeholder:text-gray-400"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] text-gray-900 placeholder:text-gray-400"
                       placeholder="+91 9876543210"
                     />
                   </motion.div>

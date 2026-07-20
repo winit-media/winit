@@ -33,7 +33,7 @@ function VerticalCarousel({
   };
 
   return (
-    <div className="overflow-hidden h-full pt-4 pb-4" style={{ contain: "layout" }}>
+    <div className="overflow-hidden h-full pt-4 pb-4" style={{ contain: "layout style" }}>
       <div
         className={
           direction === "down" ? "animate-marquee-down" : "animate-marquee-up"
@@ -45,7 +45,7 @@ function VerticalCarousel({
           return (
           <div
             key={`${item.id}-${i}`}
-            className={`group block mx-auto mb-4 w-[35vw] max-w-[140px] aspect-square md:w-[180px] md:h-[180px] md:max-w-none rounded-2xl flex items-center justify-center p-4 sm:p-5 md:p-6 transition-all duration-500 ease-out ${variantClasses[variant]}`}
+            className={`group block mx-auto mb-4 w-[35vw] max-w-[140px] aspect-square md:w-[180px] md:h-[180px] md:max-w-none rounded-2xl flex items-center justify-center p-4 sm:p-5 md:p-6 transition-[transform,box-shadow,border-color,background-color] duration-500 ease-out ${variantClasses[variant]}`}
           >
             {finalUrl ? (
               <div className="relative w-full h-full">

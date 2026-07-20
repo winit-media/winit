@@ -95,6 +95,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.variable} ${clashDisplay.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: "(function(){var ua=navigator.userAgent;if(/iPhone|iPad|iPod/.test(ua)||(navigator.maxTouchPoints>1&&/Macintosh/.test(ua)))document.documentElement.classList.add('is-ios')})()" }} />
+      </head>
       <body className="min-h-svh antialiased">{children}</body>
     </html>
   );
