@@ -1,4 +1,5 @@
 ﻿import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import Analytics from "./components/Analytics";
@@ -107,7 +108,9 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: "(function(){var ua=navigator.userAgent;if(/iPhone|iPad|iPod/.test(ua)||(navigator.maxTouchPoints>1&&/Macintosh/.test(ua)))document.documentElement.classList.add('is-ios')})()" }} />
       </head>
       <body className="min-h-svh antialiased">
-        <Analytics />
+        <Suspense>
+          <Analytics />
+        </Suspense>
         {children}
       </body>
     </html>
