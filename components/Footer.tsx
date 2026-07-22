@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { memo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAdmin } from "./AdminProvider";
 import { scrollToTarget } from "@/hooks/useLenis";
 import { Phone, MapPin, Mail } from "lucide-react";
@@ -9,12 +9,16 @@ import { Phone, MapPin, Mail } from "lucide-react";
 export default memo(function Footer() {
   const { data } = useAdmin();
   const router = useRouter();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   const scrollTo = (href: string) => {
     if (href.startsWith("/")) {
       router.push(href);
-    } else {
+    } else if (isHome) {
       scrollToTarget(href);
+    } else {
+      router.push("/" + href);
     }
   };
 
