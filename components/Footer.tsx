@@ -13,7 +13,9 @@ export default memo(function Footer() {
   const isHome = pathname === "/";
 
   const scrollTo = (href: string) => {
-    if (href.startsWith("/")) {
+    if (href === "#contact") {
+      window.dispatchEvent(new Event("open-contact-modal"));
+    } else if (href.startsWith("/")) {
       router.push(href);
     } else if (isHome) {
       scrollToTarget(href);
