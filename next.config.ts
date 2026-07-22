@@ -10,9 +10,17 @@ const nextConfig: NextConfig = {
         hostname: "res.cloudinary.com",
       },
     ],
+    formats: ["image/avif", "image/webp"],
   },
   async headers() {
     return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "winit.acaditya10.tech" }, { type: "host", value: "blogs.winitmedia.com" }, { type: "host", value: "admin.winitmedia.com" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
       {
         source: "/admin/:path*",
         headers: [
@@ -27,6 +35,7 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
         ],
       },
       {

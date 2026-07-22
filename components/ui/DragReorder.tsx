@@ -15,6 +15,65 @@ function isTouchDevice() {
   return "ontouchstart" in window || navigator.maxTouchPoints > 0;
 }
 
+function DragHandle({
+  index,
+  isTouch,
+  totalItems,
+  onMove,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+}: {
+  index: number;
+  isTouch: boolean;
+  totalItems: number;
+  onMove: (index: number, direction: "up" | "down") => void;
+  onDragStart: (index: number) => void;
+  onDragOver: (e: React.DragEvent, index: number) => void;
+  onDrop: (index: number) => void;
+  onDragEnd: () => void;
+}) {
+  if (isTouch) {
+    return (
+      <div className="flex flex-col items-center justify-center shrink-0">
+        <button
+          type="button"
+          onClick={() => onMove(index, "up")}
+          disabled={index === 0}
+          className="text-gray-400 hover:text-brand disabled:opacity-30 p-0.5 min-w-[28px] min-h-[28px] flex items-center justify-center"
+          title="Move up"
+        >
+          <ChevronUp size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onMove(index, "down")}
+          disabled={index === totalItems - 1}
+          className="text-gray-400 hover:text-brand disabled:opacity-30 p-0.5 min-w-[28px] min-h-[28px] flex items-center justify-center"
+          title="Move down"
+        >
+          <ChevronDown size={16} />
+        </button>
+      </div>
+    );
+  }
+  return (
+    <button
+      type="button"
+      draggable
+      onDragStart={() => onDragStart(index)}
+      onDragOver={(e) => onDragOver(e, index)}
+      onDrop={() => onDrop(index)}
+      onDragEnd={onDragEnd}
+      className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing p-0.5 touch-none min-w-[28px] min-h-[28px] flex items-center justify-center"
+      title="Drag to reorder"
+    >
+      <GripVertical size={16} />
+    </button>
+  );
+}
+
 export default function DragReorder<T>({
   items,
   onReorder,
@@ -83,47 +142,6 @@ export default function DragReorder<T>({
     [items, onReorder]
   );
 
-  const DragHandle = ({ index }: { index: number }) => {
-    if (isTouch) {
-      return (
-        <div className="flex flex-col items-center justify-center shrink-0">
-          <button
-            type="button"
-            onClick={() => moveItem(index, "up")}
-            disabled={index === 0}
-            className="text-gray-400 hover:text-brand disabled:opacity-30 p-0.5 min-w-[28px] min-h-[28px] flex items-center justify-center"
-            title="Move up"
-          >
-            <ChevronUp size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => moveItem(index, "down")}
-            disabled={index === items.length - 1}
-            className="text-gray-400 hover:text-brand disabled:opacity-30 p-0.5 min-w-[28px] min-h-[28px] flex items-center justify-center"
-            title="Move down"
-          >
-            <ChevronDown size={16} />
-          </button>
-        </div>
-      );
-    }
-    return (
-      <button
-        type="button"
-        draggable
-        onDragStart={() => handleDragStart(index)}
-        onDragOver={(e) => handleDragOver(e, index)}
-        onDrop={() => handleDrop(index)}
-        onDragEnd={handleDragEnd}
-        className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing p-0.5 touch-none min-w-[28px] min-h-[28px] flex items-center justify-center"
-        title="Drag to reorder"
-      >
-        <GripVertical size={16} />
-      </button>
-    );
-  };
-
   return (
     <div className="space-y-1">
       {items.map((item, index) => (
@@ -136,7 +154,18 @@ export default function DragReorder<T>({
             dragIndex === index ? "opacity-40" : ""
           } ${overIndex === index && dragIndex !== index ? "border-t-2 border-brand pt-1" : ""}`}
         >
-          {renderItem(item, index, <DragHandle index={index} />)}
+          {renderItem(item, index, (
+            <DragHandle
+              index={index}
+              isTouch={isTouch}
+              totalItems={items.length}
+              onMove={moveItem}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onDragEnd={handleDragEnd}
+            />
+          ))}
         </div>
       ))}
     </div>

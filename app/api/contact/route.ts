@@ -10,7 +10,7 @@ import { sanitizeContactForm } from "@/lib/sanitize";
 
 const ALLOWED_ORIGINS = [
   process.env.NEXT_PUBLIC_SITE_URL || "https://winitmedia.com",
-  "http://localhost:3000",
+  "http://localhost:3000", // local dev only — not a security risk in production
 ];
 
 function getClientIp(req: Request): string {

@@ -155,6 +155,7 @@ export default memo(function VideoSection() {
         <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={togglePlay}
+            aria-label={isPlaying ? "Pause video" : "Play video"}
             className="bg-white/30 hover:bg-white/40 backdrop-blur-sm rounded-full p-4 transition-colors"
           >
             {isPlaying ? (
@@ -165,6 +166,7 @@ export default memo(function VideoSection() {
           </button>
           <button
             onClick={toggleMute}
+            aria-label={muted ? "Unmute video" : "Mute video"}
             className="bg-white/30 hover:bg-white/40 backdrop-blur-sm rounded-full p-4 transition-colors"
           >
             {muted ? (
@@ -179,6 +181,7 @@ export default memo(function VideoSection() {
         <div className="absolute inset-0 flex items-center justify-center bg-black/30" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={togglePlay}
+            aria-label="Play video"
             className="bg-white/90 hover:bg-white rounded-full p-6 shadow-2xl transition-transform hover:scale-110"
           >
             <Play size={40} className="text-brand fill-brand" />

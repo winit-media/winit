@@ -1,4 +1,5 @@
 ﻿@import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme inline {
   --color-brand: #912dbf;
@@ -47,12 +48,12 @@ input, textarea, select, button {
    -webkit-fill-available dynamically adjusts to the visible viewport
    (excludes URL bar / toolbar), unlike 100vh which overflows. */
 @supports not (height: 100svh) {
-  .h-svh { height: var(--vh, -webkit-fill-available); height: var(--vh, 100vh); }
-  .min-h-svh { min-height: var(--vh, -webkit-fill-available); min-height: var(--vh, 100vh); }
+  .h-svh { height: var(--vh, 100vh); }
+  .min-h-svh { min-height: var(--vh, 100vh); }
 }
 
 .swiper-pagination-bullet-active {
-  background: #912dbf !important;
+  background: var(--color-brand) !important;
 }
 
 .swiper-button-next,
@@ -148,10 +149,12 @@ input, textarea, select, button {
   }
 }
 
-@media (hover: hover) {
-  .animate-marquee-down:hover,
-  .animate-marquee-up:hover {
-    animation-play-state: running;
+@media (max-width: 767px) {
+  .media-marquee-left {
+    animation-duration: 40s;
+  }
+  .media-marquee-right {
+    animation-duration: 40s;
   }
 }
 
@@ -220,10 +223,6 @@ input, textarea, select, button {
     }
   }
 
-  .whatwedo-scroll-card {
-    animation: whatwedo-card-exit linear both;
-    animation-timeline: scroll(root block);
-  }
 }
 
 
@@ -237,20 +236,25 @@ input, textarea, select, button {
   content: '';
   position: absolute;
   inset: 0;
-  background: url('/pattern.png');
+  background-image: url('/pattern.png');
   background-size: cover;
     opacity: 0.06;
   pointer-events: none;
   z-index: 0;
 }
 
-[data-theme="light"] .pattern-bg::before,
-[data-theme="light"].pattern-bg::before {
-  background-image: url('/pattern-dark.png');
+[data-theme="light"].pattern-bg::before,
+[data-theme="light"] .pattern-bg::before {
+  filter: invert(1);
 }
 
 .pattern-bg-hero::before {
   opacity: 0.1;
+}
+
+/* Blog pages — subtler pattern */
+.blogs-page .pattern-bg::before {
+  opacity: 0.03;
 }
 
 @media (max-width: 767px) {
@@ -259,6 +263,8 @@ input, textarea, select, button {
   }
   .pattern-bg-hero::before {
     opacity: 0.1;
+    transform: scale(1.25);
+    transform-origin: center center;
   }
 }
 
@@ -319,4 +325,13 @@ input, textarea, select, button {
 /* iOS momentum scroll — add alongside overflow-y-auto / overflow-y-scroll */
 .ios-scroll {
   -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

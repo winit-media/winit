@@ -1,15 +1,21 @@
 ﻿"use client";
 
 import { memo } from "react";
+import { useRouter } from "next/navigation";
 import { useAdmin } from "./AdminProvider";
 import { scrollToTarget } from "@/hooks/useLenis";
 import { Phone, MapPin, Mail } from "lucide-react";
 
 export default memo(function Footer() {
   const { data } = useAdmin();
+  const router = useRouter();
 
   const scrollTo = (href: string) => {
-    scrollToTarget(href);
+    if (href.startsWith("/")) {
+      router.push(href);
+    } else {
+      scrollToTarget(href);
+    }
   };
 
   return (
@@ -42,7 +48,7 @@ export default memo(function Footer() {
           <div className="flex flex-col gap-2 lg:gap-4 order-3 md:order-2 col-span-2 md:col-span-1 mt-2 md:mt-0 min-w-0">
             <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerQuickLinksTitle}</h3>
             <div className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-1.5 lg:gap-2.5">
-              {data.navLinks.map((link) => (
+              {data.footerQuickLinks.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => scrollTo(link.href)}

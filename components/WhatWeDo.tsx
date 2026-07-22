@@ -50,7 +50,15 @@ function StackedCard({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className="absolute inset-0 flex items-center justify-center origin-center cursor-pointer whatwedo-card"
       style={
         prefersReducedMotion

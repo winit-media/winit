@@ -87,7 +87,7 @@ export default memo(function BrandShowcase() {
   }, []);
 
   return (
-    <section ref={sectionRef} className={`relative bg-[#fcfcfc] h-svh overflow-hidden ios-gpu-stable section-lazy pattern-bg ${isInView ? "" : "animate-marquee-paused"}`} data-theme="light">
+    <section id="brands" ref={sectionRef} className={`relative bg-[#fcfcfc] h-svh overflow-hidden ios-gpu-stable section-lazy pattern-bg ${isInView ? "" : "animate-marquee-paused"}`} data-theme="light">
       <div className="relative z-10 h-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center lg:gap-12 lg:px-8">
         
         {/* Title Section */}

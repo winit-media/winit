@@ -8,12 +8,18 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 
 export default function BlogUsersTab() {
-  const { data, updateContent } = useAdmin();
+  const { data, updateContent, revertedCount } = useAdmin();
   const [users, setUsers] = useState(data.blogUsers);
+  const [prevReverted, setPrevReverted] = useState(revertedCount);
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const { toast } = useToast();
+
+  if (revertedCount !== prevReverted) {
+    setPrevReverted(revertedCount);
+    setUsers(data.blogUsers);
+  }
 
   const add = () => {
     if (!newEmail.trim()) {

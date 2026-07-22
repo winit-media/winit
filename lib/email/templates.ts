@@ -1,3 +1,5 @@
+import { SITE_LOGO_URL } from "../siteContent";
+
 interface ContactFormData {
   name: string;
   email: string;
@@ -11,6 +13,15 @@ interface SiteContactDetails {
   contactEmail: string;
   footerTitle: string;
   footerCopyright: string;
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
 }
 
 const BRAND_COLOR = "#912dbf";
@@ -43,7 +54,7 @@ function headerBar(): string {
   return `
 <tr>
   <td style="background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);padding:32px 40px;border-radius:16px 16px 0 0;text-align:center;">
-    <img src="https://winitmedia.com/logo.png" alt="WinIt" width="120" style="display:block;margin:0 auto 16px;max-width:120px;height:auto;" />
+    <img src="${SITE_LOGO_URL}" alt="WinIt" width="120" style="display:block;margin:0 auto 16px;max-width:120px;height:auto;" />
     <div style="width:40px;height:3px;background:rgba(255,255,255,0.4);border-radius:2px;margin:0 auto;"></div>
   </td>
 </tr>`;
@@ -54,10 +65,10 @@ function footerBar(siteDetails: SiteContactDetails): string {
 <tr>
   <td style="background:linear-gradient(135deg,${BRAND_DARK} 0%,${BRAND_COLOR} 100%);padding:28px 40px;border-radius:0 0 16px 16px;text-align:center;">
     <p style="margin:0 0 8px;color:rgba(255,255,255,0.9);font-size:13px;line-height:1.6;">
-      ${siteDetails.contactPhone} &nbsp;|&nbsp; ${siteDetails.contactEmail}
+      ${escapeHtml(siteDetails.contactPhone)} &nbsp;|&nbsp; ${escapeHtml(siteDetails.contactEmail)}
     </p>
     <p style="margin:0;color:rgba(255,255,255,0.5);font-size:11px;">
-      ${siteDetails.footerCopyright}
+      ${escapeHtml(siteDetails.footerCopyright)}
     </p>
   </td>
 </tr>`;
@@ -94,13 +105,13 @@ export function visitorAutoResponseTemplate(
             Need immediate assistance?
           </p>
           <p style="margin:0 0 6px;font-size:13px;color:#374151;">
-            &#128231;&nbsp; <a href="mailto:${siteDetails.contactEmail}" style="color:${BRAND_COLOR};text-decoration:none;">${siteDetails.contactEmail}</a>
+            &#128231;&nbsp; <a href="mailto:${escapeHtml(siteDetails.contactEmail)}" style="color:${BRAND_COLOR};text-decoration:none;">${escapeHtml(siteDetails.contactEmail)}</a>
           </p>
           <p style="margin:0 0 6px;font-size:13px;color:#374151;">
-            &#128241;&nbsp; ${siteDetails.contactPhone}
+            &#128241;&nbsp; ${escapeHtml(siteDetails.contactPhone)}
           </p>
           <p style="margin:0;font-size:13px;color:#374151;">
-            &#128205;&nbsp; ${siteDetails.contactAddress}
+            &#128205;&nbsp; ${escapeHtml(siteDetails.contactAddress)}
           </p>
         </div>
       </td>
@@ -147,7 +158,7 @@ export function adminNotificationTemplate(
           <tr>
             <td style="padding:12px 20px;border-bottom:1px solid #f3f4f6;">
               <span style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;">Email</span><br/>
-              <a href="mailto:${data.email}" style="font-size:14px;color:${BRAND_COLOR};text-decoration:none;">${data.email}</a>
+              <a href="mailto:${escapeHtml(data.email)}" style="font-size:14px;color:${BRAND_COLOR};text-decoration:none;">${escapeHtml(data.email)}</a>
             </td>
           </tr>
           ${phoneRow}
@@ -159,7 +170,7 @@ export function adminNotificationTemplate(
           </tr>
         </table>
 
-        <a href="mailto:${data.email}?subject=Re: Your message to WinIt Media" style="display:inline-block;background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:12px;">
+        <a href="mailto:${escapeHtml(data.email)}?subject=Re: Your message to WinIt Media" style="display:inline-block;background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:12px;">
           Reply to ${data.name.split(" ")[0]}
         </a>
       </td>

@@ -76,6 +76,14 @@ export default memo(function Hero() {
       data-theme="dark"
       className="relative pt-20 pb-12 md:py-0 h-auto md:min-h-svh flex items-center justify-center bg-brand overflow-hidden ios-gpu-stable pattern-bg pattern-bg-hero"
     >
+      <style>{`
+        @media (max-width: 767px) {
+          #home::before {
+            transform: scale(1.25);
+            transform-origin: center center;
+          }
+        }
+      `}</style>
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
           initial={prefersReducedMotion ? false : { y: -viewportHeight }}

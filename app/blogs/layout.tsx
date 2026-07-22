@@ -1,6 +1,4 @@
-﻿"use client";
-
-import { AdminProvider } from "@/components/AdminProvider";
+﻿import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";

@@ -32,6 +32,7 @@ export function AdminProvider({ children, initialContent }: { children: ReactNod
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [revertedCount, setRevertedCount] = useState(0);
+  const [loaded] = useState(!!initialContent);
   const { toast } = useToast();
   const originalRef = useRef<SiteContent>(initialContent ?? defaultSiteContent);
   const pendingRef = useRef<SiteContent | null>(null);
@@ -50,7 +51,7 @@ export function AdminProvider({ children, initialContent }: { children: ReactNod
       setHasChanges(false);
       if (!silent) toast("Changes saved", "success");
     } catch (err) {
-      console.error("Failed to save:", err);
+      console.error("[AdminProvider] Failed to save:", err);
       const message = err instanceof Error ? err.message : "Unknown error";
       setData(originalRef.current);
       dataRef.current = originalRef.current;
@@ -98,13 +99,13 @@ export function AdminProvider({ children, initialContent }: { children: ReactNod
 
   const contextValue = useMemo(() => ({
     data,
-    loaded: true,
+    loaded,
     saving,
     hasChanges,
     revertedCount,
     updateContent,
     saveNow,
-  }), [data, saving, hasChanges, revertedCount, updateContent, saveNow]);
+  }), [data, loaded, saving, hasChanges, revertedCount, updateContent, saveNow]);
 
   return (
     <AdminContext.Provider value={contextValue}>

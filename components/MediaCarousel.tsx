@@ -84,7 +84,15 @@ function VideoCard({ video, cardKey, onExpand, shouldPlay }: VideoCardProps) {
   return (
     <div
       data-card-id={cardKey}
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`relative flex-shrink-0 ${isLandscape ? "aspect-video" : "aspect-[9/16]"} h-full bg-black rounded-lg overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02] border-2 border-white`}
@@ -212,6 +220,7 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
           <button
             onClick={togglePlay}
+            aria-label={isPlaying ? "Pause video" : "Play video"}
             className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
           >
             {isPlaying ? (
@@ -222,12 +231,14 @@ function ExpandedVideoModal({ video, onClose }: ExpandedVideoModalProps) {
           </button>
           <button
             onClick={toggleAudio}
+            aria-label={muted ? "Unmute video" : "Mute video"}
             className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
           >
             {muted ? <VolumeX size={20} className="text-white" /> : <Volume2 size={20} className="text-white" />}
           </button>
           <button
             onClick={onClose}
+            aria-label="Close video"
             className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-colors"
           >
             <X size={20} className="text-white" />

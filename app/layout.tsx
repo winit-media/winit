@@ -1,6 +1,7 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
+import Analytics from "./components/Analytics";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -66,9 +67,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@WinItMedia",
+    creator: "@WinItMedia",
     title: "WinIt - Shaping Success Stories",
     description:
       "We transform brand stories into powerful narratives that drive success.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -102,7 +106,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <script dangerouslySetInnerHTML={{ __html: "(function(){var ua=navigator.userAgent;if(/iPhone|iPad|iPod/.test(ua)||(navigator.maxTouchPoints>1&&/Macintosh/.test(ua)))document.documentElement.classList.add('is-ios')})()" }} />
       </head>
-      <body className="min-h-svh antialiased">{children}</body>
+      <body className="min-h-svh antialiased">
+        <Analytics />
+        {children}
+      </body>
     </html>
   );
 }

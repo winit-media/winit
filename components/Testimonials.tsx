@@ -254,7 +254,7 @@ export default memo(function Testimonials() {
   if (count === 0) return null;
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy ios-gpu-stable pattern-bg" data-theme="light">
+    <section id="testimonials" className="relative bg-gradient-to-b from-white via-gray-50/50 to-white pt-12 pb-6 lg:pt-16 lg:pb-8 overflow-hidden flex flex-col justify-center section-lazy ios-gpu-stable pattern-bg" data-theme="light">
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-6 lg:mb-6">
           <span className="text-brand font-semibold tracking-wider uppercase text-sm mb-2 lg:mb-4 block">

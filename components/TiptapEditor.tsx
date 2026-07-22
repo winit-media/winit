@@ -18,11 +18,13 @@ interface TiptapEditorProps {
   placeholder?: string;
 }
 
-function ToolBtn({ onClick, active, children }: { onClick: () => void; active: boolean; children: React.ReactNode }) {
+function ToolBtn({ onClick, active, label, children }: { onClick: () => void; active: boolean; label: string; children: React.ReactNode }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-label={label}
+      aria-pressed={active}
       className={`p-1.5 rounded transition-colors ${active ? "bg-brand text-white" : "text-gray-600 hover:bg-gray-100"}`}
     >
       {children}
@@ -66,56 +68,56 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-      <div className="flex flex-wrap gap-0.5 p-2 border-b border-gray-200 bg-gray-50">
-        <ToolBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
+      <div role="toolbar" aria-label="Formatting" className="flex flex-wrap gap-0.5 p-2 border-b border-gray-200 bg-gray-50">
+        <ToolBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} label="Bold">
           <Bold size={16} />
         </ToolBtn>
-        <ToolBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} label="Italic">
           <Italic size={16} />
         </ToolBtn>
-        <ToolBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} label="Underline">
           <UnderlineIcon size={16} />
         </ToolBtn>
-        <ToolBtn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} label="Strikethrough">
           <Strikethrough size={16} />
         </ToolBtn>
 
-        <span className="w-px bg-gray-300 mx-1" />
+        <span className="w-px bg-gray-300 mx-1" aria-hidden="true" />
 
-        <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })} label="Heading 1">
           <Heading1 size={16} />
         </ToolBtn>
-        <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })} label="Heading 2">
           <Heading2 size={16} />
         </ToolBtn>
 
-        <span className="w-px bg-gray-300 mx-1" />
+        <span className="w-px bg-gray-300 mx-1" aria-hidden="true" />
 
-        <ToolBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} label="Bullet list">
           <List size={16} />
         </ToolBtn>
-        <ToolBtn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} label="Numbered list">
           <ListOrdered size={16} />
         </ToolBtn>
-        <ToolBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")}>
+        <ToolBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")} label="Blockquote">
           <Quote size={16} />
         </ToolBtn>
 
-        <span className="w-px bg-gray-300 mx-1" />
+        <span className="w-px bg-gray-300 mx-1" aria-hidden="true" />
 
-        <ToolBtn onClick={addImage} active={false}>
+        <ToolBtn onClick={addImage} active={false} label="Insert image">
           <ImageIcon size={16} />
         </ToolBtn>
-        <ToolBtn onClick={addLink} active={editor.isActive("link")}>
+        <ToolBtn onClick={addLink} active={editor.isActive("link")} label="Insert link">
           <LinkIcon size={16} />
         </ToolBtn>
 
-        <span className="w-px bg-gray-300 mx-1" />
+        <span className="w-px bg-gray-300 mx-1" aria-hidden="true" />
 
-        <ToolBtn onClick={() => editor.chain().focus().undo().run()} active={false}>
+        <ToolBtn onClick={() => editor.chain().focus().undo().run()} active={false} label="Undo">
           <Undo size={16} />
         </ToolBtn>
-        <ToolBtn onClick={() => editor.chain().focus().redo().run()} active={false}>
+        <ToolBtn onClick={() => editor.chain().focus().redo().run()} active={false} label="Redo">
           <Redo size={16} />
         </ToolBtn>
       </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Trash2, Loader2, LogOut, ArrowLeft, Search } from "lucide-react";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { app, fetchSiteContent, BlogPost, fetchBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost } from "@/lib/firebase";
 import TiptapEditor from "@/components/TiptapEditor";
 import ImageUpload from "@/app/admin/components/ImageUpload";
@@ -12,72 +12,9 @@ import { useToast, ToastProvider } from "@/components/ui/Toast";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Link from "next/link";
 
+import LoginGate from "@/app/admin/components/LoginGate";
+
 const auth = getAuth(app);
-
-function LoginGate({ onLogin }: { onLogin: () => void }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      onLogin();
-    } catch (err: unknown) {
-      const code = (err as { code?: string }).code || "";
-      if (code.includes("user-not-found") || code.includes("wrong-password") || code.includes("invalid-credential")) {
-        setError("Invalid email or password.");
-      } else if (code.includes("too-many-requests")) {
-        setError("Too many attempts. Please try again later.");
-      } else {
-        setError("Login failed. Please try again.");
-      }
-    }
-    setLoading(false);
-  };
-
-  return (
-    <div className="min-h-svh bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Blog Manager</h1>
-          <p className="text-gray-500 text-sm mt-1">Sign in to manage blog posts</p>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand"
-            required
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand"
-            required
-          />
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {loading && <Loader2 size={16} className="animate-spin" />}
-            Sign In
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 function BlogDashboard() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -138,7 +75,7 @@ function BlogDashboard() {
       setEditing(null);
       load();
     } catch (err) {
-      console.error("Save failed:", err);
+      console.error("[BlogAdmin] Save failed:", err);
       toast("Failed to save post", "error");
     }
     setSaving(false);
@@ -150,7 +87,7 @@ function BlogDashboard() {
       toast("Post deleted", "success");
       load();
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error("[BlogAdmin] Delete failed:", err);
       toast("Failed to delete post", "error");
     }
     setDeleteId(null);
@@ -353,9 +290,13 @@ export default function BlogAdminPage() {
       setAuthed(!!user);
       if (user?.email) {
         setUserEmail(user.email);
-        const content = await fetchSiteContent();
-        const allowed = content.blogUsers.some((u) => u.email === user.email) || user.email === content.contactEmail;
-        setAuthorized(allowed);
+        try {
+          const content = await fetchSiteContent();
+          const allowed = content.blogUsers.some((u) => u.email === user.email) || user.email === content.contactEmail;
+          setAuthorized(allowed);
+        } catch {
+          setAuthorized(false);
+        }
       }
       setChecking(false);
     });

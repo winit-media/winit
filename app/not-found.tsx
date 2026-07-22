@@ -1,6 +1,4 @@
-﻿"use client";
-
-import Link from "next/link";
+﻿import Link from "next/link";
 import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";

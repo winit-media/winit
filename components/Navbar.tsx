@@ -18,8 +18,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const isHome = pathname === "/";
-  const isBlogs = pathname.startsWith("/blogs");
-  const canBeTransparent = isHome || isBlogs;
+  const canBeTransparent = isHome;
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
 

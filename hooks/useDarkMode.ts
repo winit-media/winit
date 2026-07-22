@@ -1,33 +1,74 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useSyncExternalStore, useCallback } from "react";
+
+const STORAGE_KEY = "admin-dark-mode";
+
+let listeners: Array<() => void> = [];
+
+function emitChange() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+function getStoredDark(): boolean | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "true") return true;
+    if (stored === "false") return false;
+  } catch {
+    // localStorage throws in iOS Safari Private Browsing
+  }
+  return null;
+}
+
+function getSystemDark(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function getDarkMode(): boolean {
+  const stored = getStoredDark();
+  if (stored !== null) return stored;
+  return getSystemDark();
+}
+
+function subscribe(callback: () => void) {
+  listeners.push(callback);
+
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const onMqChange = () => {
+    // Only react to system changes when no explicit preference is stored
+    if (getStoredDark() === null) {
+      emitChange();
+    }
+  };
+  mq.addEventListener("change", onMqChange);
+
+  return () => {
+    mq.removeEventListener("change", onMqChange);
+    listeners = listeners.filter((l) => l !== callback);
+  };
+}
 
 export function useDarkMode() {
-  const [dark, setDark] = useState(false);
+  const dark = useSyncExternalStore(
+    subscribe,
+    getDarkMode,
+    () => false,
+  );
 
-  useEffect(() => {
+  const toggle = useCallback(() => {
+    const next = !dark;
     try {
-      const stored = localStorage.getItem("admin-dark-mode") === "true";
-      queueMicrotask(() => setDark(stored));
+      localStorage.setItem(STORAGE_KEY, String(next));
     } catch {
       // localStorage throws in iOS Safari Private Browsing
     }
-  }, []);
-
-  useEffect(() => {
-    if (dark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    try {
-      localStorage.setItem("admin-dark-mode", String(dark));
-    } catch {
-      // localStorage throws in iOS Safari Private Browsing
-    }
+    document.documentElement.classList.toggle("dark", next);
+    emitChange();
   }, [dark]);
-
-  const toggle = useCallback(() => setDark((prev) => !prev), []);
 
   return { dark, toggle };
 }

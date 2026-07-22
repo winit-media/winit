@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 
 const FOCUSABLE_SELECTORS =
@@ -33,11 +35,11 @@ export function useFocusTrap(isOpen: boolean) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const container = containerRef.current;
-    if (!container) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
+
+      const container = containerRef.current;
+      if (!container) return;
 
       const focusable = container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS);
       if (focusable.length === 0) return;

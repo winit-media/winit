@@ -3,11 +3,12 @@
 import { AdminProvider } from "@/components/AdminProvider";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import JsonLd from "@/components/JsonLd";
 import LazyLoad from "@/components/LazyLoad";
 import SectionSkeleton from "@/components/SectionSkeleton";
 import { LazyMotion, domAnimation } from "framer-motion";
 import { useLenis } from "@/hooks/useLenis";
-import { useIOSBodyClass } from "@/hooks/useIOSDetect";
+import { useIOSBodyClass } from "@/hooks/useIOSBodyClass";
 import { useViewportHeight } from "@/hooks/useViewportHeight";
 import { SiteContent } from "@/lib/siteContent";
 import dynamic from "next/dynamic";
@@ -55,6 +56,7 @@ export default function HomeClient({ initialContent }: { initialContent: SiteCon
   return (
     <LazyMotion features={domAnimation}>
       <AdminProvider initialContent={initialContent}>
+        <JsonLd content={initialContent} />
         <Navbar />
         <main>
           <Hero />

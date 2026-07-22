@@ -40,39 +40,51 @@ export default function ContentTab() {
             onReorder={(links) => field("navLinks", links)}
             keyExtractor={(link, i) => `${link.href}-${i}`}
             renderItem={(link, i, handle) => (
-              <div className="flex items-center gap-2">
-                {handle}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  {handle}
+                  <input
+                    value={link.label}
+                    onChange={(e) => {
+                      const links = [...local.navLinks];
+                      links[i] = { ...links[i], label: e.target.value };
+                      field("navLinks", links);
+                    }}
+                    className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                    placeholder="Label"
+                  />
+                  <input
+                    value={link.href}
+                    onChange={(e) => {
+                      const links = [...local.navLinks];
+                      links[i] = { ...links[i], href: e.target.value };
+                      field("navLinks", links);
+                    }}
+                    className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                    placeholder="Anchor (e.g. #home)"
+                  />
+                  <button
+                    onClick={() => field("navLinks", local.navLinks.filter((_, j) => j !== i))}
+                    className="text-red-400 hover:text-red-600 p-2 rounded-md hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
                 <input
-                  value={link.label}
+                  value={link.description ?? ""}
                   onChange={(e) => {
                     const links = [...local.navLinks];
-                    links[i] = { ...links[i], label: e.target.value };
+                    links[i] = { ...links[i], description: e.target.value };
                     field("navLinks", links);
                   }}
-                  className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                  placeholder="Label"
+                  className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand ml-8"
+                  placeholder="Description (for SEO, optional)"
                 />
-                <input
-                  value={link.href}
-                  onChange={(e) => {
-                    const links = [...local.navLinks];
-                    links[i] = { ...links[i], href: e.target.value };
-                    field("navLinks", links);
-                  }}
-                  className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                  placeholder="Anchor (e.g. #home)"
-                />
-                <button
-                  onClick={() => field("navLinks", local.navLinks.filter((_, j) => j !== i))}
-                  className="text-red-400 hover:text-red-600 p-2 rounded-md hover:bg-red-50 transition-colors"
-                >
-                  <Trash2 size={14} />
-                </button>
               </div>
             )}
           />
           <button
-            onClick={() => field("navLinks", [...local.navLinks, { label: "New", href: "#" }])}
+            onClick={() => field("navLinks", [...local.navLinks, { label: "New", href: "", description: "" }])}
             className="flex items-center gap-1 text-sm text-brand hover:text-brand-dark font-medium"
           >
             <Plus size={14} /> Add Link
@@ -252,7 +264,7 @@ export default function ContentTab() {
             )}
           />
           <button
-            onClick={() => field("footerQuickLinks", [...local.footerQuickLinks, { label: "New", href: "#" }])}
+            onClick={() => field("footerQuickLinks", [...local.footerQuickLinks, { label: "New", href: "" }])}
             className="flex items-center gap-1 text-sm text-brand hover:text-brand-dark font-medium"
           >
             <Plus size={14} /> Add Link

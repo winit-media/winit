@@ -15,6 +15,8 @@ import {
 export type { SiteContent } from "./siteContent";
 export { defaultSiteContent, mergeSiteContent } from "./siteContent";
 import { SiteContent, defaultSiteContent, mergeSiteContent } from "./siteContent";
+export type { BlogPost } from "./types";
+import { BlogPost } from "./types";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -72,22 +74,6 @@ export async function saveSiteContent(content: SiteContent): Promise<void> {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error || `Failed to save content (${res.status})`);
   }
-}
-
-// ── Blog Types ──────────────────────────────────────────────
-
-export interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  coverImage: string;
-  author: string;
-  published: boolean;
-  tags: string[];
-  createdAt: number;
-  updatedAt: number;
 }
 
 const BLOGS_COLLECTION = "blogs";

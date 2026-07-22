@@ -23,31 +23,39 @@ function subscribe(callback: () => void) {
   return () => listeners.forEach((l) => l());
 }
 
+function getDeviceSignals() {
+  if (typeof window === "undefined") {
+    return { hidden: false, prefersReducedMotion: false, saveData: false, slowConnection: false, lowMemory: false, lowCPU: false };
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  const nav = navigator as unknown as Record<string, unknown>;
+  const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+  const connection = conn as Record<string, unknown> | undefined;
+  const saveData = connection?.saveData === true;
+  const slowConnection =
+    connection?.effectiveType === "slow-2g" ||
+    connection?.effectiveType === "2g";
+
+  const lowMemory =
+    (nav.deviceMemory as number | undefined) != null &&
+    (nav.deviceMemory as number) < 2;
+  const lowCPU =
+    (nav.hardwareConcurrency as number | undefined) != null &&
+    (nav.hardwareConcurrency as number) < 2;
+
+  return { hidden: document.hidden, prefersReducedMotion, saveData, slowConnection, lowMemory, lowCPU };
+}
+
 function getCanPlayMedia() {
   if (typeof window === "undefined") return true;
-
   if (document.hidden) return false;
 
   try {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    const nav = navigator as unknown as Record<string, unknown>;
-    const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
-    const connection = conn as Record<string, unknown> | undefined;
-    const saveData = connection?.saveData === true;
-    const slowConnection =
-      connection?.effectiveType === "slow-2g" ||
-      connection?.effectiveType === "2g";
-
-    const lowMemory =
-      (nav.deviceMemory as number | undefined) != null &&
-      (nav.deviceMemory as number) < 2;
-    const lowCPU =
-      (nav.hardwareConcurrency as number | undefined) != null &&
-      (nav.hardwareConcurrency as number) < 2;
-
+    const { prefersReducedMotion, saveData, slowConnection, lowMemory, lowCPU } = getDeviceSignals();
     return !(prefersReducedMotion || saveData || slowConnection || lowMemory || lowCPU);
   } catch {
     return true;
@@ -68,20 +76,10 @@ export function getMaxConcurrentVideos(): number {
   if (document.hidden) return 0;
 
   try {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const { prefersReducedMotion, saveData, slowConnection } = getDeviceSignals();
     if (prefersReducedMotion) return 0;
-
-    const nav = navigator as unknown as Record<string, unknown>;
-    const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
-    const connection = conn as Record<string, unknown> | undefined;
-    if (connection?.saveData === true) return 0;
-    if (
-      connection?.effectiveType === "slow-2g" ||
-      connection?.effectiveType === "2g"
-    )
-      return 0;
+    if (saveData) return 0;
+    if (slowConnection) return 0;
 
     const device = detectDevice();
     if (device === "ios") return 1;

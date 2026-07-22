@@ -63,7 +63,7 @@ export default memo(function WhyChooseUs() {
     && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
-    <section className="relative bg-brand min-h-svh pt-16 lg:pt-16 pb-6 lg:pb-10 ios-gpu-stable section-lazy pattern-bg" data-theme="dark">
+    <section id="why-us" className="relative bg-brand min-h-svh pt-16 lg:pt-16 pb-6 lg:pb-10 ios-gpu-stable section-lazy pattern-bg" data-theme="dark">
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-5xl sm:text-6xl md:text-7xl font-display font-bold text-white text-center mb-6 lg:mb-16 leading-[1.1]">
           {data.whyChooseUsTitle.replace(/Choose /i, "Choose \n").split('\n').map((line, i, arr) => (

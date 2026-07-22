@@ -1,4 +1,4 @@
-import DOMPurify from "dompurify";
+import createDOMPurify from "dompurify";
 
 const ALLOWED_IFRAME_HOSTS = new Set([
   "www.youtube-nocookie.com",
@@ -7,7 +7,9 @@ const ALLOWED_IFRAME_HOSTS = new Set([
   "wistia.com",
 ]);
 
-if (typeof window !== "undefined") {
+const DOMPurify = typeof window !== "undefined" ? createDOMPurify(window) : null;
+
+if (DOMPurify) {
   DOMPurify.addHook("uponSanitizeElement", (node, data) => {
     if (data.tagName !== "iframe") return;
     const el = node as Element;
@@ -39,6 +41,7 @@ if (typeof window !== "undefined") {
 }
 
 export function sanitizeBlogContent(html: string): string {
+  if (!DOMPurify) return html;
   return DOMPurify.sanitize(html, {
     ADD_TAGS: ["iframe"],
     ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"],
