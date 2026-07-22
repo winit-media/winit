@@ -277,13 +277,12 @@ export default memo(function MediaCarousel() {
   const row2Videos = videos.slice(Math.ceil(videos.length / 2));
 
   useEffect(() => {
-    const maxConcurrent = getMaxConcurrentVideos();
-    if (maxConcurrent === 0) {
+    if (getMaxConcurrentVideos() === 0) {
       queueMicrotask(() => setActiveIds(new Set()));
       return;
     }
 
-    const visibleOrder: string[] = [];
+    const visibleIds = new Set<string>();
 
     const cardObserver = new IntersectionObserver(
       (entries) => {
@@ -291,17 +290,15 @@ export default memo(function MediaCarousel() {
           const id = (entry.target as HTMLElement).dataset.cardId;
           if (!id) return;
           if (entry.isIntersecting) {
-            if (!visibleOrder.includes(id)) visibleOrder.push(id);
+            visibleIds.add(id);
           } else {
-            const idx = visibleOrder.indexOf(id);
-            if (idx !== -1) visibleOrder.splice(idx, 1);
+            visibleIds.delete(id);
           }
         });
 
-        const newActive = new Set(visibleOrder.slice(-maxConcurrent));
         setActiveIds((prev) => {
-          if (prev.size === newActive.size && [...prev].every((id) => newActive.has(id))) return prev;
-          return newActive;
+          if (prev.size === visibleIds.size && [...prev].every((id) => visibleIds.has(id))) return prev;
+          return new Set(visibleIds);
         });
       },
       { rootMargin: "200px 0px", threshold: 0 }
