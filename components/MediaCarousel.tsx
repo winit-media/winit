@@ -51,13 +51,29 @@ function VideoCard({ video, cardKey, onExpand, shouldPlay }: VideoCardProps) {
   const [isLandscape, setIsLandscape] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { videoUrl, posterUrl } = getOptimizedMedia(video.url);
+  const isMobile = useRef(typeof navigator !== "undefined" && (navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent)));
+  const previewDuration = 3;
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
 
     if (shouldPlay && !isHovered) {
-      v.play().catch(() => {});
+      if (isMobile.current) {
+        v.currentTime = 0;
+        v.loop = false;
+        const onTimeUpdate = () => {
+          if (v.currentTime >= previewDuration) {
+            v.currentTime = 0;
+          }
+        };
+        v.addEventListener("timeupdate", onTimeUpdate);
+        v.play().catch(() => {});
+        return () => v.removeEventListener("timeupdate", onTimeUpdate);
+      } else {
+        v.loop = true;
+        v.play().catch(() => {});
+      }
     } else {
       v.pause();
     }
@@ -102,7 +118,6 @@ function VideoCard({ video, cardKey, onExpand, shouldPlay }: VideoCardProps) {
         src={videoUrl}
         poster={posterUrl || undefined}
         className="w-full h-full object-cover bg-black pointer-events-none"
-        loop
         playsInline webkit-playsinline="true"
         muted
         preload="metadata"
@@ -283,7 +298,7 @@ export default memo(function MediaCarousel() {
           }
         });
 
-        const newActive = new Set(visibleOrder.slice(0, maxConcurrent));
+        const newActive = new Set(visibleOrder.slice(-maxConcurrent));
         setActiveIds((prev) => {
           if (prev.size === newActive.size && [...prev].every((id) => newActive.has(id))) return prev;
           return newActive;
