@@ -157,7 +157,6 @@ export default async function BlogPostPage({
               </div>
             )}
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent z-10" />
         </div>
 
         {/* Mobile content */}
@@ -221,7 +220,7 @@ export default async function BlogPostPage({
               )}
 
               {post.coverImage && (
-                <div className="mt-8 rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10">
+                <div className="mt-8 rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10 relative z-10">
                   <img src={post.coverImage} alt={post.title} className="w-full h-auto max-h-[320px] object-cover" loading="lazy" decoding="async" />
                 </div>
               )}

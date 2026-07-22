@@ -35,7 +35,6 @@ export default async function BlogsPage() {
             Insights, stories, and updates from the WinIt team.
           </p>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent z-10" />
       </div>
 
       {/* List */}

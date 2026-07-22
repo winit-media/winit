@@ -214,7 +214,7 @@ function BlogDashboard() {
               <label className="text-sm font-medium text-gray-700 mb-1 block">Cover Image</label>
               <ImageUpload value={editing.coverImage} onChange={(v) => updateEditing({ coverImage: v })} />
             </div>
-            <Field label="Tags (comma separated)" value={editing.tags.join(", ")} onChange={(v) => updateEditing({ tags: v.split(",").map((t) => t.trim()).filter(Boolean) })} placeholder="tag1, tag2, tag3" />
+            <Field label="Tags (comma separated)" value={editing.tags.join(", ")} onChange={(v) => updateEditing({ tags: v.split(",").map((t) => t.trim()) })} placeholder="tag1, tag2, tag3" />
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Content</label>
               <TiptapEditor

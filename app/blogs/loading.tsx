@@ -4,17 +4,17 @@
 
 export default function BlogsLoading() {
   return (
-    <div className="min-h-svh bg-white">
+    <div className="min-h-svh bg-white blogs-page">
       {/* Header skeleton */}
-      <div className="bg-brand relative overflow-hidden">
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-[3.75rem]">
+      <div className="bg-brand relative overflow-hidden pattern-bg">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 pt-24 pb-12">
           <Shimmer className="h-10 w-32 mb-3 bg-white/20" />
           <Shimmer className="h-4 w-64 bg-white/20" />
         </div>
       </div>
 
       {/* Grid skeleton */}
-      <div className="relative w-full py-12">
+      <div className="relative w-full py-12 pattern-bg" data-theme="light">
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
