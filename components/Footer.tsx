@@ -1,27 +1,24 @@
 ﻿"use client";
 
 import { memo } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useAdmin } from "./AdminProvider";
-import { scrollToTarget } from "@/hooks/useLenis";
 import { Phone, MapPin, Mail } from "lucide-react";
 
 export default memo(function Footer() {
   const { data } = useAdmin();
-  const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "/";
 
   const scrollTo = (href: string) => {
     if (href === "#contact") {
       window.dispatchEvent(new Event("open-contact-modal"));
-    } else if (href.startsWith("/")) {
-      router.push(href);
-    } else if (isHome) {
-      scrollToTarget(href);
-    } else {
-      router.push("/" + href);
     }
+  };
+
+  const quickLinkHref = (href: string) => {
+    if (href === "#contact") return undefined;
+    return isHome ? href : "/" + href;
   };
 
   return (
@@ -55,13 +52,14 @@ export default memo(function Footer() {
             <h3 className="text-white font-display text-lg lg:text-xl font-bold">{data.footerQuickLinksTitle}</h3>
             <div className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-1.5 lg:gap-2.5">
               {data.footerQuickLinks.map((link) => (
-                <button
+                <a
                   key={link.href}
-                  onClick={() => scrollTo(link.href)}
+                  href={quickLinkHref(link.href)}
+                  onClick={link.href === "#contact" ? (e) => { e.preventDefault(); scrollTo(link.href); } : undefined}
                   className="text-white/70 hover:text-white transition-colors text-xs lg:text-sm text-left w-fit shrink-0"
                 >
                   {link.label}
-                </button>
+                </a>
               ))}
             </div>
             <div className="flex md:hidden flex-row gap-3 mt-2 lg:mt-3">
