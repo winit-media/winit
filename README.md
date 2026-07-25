@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WinIt Media
+
+The official website for [WinIt Media](https://winitmedia.com) — a brand storytelling and influencer marketing agency based in New Delhi, India.
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **UI:** React 19, Tailwind CSS 4
+- **Backend:** Firebase (Firestore)
+- **Media:** Cloudinary
+- **Animations:** Framer Motion, Lenis (smooth scroll)
+- **Rich Text:** Tiptap Editor
+- **Email:** Nodemailer (cPanel SMTP)
+
+## Features
+
+- **Blog System** — Create, edit, and publish blogs via admin panel with Tiptap rich text editor
+- **Admin Panel** — Firebase-authenticated dashboard for managing content and blogs
+- **Contact Form** — Server-side validated form with rate limiting and email notifications
+- **Brand Showcase** — Animated brand marquee and portfolio carousel
+- **Testimonials** — Client testimonial slider
+- **Video Section** — Embedded video showcase
+- **SEO** — Sitemap, robots.txt, OpenGraph, JSON-LD structured data
+- **Blog Subdomain** — Rewrites `blog.acaditya10.tech` to `/admin/blogs`
+- **Dark Mode** — System-preference-based dark mode support
+- **Responsive** — Mobile-first design with iOS-specific handling
+- **PWA** — Web manifest with Apple Web App support
+
+## Project Structure
+
+```
+├── app/
+│   ├── admin/          # Admin panel
+│   ├── api/            # API routes (admin, cloudinary, contact)
+│   ├── blogs/          # Blog pages
+│   └── components/     # App-level components
+├── components/         # Shared UI components
+├── hooks/              # Custom React hooks
+├── lib/                # Utilities, Firebase config, helpers
+├── fonts/              # Local fonts (Clash Display)
+└── public/             # Static assets
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Firebase project with Firestore enabled
+- Cloudinary account
+- SMTP server (cPanel or similar)
+
+### Installation
+
+```bash
+git clone https://github.com/winit-media/winit.git
+cd winit
+npm install
+```
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in:
+
+```bash
+# Firebase (Client)
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+
+# Firebase (Admin)
+FIREBASE_ADMIN_CLIENT_EMAIL=
+FIREBASE_ADMIN_PRIVATE_KEY=
+
+# Cloudinary
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+# SMTP
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+
+# Contact Form
+ADMIN_EMAIL=
+
+# Blog Subdomain (optional)
+BLOG_DOMAIN=
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run TypeScript type checking |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private — WinIt Media
