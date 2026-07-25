@@ -1,3 +1,8 @@
+/**
+ * Generates a unique ID string.
+ * Uses `crypto.randomUUID()` when available, falls back to a
+ * timestamp + random string for older browsers or insecure contexts.
+ */
 export function uid(): string {
   try {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {

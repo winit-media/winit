@@ -1,3 +1,9 @@
+/**
+ * Firebase Admin SDK initialization.
+ * Provides server-side access to Firestore and Auth with elevated privileges.
+ * Uses credentials from FIREBASE_ADMIN_CLIENT_EMAIL and FIREBASE_ADMIN_PRIVATE_KEY env vars.
+ */
+
 import { initializeApp, getApps, cert, App } from "firebase-admin/app";
 import { getAuth, Auth } from "firebase-admin/auth";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
@@ -34,11 +40,13 @@ function getAdminApp(): App {
   return _app;
 }
 
+/** Returns the Firebase Admin Auth instance (lazy-initialized). */
 export function getAdminAuth(): Auth {
   if (!_auth) _auth = getAuth(getAdminApp());
   return _auth;
 }
 
+/** Returns the Firebase Admin Firestore instance (lazy-initialized). */
 export function getAdminDb(): Firestore {
   if (!_db) _db = getFirestore(getAdminApp());
   return _db;

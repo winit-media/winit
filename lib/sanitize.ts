@@ -1,3 +1,9 @@
+/**
+ * Input sanitization utilities for the contact form.
+ * Strips control characters, null bytes, and HTML entities.
+ * Validates field lengths and email format.
+ */
+
 const MAX_LENGTHS = {
   name: 100,
   email: 254,
@@ -28,16 +34,19 @@ function stripNullBytes(str: string): string {
   return str.replace(/\0/g, "");
 }
 
+/** Strips control characters, null bytes, and HTML-escapes the input. */
 export function sanitizeInput(input: unknown): string {
   if (typeof input !== "string") return "";
   return stripNullBytes(stripControlChars(escapeHtml(input.trim())));
 }
 
+/** Like sanitizeInput but also strips all control characters (for name fields). */
 export function sanitizeHeaderInput(input: unknown): string {
   if (typeof input !== "string") return "";
   return stripNullBytes(stripAllControlChars(escapeHtml(input.trim())));
 }
 
+/** Sanitizes and lowercases an email input string. */
 export function sanitizeEmailInput(input: unknown): string {
   if (typeof input !== "string") return "";
   return stripNullBytes(stripAllControlChars(input.trim())).toLowerCase();
@@ -51,6 +60,13 @@ export interface SanitizedContactForm {
   errors: string[];
 }
 
+/**
+ * Validates and sanitizes a contact form submission.
+ * Returns sanitized field values and an array of validation error messages.
+ *
+ * @param body - Raw form data object with name, email, phone, message fields
+ * @returns Sanitized fields plus any validation errors
+ */
 export function sanitizeContactForm(body: Record<string, unknown>): SanitizedContactForm {
   const errors: string[] = [];
 

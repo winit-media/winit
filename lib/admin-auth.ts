@@ -1,5 +1,15 @@
 import { getAdminAuth, getAdminDb } from "./firebase-admin";
 
+/**
+ * Verifies the Authorization Bearer token and checks admin status.
+ * A user is considered admin if they match ADMIN_EMAIL env var,
+ * appear in the `blogUsers` array, or match the `contactEmail` field
+ * in the Firestore `siteContent/main` document.
+ *
+ * @param authHeader - The raw `Authorization` header value (e.g. "Bearer <token>")
+ * @returns The authenticated user's UID and email
+ * @throws {AuthError} If token is missing, invalid, or user is not authorized
+ */
 export async function verifyAdmin(
   authHeader: string | null
 ): Promise<{ uid: string; email: string }> {
@@ -61,6 +71,10 @@ export async function verifyAdmin(
   return { uid: decoded.uid, email: decoded.email };
 }
 
+/**
+ * Custom error class for authentication/authorization failures.
+ * Carries an HTTP status code for use in API route responses.
+ */
 export class AuthError extends Error {
   status: number;
   constructor(message: string, status: number) {

@@ -1,3 +1,9 @@
+/**
+ * Simple in-memory rate limiter using a sliding window.
+ * Tracks request timestamps per key and enforces a max request count
+ * within a configurable time window. Periodically cleans up expired entries.
+ */
+
 const rateLimitMap = new Map<string, number[]>();
 
 const CLEANUP_INTERVAL = 60_000;
@@ -18,6 +24,14 @@ function cleanup(windowMs: number) {
   }
 }
 
+/**
+ * Checks whether a request is allowed under the rate limit.
+ *
+ * @param key - Unique identifier for the rate limit bucket (e.g. IP address or user ID)
+ * @param windowMs - Time window in milliseconds
+ * @param maxRequests - Maximum number of requests allowed within the window
+ * @returns An object with `allowed`, `remaining` count, and `retryAfterMs` if denied
+ */
 export function rateLimit(
   key: string,
   windowMs: number,

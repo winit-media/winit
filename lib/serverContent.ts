@@ -1,6 +1,12 @@
+/**
+ * Server-side content fetcher using Firebase Admin SDK.
+ * Reads site content from Firestore and merges with defaults.
+ */
+
 import { getAdminDb } from "./firebase-admin";
 import { SiteContent, defaultSiteContent, mergeSiteContent } from "./siteContent";
 
+/** Fetches the main site content document from Firestore, falling back to defaults. */
 export async function getSiteContent(): Promise<SiteContent> {
   try {
     const db = getAdminDb();

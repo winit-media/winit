@@ -1,6 +1,9 @@
 /**
- * Reliable iOS detection covering Safari, Chrome (CriOS), Firefox (FxiOS),
+ * Detects iOS devices including Safari, Chrome (CriOS), Firefox (FxiOS),
  * and iPadOS 13+ (which reports as Macintosh but has touch support).
+ * Returns false during SSR.
+ *
+ * @returns `true` if running on an iOS device
  */
 export function isIOS(): boolean {
   if (typeof window === "undefined") return false;

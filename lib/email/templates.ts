@@ -1,3 +1,9 @@
+/**
+ * Email templates for the contact form.
+ * Generates branded HTML emails for both the visitor auto-response
+ * and the admin notification.
+ */
+
 import { SITE_LOGO_URL } from "../siteContent";
 
 interface ContactFormData {
@@ -74,6 +80,13 @@ function footerBar(siteDetails: SiteContactDetails): string {
 </tr>`;
 }
 
+/**
+ * Generates the auto-response email sent to visitors after form submission.
+ *
+ * @param data - The visitor's form submission data
+ * @param siteDetails - Site contact details for the email footer
+ * @returns Object with `subject` and `html` for the email
+ */
 export function visitorAutoResponseTemplate(
   data: ContactFormData,
   siteDetails: SiteContactDetails
@@ -122,6 +135,13 @@ export function visitorAutoResponseTemplate(
   return { subject, html };
 }
 
+/**
+ * Generates the notification email sent to the admin on form submission.
+ *
+ * @param data - The visitor's form submission data
+ * @param siteDetails - Site contact details for the email footer
+ * @returns Object with `subject` and `html` for the email
+ */
 export function adminNotificationTemplate(
   data: ContactFormData,
   siteDetails: SiteContactDetails

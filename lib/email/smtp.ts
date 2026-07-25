@@ -1,3 +1,8 @@
+/**
+ * Nodemailer SMTP transport configuration.
+ * Uses credentials from SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS env vars.
+ */
+
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -10,6 +15,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/** Options for sending an email via SMTP. */
 interface SendEmailOptions {
   to: string;
   subject: string;
@@ -17,6 +23,14 @@ interface SendEmailOptions {
   replyTo?: string;
 }
 
+/**
+ * Sends an HTML email via the configured SMTP transport.
+ *
+ * @param options.to - Recipient email address
+ * @param options.subject - Email subject line
+ * @param options.html - HTML body content
+ * @param options.replyTo - Optional reply-to address
+ */
 export async function sendEmail({ to, subject, html, replyTo }: SendEmailOptions) {
   return transporter.sendMail({
     from: `"WinIt Media" <${process.env.SMTP_USER}>`,

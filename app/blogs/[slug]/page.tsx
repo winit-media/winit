@@ -245,17 +245,7 @@ export default async function BlogPostPage({
         </div>
       </div>
 
-      {/* Bottom bar (mobile only) */}
-      <div className="lg:hidden bg-gray-50 border-t border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
-          <Link href="/blogs" className="text-brand hover:text-brand-dark font-medium text-sm transition-colors flex items-center gap-1">
-            <ArrowLeft size={14} /> All Blogs
-          </Link>
-          <Link href="/" className="text-gray-400 hover:text-gray-600 text-sm transition-colors">
-            WinIt Home
-          </Link>
-        </div>
-      </div>
+
     </div>
   );
 }

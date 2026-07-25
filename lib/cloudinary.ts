@@ -1,6 +1,17 @@
 import { getAuth } from "firebase/auth";
 import { app } from "./firebase";
 
+/**
+ * Uploads a file to Cloudinary using a signed upload from the server.
+ * Requires the user to be authenticated (Firebase Auth token is sent
+ * to `/api/cloudinary-sign` to get a temporary signature).
+ *
+ * @param file - The File object to upload
+ * @param folder - Cloudinary folder path (default: "winit")
+ * @param onProgress - Optional callback receiving upload percentage (0-100)
+ * @returns The secure URL of the uploaded asset
+ * @throws If not authenticated, signing fails, or upload fails
+ */
 export async function uploadToCloudinary(
   file: File,
   folder: string = "winit",

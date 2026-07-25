@@ -1,3 +1,9 @@
+/**
+ * Blog content sanitizer.
+ * Uses DOMPurify to strip dangerous HTML while allowing safe embedded
+ * content (YouTube, Vimeo, Wistia iframes). Only runs client-side.
+ */
+
 import createDOMPurify from "dompurify";
 
 const ALLOWED_IFRAME_HOSTS = new Set([
@@ -40,6 +46,12 @@ if (DOMPurify) {
   });
 }
 
+/**
+ * Sanitizes blog HTML content, allowing only safe tags and whitelisted iframe hosts.
+ *
+ * @param html - Raw HTML string from the blog editor
+ * @returns Sanitized HTML safe for rendering
+ */
 export function sanitizeBlogContent(html: string): string {
   if (!DOMPurify) return html;
   return DOMPurify.sanitize(html, {

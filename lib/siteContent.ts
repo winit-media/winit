@@ -1,3 +1,9 @@
+/**
+ * Site content types and defaults.
+ * All editable site content (copy, links, brands, testimonials, etc.)
+ * is stored in Firestore at `siteContent/main` and merged with these defaults.
+ */
+
 export interface SiteContent {
   // Navbar
   logoUrl: string;

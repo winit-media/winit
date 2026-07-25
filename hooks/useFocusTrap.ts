@@ -5,6 +5,14 @@ import { useEffect, useRef } from "react";
 const FOCUSABLE_SELECTORS =
   'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/**
+ * Traps keyboard focus within a container element (for modals/dialogs).
+ * Auto-focuses the first focusable element on open, traps Tab/Shift+Tab
+ * within the container, and restores previous focus on close.
+ *
+ * @param isOpen - Whether the modal/dialog is currently open
+ * @returns A ref to attach to the focus container element
+ */
 export function useFocusTrap(isOpen: boolean) {
   const containerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);

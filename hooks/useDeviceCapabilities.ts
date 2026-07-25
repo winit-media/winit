@@ -71,6 +71,12 @@ function detectDevice(): "ios" | "mobile" | "desktop" {
   return "desktop";
 }
 
+/**
+ * Returns the maximum number of videos that should play concurrently
+ * based on device type, connection speed, and system preferences.
+ *
+ * @returns Number of concurrent videos allowed (0 on slow/low-end devices, up to 5 on desktop)
+ */
 export function getMaxConcurrentVideos(): number {
   if (typeof window === "undefined") return 4;
   if (document.hidden) return 0;
@@ -90,6 +96,11 @@ export function getMaxConcurrentVideos(): number {
   }
 }
 
+/**
+ * Hook that returns whether the device can play media content.
+ * Returns `false` if the user prefers reduced motion, is on a slow connection,
+ * has data saver enabled, or has low memory/CPU.
+ */
 export function useDeviceCapabilities() {
   return useSyncExternalStore(subscribe, getCanPlayMedia, () => true);
 }

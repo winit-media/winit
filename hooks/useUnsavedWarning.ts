@@ -2,6 +2,13 @@
 
 import { useEffect, useCallback } from "react";
 
+/**
+ * Warns the user before leaving the page when there are unsaved changes.
+ * Handles both `beforeunload` (desktop) and `pagehide` (iOS Safari).
+ *
+ * @param hasChanges - Whether there are unsaved changes to warn about
+ * @returns An object with `confirmNavigation()` that returns `true` if safe to leave
+ */
 export function useUnsavedWarning(hasChanges: boolean) {
   const message = "You have unsaved changes. Are you sure you want to leave?";
 

@@ -11,6 +11,12 @@ type LenisInstance = {
 
 let globalLenis: LenisInstance | null = null;
 
+/**
+ * Hook that initializes Lenis smooth scrolling (disabled on iOS).
+ * Dynamically imports Lenis and manages the animation frame loop.
+ *
+ * @returns The Lenis instance, or null if unavailable (iOS or loading failed)
+ */
 export function useLenis() {
   const rafRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
   const [instance, setInstance] = useState<LenisInstance | null>(null);
@@ -56,6 +62,12 @@ export function useLenis() {
   return instance;
 }
 
+/**
+ * Smoothly scrolls to a target element or position.
+ * Uses Lenis if available, otherwise falls back to native `scrollIntoView`.
+ *
+ * @param target - CSS selector string or pixel offset
+ */
 export function scrollToTarget(target: string | number) {
   if (globalLenis) {
     globalLenis.scrollTo(target, { offset: -64 });

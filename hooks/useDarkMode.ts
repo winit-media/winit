@@ -52,6 +52,13 @@ function subscribe(callback: () => void) {
   };
 }
 
+/**
+ * Hook for managing dark mode state.
+ * Checks localStorage for an explicit preference, otherwise follows the
+ * system `prefers-color-scheme` media query. Persists toggles to localStorage.
+ *
+ * @returns An object with `dark` (boolean) and `toggle` (function) to switch modes
+ */
 export function useDarkMode() {
   const dark = useSyncExternalStore(
     subscribe,

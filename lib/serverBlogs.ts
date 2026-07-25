@@ -1,3 +1,8 @@
+/**
+ * Server-side blog data access using Firebase Admin SDK.
+ * Used in Next.js Server Components and API routes for direct Firestore access.
+ */
+
 import { getAdminDb } from "./firebase-admin";
 import type { BlogPost } from "./types";
 
@@ -5,6 +10,7 @@ export type ServerBlogPost = BlogPost;
 
 const BLOGS_COLLECTION = "blogs";
 
+/** Fetches all published blog posts, ordered by creation date (newest first). */
 export async function getAllPublishedPosts(): Promise<ServerBlogPost[]> {
   try {
     const db = getAdminDb();
@@ -21,6 +27,7 @@ export async function getAllPublishedPosts(): Promise<ServerBlogPost[]> {
   }
 }
 
+/** Fetches a single published blog post by its URL slug. Returns null if not found or unpublished. */
 export async function getPublishedPostBySlug(
   slug: string
 ): Promise<ServerBlogPost | null> {
