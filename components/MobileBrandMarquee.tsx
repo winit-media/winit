@@ -38,7 +38,7 @@ export default memo(function MobileBrandMarquee() {
   const duration = Math.max(30, brands.length * 6);
 
   return (
-    <div ref={sectionRef} className={`block lg:hidden w-full overflow-hidden bg-white py-4 border-b border-gray-100 section-lazy ios-gpu-stable ${isInView ? "" : "animate-marquee-paused"}`}>
+    <div ref={sectionRef} data-theme="light" className={`block lg:hidden w-full overflow-hidden bg-white py-4 border-b border-gray-100 section-lazy ios-gpu-stable ${isInView ? "" : "animate-marquee-paused"}`}>
       <div 
         className="flex w-max animate-marquee-left items-center hover:[animation-play-state:paused]"
         style={{ animationDuration: `${duration}s` }}

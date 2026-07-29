@@ -16,7 +16,7 @@ function TestimonialCard({
   onReadMore: () => void;
 }) {
   return (
-    <div className="testimonial-slide bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border-2 border-brand/20 p-6 sm:p-10 flex flex-col items-center text-center min-h-[350px] max-h-[480px] snap-center">
+    <div className="testimonial-slide bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border-2 border-brand/20 p-6 sm:p-10 flex flex-col items-center text-center snap-center flex-1">
       {t.logoUrl ? (
         <div className="h-16 mb-5 flex items-center justify-center shrink-0">
           <img
@@ -35,7 +35,7 @@ function TestimonialCard({
 
       <Quote size={24} className="text-brand mb-4 fill-brand/10 shrink-0" />
 
-      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-4 mb-4">
+      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-4 mb-4 flex-1 w-full">
         {t.review}
       </p>
 
@@ -284,7 +284,7 @@ export default memo(function Testimonials() {
             {tripled.map((t, index) => (
               <div
                 key={`${t.id}-${index}`}
-                className="testimonial-slide-wrapper shrink-0 w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[calc((100%-2rem)/3)]"
+                className="testimonial-slide-wrapper shrink-0 w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[calc((100%-2rem)/3)] flex flex-col"
               >
                 <TestimonialCard
                   t={t}
