@@ -35,7 +35,7 @@ function TestimonialCard({
 
       <Quote size={24} className="text-brand mb-4 fill-brand/10 shrink-0" />
 
-      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-4 mb-4 flex-1 w-full">
+      <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-4 mb-4 flex-1 w-full text-center">
         {t.review}
       </p>
 
