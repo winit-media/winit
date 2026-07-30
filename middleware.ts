@@ -6,14 +6,24 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const blogDomain = process.env.BLOG_DOMAIN;
-  if (blogDomain && hostname === blogDomain && !pathname.startsWith("/admin/blogs")) {
+  if (
+    blogDomain &&
+    hostname === blogDomain &&
+    !pathname.startsWith("/admin/blogs") &&
+    !pathname.startsWith("/api")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/blogs";
     return NextResponse.rewrite(url);
   }
 
   const adminDomain = process.env.ADMIN_DOMAIN;
-  if (adminDomain && hostname === adminDomain && !pathname.startsWith("/admin")) {
+  if (
+    adminDomain &&
+    hostname === adminDomain &&
+    !pathname.startsWith("/admin") &&
+    !pathname.startsWith("/api")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     return NextResponse.rewrite(url);

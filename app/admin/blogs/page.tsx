@@ -64,9 +64,17 @@ function BlogDashboard() {
       toast("Title is required", "error");
       return;
     }
+    if (!editing.slug.trim()) {
+      toast("Slug is required", "error");
+      return;
+    }
+    if (posts.some((p) => p.id !== editing.id && p.slug === editing.slug.trim())) {
+      toast("Another post already uses this slug — please choose a unique one", "error");
+      return;
+    }
     setSaving(true);
     try {
-      const data = { ...editing, updatedAt: Date.now() };
+      const data = { ...editing, slug: editing.slug.trim(), updatedAt: Date.now() };
       if (posts.find((p) => p.id === editing.id)) {
         await updateBlogPost(editing.id, data);
         toast("Post updated", "success");

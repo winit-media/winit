@@ -3,7 +3,8 @@ import { Calendar, ArrowRight, Tag } from "lucide-react";
 import { getAllPublishedPosts } from "@/lib/serverBlogs";
 import type { Metadata } from "next";
 
-export const revalidate = 3600;
+// Render fresh on every request so new/updated posts appear instantly.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Blogs",

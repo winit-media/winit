@@ -3,9 +3,7 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import ImageExtension from "@tiptap/extension-image";
-import LinkExtension from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import Underline from "@tiptap/extension-underline";
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   List, ListOrdered, Quote, Heading1, Heading2,
@@ -37,11 +35,10 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
+        link: { openOnClick: false },
       }),
       ImageExtension.configure({ inline: false }),
-      LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: placeholder || "Write your blog content here..." }),
-      Underline,
     ],
     content,
     onUpdate: ({ editor }) => {

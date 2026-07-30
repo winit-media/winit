@@ -36,11 +36,18 @@ export async function getPublishedPostBySlug(
     const snap = await db
       .collection(BLOGS_COLLECTION)
       .where("slug", "==", slug)
-      .limit(1)
       .get();
-    if (snap.empty) return null;
-    const post = { id: snap.docs[0].id, ...snap.docs[0].data() } as ServerBlogPost;
-    return post.published ? post : null;
+    // Multiple docs can share a slug (e.g. a draft saved before the published
+    // post). Without this, an arbitrary (possibly unpublished) doc could be
+    // picked and the published post would 404. Prefer the most recently
+    // updated published doc.
+    const post = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as ServerBlogPost)
+      .filter((p) => p.published)
+      .sort(
+        (a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt)
+      )[0];
+    return post ?? null;
   } catch (err) {
     console.error("[ServerBlogs] getPublishedPostBySlug error:", err);
     return null;

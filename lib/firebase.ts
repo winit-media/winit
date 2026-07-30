@@ -95,9 +95,12 @@ export async function fetchBlogPostBySlug(slug: string): Promise<BlogPost | null
     if (!db) return null;
     const q = query(collection(db, BLOGS_COLLECTION), where("slug", "==", slug));
     const snap = await getDocs(q);
-    if (snap.empty) return null;
-    const post = snap.docs[0].data() as BlogPost;
-    return post.published ? post : null;
+    // Multiple docs can share a slug — pick the newest published one.
+    const post = snap.docs
+      .map((d) => d.data() as BlogPost)
+      .filter((p) => p.published)
+      .sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt))[0];
+    return post ?? null;
   } catch (err) {
     console.error("[Firebase] fetchBlogPostBySlug error:", err);
     return null;
