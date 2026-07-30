@@ -164,7 +164,7 @@ export default async function BlogPostPage({
           <div className="relative z-10">
             {post.coverImage && (
               <div className="max-w-4xl mx-auto px-4 -mt-6 relative z-20 mb-6">
-                <div className="rounded-xl overflow-hidden shadow-xl ring-1 ring-black/5">
+                <div className="rounded-xl overflow-hidden shadow-xl ring-1 ring-black/5 bg-white">
                   <img src={post.coverImage} alt={post.title} className="w-full h-auto max-h-[400px] object-cover" loading="lazy" decoding="async" />
                 </div>
               </div>
@@ -220,7 +220,7 @@ export default async function BlogPostPage({
               )}
 
               {post.coverImage && (
-                <div className="mt-8 rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10 relative z-10">
+                <div className="mt-8 rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10 relative z-10 bg-white">
                   <img src={post.coverImage} alt={post.title} className="w-full h-auto max-h-[320px] object-cover" loading="lazy" decoding="async" />
                 </div>
               )}
