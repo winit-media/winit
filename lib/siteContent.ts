@@ -143,7 +143,7 @@ export const defaultSiteContent: SiteContent = {
     { label: "Views Delivered", number: 1, suffix: "Bn+" },
     { number: 14, label: "Languages", suffix: "+" },
     { suffix: "+", number: 24, label: "States" },
-    { suffix: "+", number: 10, label: "Services" },
+    { suffix: "%", number: 100, label: "End to End Campaign Management" },
     { suffix: "%", number: 25, label: "Cost Optimisation" },
   ],
   reasons: [

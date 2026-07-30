@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, memo } from "react";
 import { motion, useInView } from "framer-motion";
-import { Users, Briefcase, Megaphone, Eye, Layers, TrendingDown } from "lucide-react";
+import { Users, Briefcase, Megaphone, Eye, Route, TrendingDown } from "lucide-react";
 import { useAdmin } from "./AdminProvider";
 
 const activeCounters = new Map<HTMLSpanElement, { target: number; suffix: string; start: number; duration: number }>();
@@ -79,7 +79,7 @@ function LanguagesIcon({ className, size }: { className?: string; size?: number 
   );
 }
 
-const iconMap = [Users, Briefcase, Megaphone, Eye, LanguagesIcon, IndiaMapIcon, Layers, TrendingDown];
+const iconMap = [Users, Briefcase, Megaphone, Eye, LanguagesIcon, IndiaMapIcon, Route, TrendingDown];
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
