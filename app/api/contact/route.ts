@@ -108,7 +108,7 @@ export async function POST(req: Request) {
   }
   const adminEmail = process.env.ADMIN_EMAIL || siteDetails.contactEmail;
 
-  // Save lead to Firestore (best-effort, log-only on failure)
+  // Save lead to Firestore
   try {
     await adminDb.collection("leads").add({
       name: sanitized.name,
@@ -122,38 +122,42 @@ export async function POST(req: Request) {
     console.error("[API] /api/contact save lead failed:", err);
   }
 
-  // Send admin notification (best-effort, log-only on failure)
-  try {
-    const adminMail = adminNotificationTemplate(
-      { name: sanitized.name, email: sanitized.email, phone: sanitized.phone, message: sanitized.message },
-      siteDetails
-    );
-    await sendEmail({
-      to: adminEmail,
-      subject: adminMail.subject,
-      html: adminMail.html,
-      replyTo: sanitized.email,
-    });
-  } catch (err) {
-    console.error("[API] /api/contact admin email failed:", err);
-  }
+  // Respond immediately — emails fire in background
+  const res = NextResponse.json({ success: true });
 
-  // Send visitor auto-response (best-effort, log-only on failure)
-  try {
-    const visitorMail = visitorAutoResponseTemplate(
-      { name: sanitized.name, email: sanitized.email, phone: sanitized.phone, message: sanitized.message },
-      siteDetails
-    );
-    await sendEmail({
-      to: sanitized.email,
-      subject: visitorMail.subject,
-      html: visitorMail.html,
-    });
-  } catch (err) {
-    console.error("[API] /api/contact visitor email failed:", err);
-  }
+  // Fire-and-forget emails (not awaited, so response returns instantly)
+  ;(async () => {
+    try {
+      const adminMail = adminNotificationTemplate(
+        { name: sanitized.name, email: sanitized.email, phone: sanitized.phone, message: sanitized.message },
+        siteDetails
+      );
+      await sendEmail({
+        to: adminEmail,
+        subject: adminMail.subject,
+        html: adminMail.html,
+        replyTo: sanitized.email,
+      });
+    } catch (err) {
+      console.error("[API] /api/contact admin email failed:", err);
+    }
 
-  return NextResponse.json({ success: true });
+    try {
+      const visitorMail = visitorAutoResponseTemplate(
+        { name: sanitized.name, email: sanitized.email, phone: sanitized.phone, message: sanitized.message },
+        siteDetails
+      );
+      await sendEmail({
+        to: sanitized.email,
+        subject: visitorMail.subject,
+        html: visitorMail.html,
+      });
+    } catch (err) {
+      console.error("[API] /api/contact visitor email failed:", err);
+    }
+  })();
+
+  return res;
 }
 
 export async function GET() {

@@ -41,12 +41,21 @@ function emailWrapper(children: string): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WinIt Media</title>
+  <style>
+    @media only screen and (max-width:480px) {
+      .inner { width:100% !important; }
+      .content-pad { padding:20px 16px !important; }
+      .header-pad { padding:24px 16px !important; }
+      .footer-pad { padding:20px 16px !important; }
+      .msg-pad { padding:16px !important; }
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7;padding:40px 20px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7;padding:20px 8px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+        <table class="inner" role="presentation" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
           ${children}
         </table>
       </td>
@@ -59,7 +68,7 @@ function emailWrapper(children: string): string {
 function headerBar(): string {
   return `
 <tr>
-  <td style="background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);padding:32px 40px;border-radius:16px 16px 0 0;text-align:center;">
+  <td class="header-pad" style="background:linear-gradient(135deg,${BRAND_COLOR} 0%,${BRAND_DARK} 100%);padding:32px 40px;border-radius:16px 16px 0 0;text-align:center;">
     <img src="${SITE_LOGO_URL}" alt="WinIt" width="120" style="display:block;margin:0 auto 16px;max-width:120px;height:auto;" />
     <div style="width:40px;height:3px;background:rgba(255,255,255,0.4);border-radius:2px;margin:0 auto;"></div>
   </td>
@@ -69,7 +78,7 @@ function headerBar(): string {
 function footerBar(siteDetails: SiteContactDetails): string {
   return `
 <tr>
-  <td style="background:linear-gradient(135deg,${BRAND_DARK} 0%,${BRAND_COLOR} 100%);padding:28px 40px;border-radius:0 0 16px 16px;text-align:center;">
+  <td class="footer-pad" style="background:linear-gradient(135deg,${BRAND_DARK} 0%,${BRAND_COLOR} 100%);padding:28px 40px;border-radius:0 0 16px 16px;text-align:center;">
     <p style="margin:0 0 8px;color:rgba(255,255,255,0.9);font-size:13px;line-height:1.6;">
       ${escapeHtml(siteDetails.contactPhone)} &nbsp;|&nbsp; ${escapeHtml(siteDetails.contactEmail)}
     </p>
@@ -96,7 +105,7 @@ export function visitorAutoResponseTemplate(
   const html = emailWrapper(`
     ${headerBar()}
     <tr>
-      <td style="background-color:#ffffff;padding:40px;border:1px solid #e5e7eb;border-top:none;">
+      <td class="content-pad" style="background-color:#ffffff;padding:40px;border:1px solid #e5e7eb;border-top:none;">
         <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#111827;">
           Hi ${data.name},
         </h1>
@@ -104,7 +113,7 @@ export function visitorAutoResponseTemplate(
           Thank you for contacting <strong style="color:${BRAND_COLOR};">WinIt Media</strong>! We&apos;ve received your message and our team will get back to you within <strong>24 hours</strong>.
         </p>
 
-        <div style="background-color:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+        <div class="msg-pad" style="background-color:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
           <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.05em;">
             Your Message
           </p>
@@ -113,7 +122,7 @@ export function visitorAutoResponseTemplate(
           </p>
         </div>
 
-        <div style="background-color:#f9fafb;border-radius:12px;padding:20px 24px;margin-bottom:8px;">
+        <div class="msg-pad" style="background-color:#f9fafb;border-radius:12px;padding:20px 24px;margin-bottom:8px;">
           <p style="margin:0 0 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;">
             Need immediate assistance?
           </p>
@@ -160,7 +169,7 @@ export function adminNotificationTemplate(
   const html = emailWrapper(`
     ${headerBar()}
     <tr>
-      <td style="background-color:#ffffff;padding:40px;border:1px solid #e5e7eb;border-top:none;">
+      <td class="content-pad" style="background-color:#ffffff;padding:40px;border:1px solid #e5e7eb;border-top:none;">
         <p style="margin:0 0 4px;font-size:11px;font-weight:700;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.05em;">
           New Submission
         </p>
