@@ -9,6 +9,8 @@ import {
   orderBy,
   where,
   getDocs,
+  updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 // Re-export types and defaults from the pure data module (no Firebase imports)
@@ -17,6 +19,16 @@ export { defaultSiteContent, mergeSiteContent } from "./siteContent";
 import { SiteContent, defaultSiteContent, mergeSiteContent } from "./siteContent";
 export type { BlogPost } from "./types";
 import { BlogPost } from "./types";
+
+export interface Lead {
+  id?: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  createdAt: number;
+  read: boolean;
+}
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -164,6 +176,38 @@ export async function createBlogUser(email: string, password: string, displayNam
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error || `Failed to create user (${res.status})`);
+  }
+}
+
+const LEADS_COLLECTION = "leads";
+
+export async function fetchLeads(): Promise<Lead[]> {
+  try {
+    if (!db) return [];
+    const q = query(collection(db, LEADS_COLLECTION), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Lead));
+  } catch (err) {
+    console.error("[Firebase] fetchLeads error:", err);
+    return [];
+  }
+}
+
+export async function markLeadRead(id: string, read: boolean): Promise<void> {
+  if (!db) return;
+  try {
+    await updateDoc(doc(db, LEADS_COLLECTION, id), { read });
+  } catch (err) {
+    console.error("[Firebase] markLeadRead error:", err);
+  }
+}
+
+export async function deleteLead(id: string): Promise<void> {
+  if (!db) return;
+  try {
+    await deleteDoc(doc(db, LEADS_COLLECTION, id));
+  } catch (err) {
+    console.error("[Firebase] deleteLead error:", err);
   }
 }
 

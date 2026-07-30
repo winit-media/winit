@@ -93,9 +93,10 @@ export async function POST(req: Request) {
 
   // Build template data (Admin SDK Firestore read)
   let siteDetails: SiteContent;
+  let adminDb: ReturnType<typeof getAdminDb>;
   try {
-    const db = getAdminDb();
-    const snap = await db.doc("siteContent/main").get();
+    adminDb = getAdminDb();
+    const snap = await adminDb.doc("siteContent/main").get();
     const raw = snap.data() as Partial<SiteContent> | undefined;
     siteDetails = raw ? mergeSiteContent(raw) : defaultSiteContent;
   } catch (err) {
@@ -106,6 +107,20 @@ export async function POST(req: Request) {
     );
   }
   const adminEmail = process.env.ADMIN_EMAIL || siteDetails.contactEmail;
+
+  // Save lead to Firestore (best-effort, log-only on failure)
+  try {
+    await adminDb.collection("leads").add({
+      name: sanitized.name,
+      email: sanitized.email,
+      phone: sanitized.phone,
+      message: sanitized.message,
+      createdAt: Date.now(),
+      read: false,
+    });
+  } catch (err) {
+    console.error("[API] /api/contact save lead failed:", err);
+  }
 
   // Send admin notification (best-effort, log-only on failure)
   try {

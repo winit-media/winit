@@ -29,6 +29,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  const leadsDomain = process.env.LEADS_DOMAIN;
+  if (
+    leadsDomain &&
+    hostname === leadsDomain &&
+    !pathname.startsWith("/leads") &&
+    !pathname.startsWith("/api")
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/leads";
+    return NextResponse.rewrite(url);
+  }
+
   return NextResponse.next();
 }
 
