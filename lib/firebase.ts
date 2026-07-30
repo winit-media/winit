@@ -83,7 +83,7 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
     if (!db) return [];
     const q = query(collection(db, BLOGS_COLLECTION), orderBy("createdAt", "desc"));
     const snap = await getDocs(q);
-    return snap.docs.map((d) => d.data() as BlogPost).filter((p) => p.published);
+    return snap.docs.map((d) => d.data() as BlogPost);
   } catch (err) {
     console.error("[Firebase] fetchBlogPosts error:", err);
     return [];

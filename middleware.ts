@@ -9,11 +9,11 @@ export function middleware(request: NextRequest) {
   if (
     blogDomain &&
     hostname === blogDomain &&
-    !pathname.startsWith("/blogs") &&
+    !pathname.startsWith("/admin/blogs") &&
     !pathname.startsWith("/api")
   ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/blogs";
+    url.pathname = "/admin/blogs";
     return NextResponse.rewrite(url);
   }
 
