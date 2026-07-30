@@ -4,6 +4,7 @@ import { Calendar, Tag, ArrowLeft, User } from "lucide-react";
 import { getPublishedPostBySlug, getAllPublishedPosts } from "@/lib/serverBlogs";
 import { SITE_LOGO_URL } from "@/lib/siteContent";
 import BlogContent from "@/components/BlogContent";
+import ShareButton from "@/components/ShareButton";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
@@ -34,13 +35,18 @@ export async function generateMetadata({
       title: post.title,
       description,
       url,
-      images: post.coverImage ? [{ url: post.coverImage, alt: post.title }] : [],
+      images: post.coverImage
+        ? [{ url: post.coverImage, alt: post.title }]
+        : [{ url: "/opengraph-image", alt: "WinIt Media" }],
+      publishedTime: new Date(post.createdAt).toISOString(),
+      modifiedTime: new Date(post.updatedAt || post.createdAt).toISOString(),
+      authors: post.author ? [post.author] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description,
-      images: post.coverImage ? [post.coverImage] : [],
+      images: post.coverImage ? [post.coverImage] : ["/opengraph-image"],
     },
   };
 }
@@ -56,6 +62,8 @@ export default async function BlogPostPage({
   if (!post) {
     notFound();
   }
+
+  const postUrl = `https://winitmedia.com/blogs/${post.slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -146,6 +154,7 @@ export default async function BlogPostPage({
                 <Calendar size={14} />
                 {new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
               </span>
+              <ShareButton title={post.title} url={postUrl} />
             </div>
             {post.tags && post.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
@@ -205,6 +214,7 @@ export default async function BlogPostPage({
                   <Calendar size={14} />
                   {new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                 </span>
+                <ShareButton title={post.title} url={postUrl} />
               </div>
 
               {post.tags && post.tags.length > 0 && (

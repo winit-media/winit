@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     title: "WinIt - Shaping Success Stories",
     description:
       "We transform brand stories into powerful narratives that drive success.",
-    images: ["/og-image.png"],
+    images: [{ url: "/opengraph-image", alt: "WinIt Media - Shaping Success Stories" }],
   },
   robots: {
     index: true,
@@ -82,9 +82,6 @@ export const metadata: Metadata = {
       index: true,
       follow: true,
     },
-  },
-  alternates: {
-    canonical: "https://winitmedia.com",
   },
 };
 

@@ -22,6 +22,7 @@ export function Field({
   placeholder,
   maxLength,
   showCount,
+  hint,
 }: {
   label: string;
   value: string;
@@ -30,6 +31,7 @@ export function Field({
   placeholder?: string;
   maxLength?: number;
   showCount?: boolean;
+  hint?: string;
 }) {
   const id = useId();
   return (
@@ -63,6 +65,7 @@ export function Field({
           maxLength={maxLength}
         />
       )}
+      {hint && <p className="mt-1 text-xs text-gray-400">{hint}</p>}
     </div>
   );
 }

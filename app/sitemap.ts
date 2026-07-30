@@ -1,5 +1,5 @@
 ﻿import { MetadataRoute } from "next";
-import { fetchBlogPosts } from "@/lib/firebase";
+import { getAllPublishedPosts } from "@/lib/serverBlogs";
 
 export const revalidate = 3600;
 
@@ -22,15 +22,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const posts = await fetchBlogPosts();
-    const blogPages: MetadataRoute.Sitemap = posts
-      .filter((post) => post.published)
-      .map((post) => ({
-        url: `${baseUrl}/blogs/${post.slug}`,
-        lastModified: new Date(post.updatedAt || post.createdAt),
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
-      }));
+    const posts = await getAllPublishedPosts();
+    const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
+      url: `${baseUrl}/blogs/${post.slug}`,
+      lastModified: new Date(post.updatedAt || post.createdAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
 
     return [...staticPages, ...blogPages];
   } catch {

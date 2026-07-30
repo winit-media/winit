@@ -7,6 +7,7 @@ import { app, fetchSiteContent, BlogPost, fetchBlogPosts, createBlogPost, update
 import TiptapEditor from "@/components/TiptapEditor";
 import ImageUpload from "@/app/admin/components/ImageUpload";
 import { Field } from "@/app/admin/components/FormElements";
+import { SerpPreview, SeoChecklist } from "@/app/admin/components/BlogSeoTools";
 import { SaveButton } from "@/app/admin/components/SaveIndicator";
 import { useToast, ToastProvider } from "@/components/ui/Toast";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -205,18 +206,39 @@ function BlogDashboard() {
                 </button>
               </div>
             </div>
+            <p className="text-xs text-gray-400 mb-3">Drafts are hidden from visitors, the sitemap, and search engines.</p>
 
-            <Field label="Title" value={editing.title} onChange={(v) => updateEditing({ title: v })} placeholder="Post title" showCount maxLength={100} />
-            <Field label="Slug" value={editing.slug} onChange={(v) => updateEditing({ slug: v })} placeholder="my-blog-post" />
-            <Field label="Excerpt" value={editing.excerpt} onChange={(v) => updateEditing({ excerpt: v })} textarea placeholder="Brief summary" showCount maxLength={200} />
-            <Field label="Author" value={editing.author} onChange={(v) => updateEditing({ author: v })} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+              <SerpPreview
+                title={editing.title}
+                slug={editing.slug}
+                excerpt={editing.excerpt}
+                content={editing.content}
+              />
+              <SeoChecklist
+                title={editing.title}
+                slug={editing.slug}
+                excerpt={editing.excerpt}
+                author={editing.author}
+                coverImage={editing.coverImage}
+                tags={editing.tags}
+                content={editing.content}
+              />
+            </div>
+
+            <Field label="Title" value={editing.title} onChange={(v) => updateEditing({ title: v })} placeholder="Post title" showCount maxLength={100} hint="The blue headline in Google results & browser tab. 50–60 chars — lead with the main keyword, make it specific (number, year, outcome)." />
+            <Field label="Slug" value={editing.slug} onChange={(v) => updateEditing({ slug: v })} placeholder="my-blog-post" hint="The URL path (winitmedia.com/blogs/...). Auto-fills from title. Use 3–6 hyphenated lowercase words. Don't change after publishing — breaks existing links." />
+            <Field label="Excerpt" value={editing.excerpt} onChange={(v) => updateEditing({ excerpt: v })} textarea placeholder="Brief summary" showCount maxLength={200} hint="The grey description under your title in Google + the share preview on WhatsApp/LinkedIn/X. 140–160 chars — say what the reader learns, include the keyword naturally. Never leave blank." />
+            <Field label="Author" value={editing.author} onChange={(v) => updateEditing({ author: v })} hint="Shown on the post & in structured data. Use a real person's name (e.g. 'Priya Sharma') rather than 'admin' — named authors build trust signals for Google." />
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Cover Image</label>
               <ImageUpload value={editing.coverImage} onChange={(v) => updateEditing({ coverImage: v })} />
+              <p className="mt-1 text-xs text-gray-400">Used as the social-share image (OG/Twitter card) & shown in Google Discover. Use landscape ≥1200×630px, &lt;500KB, minimal text overlay.</p>
             </div>
-            <Field label="Tags (comma separated)" value={editing.tags.join(", ")} onChange={(v) => updateEditing({ tags: v.split(",").map((t) => t.trim()) })} placeholder="tag1, tag2, tag3" />
+            <Field label="Tags (comma separated)" value={editing.tags.join(", ")} onChange={(v) => updateEditing({ tags: v.split(",").map((t) => t.trim()) })} placeholder="tag1, tag2, tag3" hint="3–5 specific tags. Helps readers & site organization, not a direct ranking factor." />
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Content</label>
+              <p className="text-xs text-gray-400 mb-2">Aim 800–1,500 words. Use H2/H3 subheadings, short paragraphs, link to other WinIt pages/posts, and add original examples or data — Google deprioritises generic AI-style text.</p>
               <TiptapEditor
                 content={editing.content}
                 onChange={(html) => updateEditing({ content: html })}

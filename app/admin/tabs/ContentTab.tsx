@@ -27,8 +27,8 @@ export default function ContentTab() {
   return (
     <div className="space-y-6">
       <Section title="Page Metadata">
-        <Field label="Page Title" value={local.pageTitle} onChange={(v) => field("pageTitle", v)} showCount maxLength={60} />
-        <Field label="Page Description" value={local.pageDescription} onChange={(v) => field("pageDescription", v)} textarea showCount maxLength={160} />
+        <Field label="Page Title" value={local.pageTitle} onChange={(v) => field("pageTitle", v)} showCount maxLength={60} hint="Appears as the browser tab title & the default Google headline. 50–60 chars — lead with your core service + location (e.g. 'Influencer Marketing Agency in Delhi | WinIt')." />
+        <Field label="Page Description" value={local.pageDescription} onChange={(v) => field("pageDescription", v)} textarea showCount maxLength={160} hint="The homepage meta description in Google search results. 140–160 chars — summarise what WinIt does, where (New Delhi), and a reason to click." />
       </Section>
 
       <Section title="Navbar">

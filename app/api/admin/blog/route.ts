@@ -1,6 +1,7 @@
 ﻿import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { verifyAdmin, AuthError } from "@/lib/admin-auth";
+import { revalidatePath } from "next/cache";
 
 const ALLOWED_POST_FIELDS = new Set([
   "id", "title", "slug", "excerpt", "content", "coverImage",
@@ -53,6 +54,9 @@ export async function POST(req: Request) {
 
     const db = getAdminDb();
     await db.collection("blogs").doc(docId).set(sanitized);
+    revalidatePath("/sitemap.xml");
+    revalidatePath("/blogs");
+    if (sanitized.slug) revalidatePath(`/blogs/${sanitized.slug}`);
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof AuthError) {
@@ -89,6 +93,13 @@ export async function PATCH(req: Request) {
 
     const db = getAdminDb();
     await db.collection("blogs").doc(docId).update(sanitized);
+    revalidatePath("/sitemap.xml");
+    revalidatePath("/blogs");
+    const patchedDoc = await db.collection("blogs").doc(docId).get();
+    if (patchedDoc.exists) {
+      const data = patchedDoc.data();
+      if (data?.slug) revalidatePath(`/blogs/${data.slug}`);
+    }
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof AuthError) {
@@ -118,7 +129,12 @@ export async function DELETE(req: Request) {
     }
 
     const db = getAdminDb();
+    const deletedDoc = await db.collection("blogs").doc(docId).get();
+    const deletedSlug = deletedDoc.exists ? (deletedDoc.data()?.slug as string | undefined) : undefined;
     await db.collection("blogs").doc(docId).delete();
+    revalidatePath("/sitemap.xml");
+    revalidatePath("/blogs");
+    if (deletedSlug) revalidatePath(`/blogs/${deletedSlug}`);
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof AuthError) {
