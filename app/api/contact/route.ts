@@ -9,8 +9,12 @@ import { rateLimit } from "@/lib/rate-limit";
 import { sanitizeContactForm } from "@/lib/sanitize";
 
 const ALLOWED_ORIGINS = [
-  process.env.NEXT_PUBLIC_SITE_URL || "https://winitmedia.com",
-  "http://localhost:3000", // local dev only — not a security risk in production
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.winitmedia.com",
+  "https://winitmedia.com",
+  "https://www.winitmedia.com",
+  "https://blogs.winitmedia.com",
+  "https://admin.winitmedia.com",
+  "http://localhost:3000",
 ];
 
 function getClientIp(req: Request): string {

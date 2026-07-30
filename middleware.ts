@@ -9,11 +9,11 @@ export function middleware(request: NextRequest) {
   if (
     blogDomain &&
     hostname === blogDomain &&
-    !pathname.startsWith("/admin/blogs") &&
+    !pathname.startsWith("/blogs") &&
     !pathname.startsWith("/api")
   ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/admin/blogs";
+    url.pathname = "/blogs";
     return NextResponse.rewrite(url);
   }
 
@@ -34,6 +34,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4)$).*)",
   ],
 };

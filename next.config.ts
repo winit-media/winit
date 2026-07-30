@@ -16,7 +16,21 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/:path*",
-        has: [{ type: "host", value: "winit.acaditya10.tech" }, { type: "host", value: "blogs.winitmedia.com" }, { type: "host", value: "admin.winitmedia.com" }],
+        has: [{ type: "host", value: "winit.acaditya10.tech" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "blogs.winitmedia.com" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "admin.winitmedia.com" }],
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
