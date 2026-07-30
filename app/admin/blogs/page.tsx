@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Trash2, Loader2, LogOut, ArrowLeft, Search } from "lucide-react";
+import { Plus, Trash2, Loader2, LogOut, ArrowLeft, Search, Calendar } from "lucide-react";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { app, fetchSiteContent, BlogPost, fetchBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost } from "@/lib/firebase";
 import TiptapEditor from "@/components/TiptapEditor";
@@ -54,6 +54,7 @@ function BlogDashboard() {
       tags: [],
       createdAt: now,
       updatedAt: now,
+      publishedAt: now,
     });
   };
 
@@ -231,6 +232,24 @@ function BlogDashboard() {
             <Field label="Excerpt" value={editing.excerpt} onChange={(v) => updateEditing({ excerpt: v })} textarea placeholder="Brief summary" showCount maxLength={200} hint="The grey description under your title in Google + the share preview on WhatsApp/LinkedIn/X. 140–160 chars — say what the reader learns, include the keyword naturally. Never leave blank." />
             <Field label="Author" value={editing.author} onChange={(v) => updateEditing({ author: v })} hint="Shown on the post & in structured data. Use a real person's name (e.g. 'Priya Sharma') rather than 'admin' — named authors build trust signals for Google." />
             <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Published Date</label>
+              <div className="relative">
+                <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <input
+                  type="date"
+                  value={editing.publishedAt ? new Date(editing.publishedAt).toISOString().split("T")[0] : ""}
+                  onChange={(e) => {
+                    const date = new Date(e.target.value);
+                    if (!isNaN(date.getTime())) {
+                      updateEditing({ publishedAt: date.getTime() });
+                    }
+                  }}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-400">Controls the date shown on the blog & in search results. Defaults to today.</p>
+            </div>
+            <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Cover Image</label>
               <ImageUpload value={editing.coverImage} onChange={(v) => updateEditing({ coverImage: v })} />
               <p className="mt-1 text-xs text-gray-400">Used as the social-share image (OG/Twitter card) & shown in Google Discover. Use landscape ≥1200×630px, &lt;500KB, minimal text overlay.</p>
@@ -271,7 +290,7 @@ function BlogDashboard() {
                     <span className={`text-xs font-medium px-2 py-0.5 rounded ${post.published ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                       {post.published ? "Published" : "Draft"}
                     </span>
-                    <span className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+                    <span className="text-xs text-gray-400">{new Date(post.publishedAt || post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
                   </div>
                   <p className="font-semibold text-sm truncate">{post.title || "Untitled"}</p>
                   <p className="text-xs text-gray-400 mt-0.5 truncate">/{post.slug}</p>

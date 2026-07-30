@@ -10,4 +10,5 @@ export interface BlogPost {
   tags: string[];
   createdAt: number;
   updatedAt: number;
+  publishedAt?: number;
 }

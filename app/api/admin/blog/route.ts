@@ -5,12 +5,12 @@ import { revalidatePath } from "next/cache";
 
 const ALLOWED_POST_FIELDS = new Set([
   "id", "title", "slug", "excerpt", "content", "coverImage",
-  "author", "published", "tags", "createdAt", "updatedAt",
+  "author", "published", "tags", "createdAt", "updatedAt", "publishedAt",
 ]);
 
 const ALLOWED_PATCH_FIELDS = new Set([
   "title", "slug", "excerpt", "content", "coverImage",
-  "author", "published", "tags", "updatedAt",
+  "author", "published", "tags", "updatedAt", "publishedAt",
 ]);
 
 function sanitizeDocId(id: string): string {

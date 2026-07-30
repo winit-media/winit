@@ -67,7 +67,7 @@ export default async function BlogsPage() {
                   <div className="p-5 flex-1 flex flex-col">
                     <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
                       <Calendar size={12} />
-                      {new Date(post.createdAt).toLocaleDateString("en-US", {
+                      {new Date(post.publishedAt || post.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",

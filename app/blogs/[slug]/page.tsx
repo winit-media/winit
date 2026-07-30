@@ -38,7 +38,7 @@ export async function generateMetadata({
       images: post.coverImage
         ? [{ url: post.coverImage, alt: post.title }]
         : [{ url: "/opengraph-image", alt: "WinIt Media" }],
-      publishedTime: new Date(post.createdAt).toISOString(),
+      publishedTime: new Date(post.publishedAt || post.createdAt).toISOString(),
       modifiedTime: new Date(post.updatedAt || post.createdAt).toISOString(),
       authors: post.author ? [post.author] : undefined,
     },
@@ -71,7 +71,7 @@ export default async function BlogPostPage({
     headline: post.title,
     description: post.excerpt || undefined,
     image: post.coverImage || undefined,
-    datePublished: new Date(post.createdAt).toISOString(),
+    datePublished: new Date(post.publishedAt || post.createdAt).toISOString(),
     dateModified: new Date(post.updatedAt || post.createdAt).toISOString(),
     author: post.author
       ? {
@@ -152,7 +152,7 @@ export default async function BlogPostPage({
               )}
               <span className="flex items-center gap-1.5">
                 <Calendar size={14} />
-                {new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                {new Date(post.publishedAt || post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
               </span>
               <ShareButton title={post.title} url={postUrl} />
             </div>
@@ -212,7 +212,7 @@ export default async function BlogPostPage({
                 )}
                 <span className="flex items-center gap-1.5">
                   <Calendar size={14} />
-                  {new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                  {new Date(post.publishedAt || post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                 </span>
                 <ShareButton title={post.title} url={postUrl} />
               </div>
