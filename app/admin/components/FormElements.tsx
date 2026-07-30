@@ -19,6 +19,7 @@ export function Field({
   value,
   onChange,
   textarea,
+  type,
   placeholder,
   maxLength,
   showCount,
@@ -28,6 +29,7 @@ export function Field({
   value: string;
   onChange: (v: string) => void;
   textarea?: boolean;
+  type?: string;
   placeholder?: string;
   maxLength?: number;
   showCount?: boolean;
@@ -56,7 +58,7 @@ export function Field({
         />
       ) : (
         <input
-          type="text"
+          type={type || "text"}
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}

@@ -151,4 +151,20 @@ export async function deleteBlogPost(id: string): Promise<void> {
   }
 }
 
+export async function createBlogUser(email: string, password: string, displayName: string): Promise<void> {
+  const token = await getAuthToken();
+  const res = await fetch("/api/admin/create-blog-user", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ email, password, displayName }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to create user (${res.status})`);
+  }
+}
+
 export { db };

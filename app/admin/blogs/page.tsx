@@ -17,7 +17,7 @@ import LoginGate from "@/app/admin/components/LoginGate";
 
 const auth = getAuth(app);
 
-function BlogDashboard() {
+function BlogDashboard({ userDisplayName }: { userDisplayName: string }) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<BlogPost | null>(null);
@@ -49,7 +49,7 @@ function BlogDashboard() {
       excerpt: "",
       content: "",
       coverImage: "",
-      author: userEmail.split("@")[0] || "",
+      author: userDisplayName || userEmail.split("@")[0] || "",
       published: false,
       tags: [],
       createdAt: now,
@@ -333,6 +333,7 @@ export default function BlogAdminPage() {
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [userDisplayName, setUserDisplayName] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -341,7 +342,9 @@ export default function BlogAdminPage() {
         setUserEmail(user.email);
         try {
           const content = await fetchSiteContent();
-          const allowed = content.blogUsers.some((u) => u.email === user.email) || user.email === content.contactEmail;
+          const match = content.blogUsers.find((u) => u.email === user.email);
+          setUserDisplayName(match?.displayName || user.email.split("@")[0] || "");
+          const allowed = !!match || user.email === content.contactEmail;
           setAuthorized(allowed);
         } catch {
           setAuthorized(false);
@@ -391,7 +394,7 @@ export default function BlogAdminPage() {
 
   return (
     <ToastProvider>
-      <BlogDashboard />
+      <BlogDashboard userDisplayName={userDisplayName} />
     </ToastProvider>
   );
 }

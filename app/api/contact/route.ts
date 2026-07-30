@@ -1,10 +1,13 @@
-﻿import { NextResponse } from "next/server";
+﻿import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email/smtp";
 import {
   visitorAutoResponseTemplate,
   adminNotificationTemplate,
 } from "@/lib/email/templates";
-import { fetchSiteContent } from "@/lib/firebase";
+import { getAdminDb } from "@/lib/firebase-admin";
+import type { SiteContent } from "@/lib/siteContent";
+import { defaultSiteContent, mergeSiteContent } from "@/lib/siteContent";
 import { rateLimit } from "@/lib/rate-limit";
 import { sanitizeContactForm } from "@/lib/sanitize";
 
@@ -86,7 +89,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const siteDetails = await fetchSiteContent();
+    const db = getAdminDb();
+    const snap = await db.doc("siteContent/main").get();
+    const raw = snap.data() as Partial<SiteContent> | undefined;
+    const siteDetails = raw ? mergeSiteContent(raw) : defaultSiteContent;
     const adminEmail = process.env.ADMIN_EMAIL || siteDetails.contactEmail;
 
     const adminMail = adminNotificationTemplate(

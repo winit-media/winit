@@ -1,11 +1,12 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
 import { useAdmin } from "@/components/AdminProvider";
 import { Section, Field } from "../components/FormElements";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
+import { createBlogUser } from "@/lib/firebase";
 
 export default function BlogUsersTab() {
   const { data, updateContent, revertedCount } = useAdmin();
@@ -13,6 +14,8 @@ export default function BlogUsersTab() {
   const [prevReverted, setPrevReverted] = useState(revertedCount);
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [creating, setCreating] = useState(false);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const { toast } = useToast();
 
@@ -21,7 +24,7 @@ export default function BlogUsersTab() {
     setUsers(data.blogUsers);
   }
 
-  const add = () => {
+  const add = async () => {
     if (!newEmail.trim()) {
       toast("Email is required", "error");
       return;
@@ -30,12 +33,29 @@ export default function BlogUsersTab() {
       toast("Please enter a valid email address", "error");
       return;
     }
-    const updated = [...users, { email: newEmail.trim(), displayName: newName.trim() || newEmail.trim() }];
-    setUsers(updated);
-    updateContent({ blogUsers: updated });
-    setNewEmail("");
-    setNewName("");
-    toast("Blog user added", "success");
+    if (!newPassword || newPassword.length < 6) {
+      toast("Password must be at least 6 characters", "error");
+      return;
+    }
+    if (!newName.trim()) {
+      toast("Display name is required", "error");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      await createBlogUser(newEmail.trim(), newPassword, newName.trim());
+      const updated = [...users, { email: newEmail.trim(), displayName: newName.trim() }];
+      setUsers(updated);
+      updateContent({ blogUsers: updated });
+      setNewEmail("");
+      setNewName("");
+      setNewPassword("");
+      toast("Blog user created — they can now sign in with the password you set", "success");
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Failed to create user", "error");
+    }
+    setCreating(false);
   };
 
   const remove = (i: number) => {
@@ -52,15 +72,18 @@ export default function BlogUsersTab() {
         <p className="text-sm text-gray-500">
           Users in this list can sign in on the blog subdomain to manage posts. Anyone not listed here is blocked from the blog manager.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Field label="Email" value={newEmail} onChange={setNewEmail} placeholder="user@example.com" />
           <Field label="Display Name" value={newName} onChange={setNewName} placeholder="John Doe" />
+          <Field label="Password" value={newPassword} onChange={setNewPassword} type="password" placeholder="Min 6 characters" />
         </div>
         <button
           onClick={add}
-          className="bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors flex items-center gap-2"
+          disabled={creating}
+          className="bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors flex items-center gap-2 disabled:opacity-60"
         >
-          <Plus size={14} /> Add User
+          {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+          {creating ? "Creating..." : "Add User"}
         </button>
       </Section>
 
