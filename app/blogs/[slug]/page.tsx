@@ -156,20 +156,18 @@ export default async function BlogPostPage({
                 ))}
               </div>
             )}
+            {post.coverImage && (
+              <div className="mt-6 rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10 relative z-10 bg-white" style={{ isolation: "isolate" }}>
+                <img src={post.coverImage} alt={post.title} className="w-full h-auto max-h-[400px] object-cover" loading="lazy" decoding="async" />
+              </div>
+            )}
           </div>
         </div>
 
         {/* Mobile content */}
         <div className="relative pattern-bg" data-theme="light">
           <div className="relative z-10">
-            {post.coverImage && (
-              <div className="max-w-4xl mx-auto px-4 -mt-6 relative z-20 mb-6">
-                <div className="rounded-xl overflow-hidden shadow-xl ring-1 ring-black/5 bg-white" style={{ isolation: "isolate" }}>
-                  <img src={post.coverImage} alt={post.title} className="w-full h-auto max-h-[400px] object-cover" loading="lazy" decoding="async" />
-                </div>
-              </div>
-            )}
-            <article className="max-w-4xl mx-auto px-4 pb-12">
+            <article className="max-w-4xl mx-auto px-4 pb-12 pt-6">
               {post.excerpt && (
                 <p className="text-lg text-gray-500 leading-relaxed mb-8 border-l-4 border-brand pl-4 italic">{post.excerpt}</p>
               )}

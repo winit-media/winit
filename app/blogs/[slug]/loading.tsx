@@ -21,16 +21,16 @@ export default function BlogPostLoading() {
               <Shimmer className="h-5 w-16 bg-white/20 rounded-full" />
               <Shimmer className="h-5 w-20 bg-white/20 rounded-full" />
             </div>
+            <div className="mt-6 rounded-xl bg-white/20">
+              <Shimmer className="w-full h-64 sm:h-80 rounded-xl bg-white/20" />
+            </div>
           </div>
         </div>
 
-        {/* Mobile cover image skeleton */}
+        {/* Mobile content skeleton */}
         <div className="relative pattern-bg" data-theme="light">
           <div className="relative z-10">
-            <div className="max-w-4xl mx-auto px-4 -mt-6 relative z-20 mb-6">
-              <Shimmer className="w-full h-64 sm:h-80 rounded-xl" />
-            </div>
-            <article className="max-w-4xl mx-auto px-4 pb-12">
+            <article className="max-w-4xl mx-auto px-4 pb-12 pt-6">
               <Shimmer className="h-5 w-3/4 mb-6 border-l-4 border-brand pl-4" />
               <Shimmer className="h-3 w-full mb-2" />
               <Shimmer className="h-3 w-full mb-2" />
