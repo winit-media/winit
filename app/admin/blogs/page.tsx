@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Trash2, Loader2, LogOut, ArrowLeft, Search, Calendar } from "lucide-react";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
-import { app, fetchSiteContent, BlogPost, fetchBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost } from "@/lib/firebase";
+import { app, fetchSiteContent, BlogPost, fetchBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost, SUPER_ADMIN_EMAIL } from "@/lib/firebase";
 import TiptapEditor from "@/components/TiptapEditor";
 import ImageUpload from "@/app/admin/components/ImageUpload";
 import { Field } from "@/app/admin/components/FormElements";
@@ -344,7 +344,7 @@ export default function BlogAdminPage() {
           const content = await fetchSiteContent();
           const match = content.blogUsers.find((u) => u.email === user.email);
           setUserDisplayName(match?.displayName || user.email.split("@")[0] || "");
-          const allowed = !!match || user.email === content.contactEmail;
+          const allowed = !!match || user.email === SUPER_ADMIN_EMAIL;
           setAuthorized(allowed);
         } catch {
           setAuthorized(false);

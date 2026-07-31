@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { AdminProvider } from "@/components/AdminProvider";
 import { ToastProvider } from "@/components/ui/Toast";
-import { app, fetchSiteContent } from "@/lib/firebase";
+import { app, fetchSiteContent, SUPER_ADMIN_EMAIL } from "@/lib/firebase";
 import { SiteContent } from "@/components/AdminProvider";
 import LoginGate from "./components/LoginGate";
 import AdminDashboard from "./components/AdminDashboard";
@@ -27,10 +27,10 @@ export default function AdminPage() {
         try {
           const content = await fetchSiteContent();
           setSiteContent(content);
-          // Only the configured site admin (contactEmail) may manage the
-          // full site. Blog editors are restricted to the blog subdomain
-          // (/admin/blogs) and are blocked from the main dashboard.
-          setAuthorized(user.email === content.contactEmail);
+          // Only the super admin may manage the full site. Blog editors
+          // are restricted to the blog subdomain (/admin/blogs) and are
+          // blocked from the main dashboard.
+          setAuthorized(user.email === SUPER_ADMIN_EMAIL);
         } catch {
           setAuthorized(false);
         }

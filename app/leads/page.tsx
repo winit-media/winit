@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Loader2, LogOut, Mail, Phone, Trash2, ExternalLink } from "lucide-react";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { app, fetchSiteContent, fetchLeads, markLeadRead, deleteLead, Lead } from "@/lib/firebase";
+import { app, fetchSiteContent, fetchLeads, markLeadRead, deleteLead, Lead, SUPER_ADMIN_EMAIL } from "@/lib/firebase";
 import { ToastProvider, useToast } from "@/components/ui/Toast";
 
 const auth = getAuth(app);
@@ -203,7 +203,7 @@ export default function LeadsPage() {
           const content = await fetchSiteContent();
           const allowed =
             content.blogUsers.some((u) => u.email === user.email) ||
-            user.email === content.contactEmail;
+            user.email === SUPER_ADMIN_EMAIL;
           setAuthorized(allowed);
         } catch {
           setAuthorized(false);
