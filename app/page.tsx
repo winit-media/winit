@@ -11,6 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       content.pageDescription ||
       "We transform brand stories into powerful narratives that drive success.",
+    alternates: { canonical: "/" },
     openGraph: {
       title: content.pageTitle || "WinIt - Shaping Success Stories",
       description:

@@ -54,9 +54,6 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "WinIt",
   },
-  formatDetection: {
-    telephone: false,
-  },
   openGraph: {
     type: "website",
     locale: "en_IN",

@@ -4,7 +4,7 @@
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/api"],
+        disallow: ["/admin", "/api", "/leads"],
       },
     ],
     sitemap: "https://winitmedia.com/sitemap.xml",

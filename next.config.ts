@@ -35,6 +35,13 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/:path*",
+        has: [{ type: "host", value: "leads.winitmedia.com" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
         source: "/admin/:path*",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow" },

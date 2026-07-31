@@ -17,6 +17,14 @@ export const metadata: Metadata = {
     description:
       "Insights, stories, and updates from the WinIt Media team on influencer marketing, brand storytelling, and creative strategy.",
     url: "https://winitmedia.com/blogs",
+    images: [{ url: "/opengraph-image", alt: "WinIt Media - Blogs" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blogs | WinIt Media",
+    description:
+      "Insights, stories, and updates from the WinIt Media team on influencer marketing, brand storytelling, and creative strategy.",
+    images: ["/opengraph-image"],
   },
 };
 

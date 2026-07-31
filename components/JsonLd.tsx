@@ -4,7 +4,18 @@ interface JsonLdProps {
   content: SiteContent;
 }
 
+const PIN_CODE = /\b\d{6}\b/;
+
 export default function JsonLd({ content }: JsonLdProps) {
+  const postalCode = content.contactAddress.match(PIN_CODE)?.[0] || "110017";
+  const address = {
+    "@type": "PostalAddress",
+    streetAddress: content.contactAddress,
+    addressLocality: "New Delhi",
+    addressRegion: "Delhi",
+    postalCode,
+    addressCountry: "IN",
+  };
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -12,14 +23,7 @@ export default function JsonLd({ content }: JsonLdProps) {
     url: "https://winitmedia.com",
     logo: SITE_LOGO_URL,
     description: content.pageDescription,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: content.contactAddress,
-      addressLocality: "New Delhi",
-      addressRegion: "Delhi",
-      postalCode: "110030",
-      addressCountry: "IN",
-    },
+    address,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: content.contactPhone,
@@ -56,14 +60,7 @@ export default function JsonLd({ content }: JsonLdProps) {
     image: SITE_LOGO_URL,
     url: "https://winitmedia.com",
     telephone: content.contactPhone,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: content.contactAddress,
-      addressLocality: "New Delhi",
-      addressRegion: "Delhi",
-      postalCode: "110030",
-      addressCountry: "IN",
-    },
+    address,
     geo: {
       "@type": "GeoCoordinates",
       latitude: 28.5244,
